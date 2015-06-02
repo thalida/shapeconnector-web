@@ -1,0 +1,63 @@
+{
+  "name": "composable-middleware",
+  "description": "Treat a sequence of middleware as middleware.",
+  "version": "0.3.0",
+  "homepage": "https://github.com/randymized/composable-middleware",
+  "author": {
+    "name": "Randy McLaughlin",
+    "email": "ot40ddj02@sneakemail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/randymized/composable-middleware.git"
+  },
+  "bugs": {
+    "url": "https://github.com/randymized/composable-middleware/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/randymized/composable-middleware/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "./index.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt simplemocha"
+  },
+  "devDependencies": {
+    "mocha": "~1.9.0",
+    "should": "~1.2.2",
+    "grunt-contrib-jshint": "~0.4.0",
+    "grunt-simple-mocha": "git://github.com/yaymukund/grunt-simple-mocha.git",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt": "~0.4.1",
+    "request": "~2.21.0",
+    "async": "~0.2.9"
+  },
+  "keywords": [],
+  "readme": "# composable-middleware\n\n> Treat a sequence of middleware as middleware.\n\n## Getting Started\nInstall the module with: `npm install composable-middleware`\n\n```javascript\nvar composable_middleware = require( 'composable-middleware' );\n```\n\n## Documentation\nMiddleware is a function that follows specific conventions.  Composable middleware allows a series of middleware functions to be used as if they were a single middleware function.  With it, a middleware stack is middleware and becomes a first-class object.  With composable middleware you can:\n\n- Define middleware that consists of several middleware steps and include it in another middleware stack.\n- Assign a middleware stack to a variable or index it in an object.\n- Form conditional or branching middleware paths, dynamically selecting middleware depending upon things like hostname, HTTP method or route.\n- Create a foundation middleware stack that is common to several sites or projects and includes commonly used operations, properly sequenced, and fill it in, as needed, with additions specific to a site.\n\nYou may compose middleware by defining its steps in the argument to the composable-middleware function:\n\n```javascript\nvar mw =\n    composable_middleware(\n        connect.logger(),\n        connect.gzip(),\n    );\n```\nor by using its `use` function:\n\n```javascript\nvar mw =\n    composable_middleware()\n        .use(connect.logger())\n        .use(connect.gzip());\n```\n\nand then include it in another middleware stack:\n```javascript\nvar okay =\n    composable_middleware()\n        .use(mw)\n        .use(\n            function(req,res,next) {\n                res.send('okay');\n        })\n```\n\nYou might then use that middleware in Connect, Express or any other middleware-based framework:\n```javascript\nvar app = connect();\napp.use(okay);\napp.listen(3000);\n```\n\nOne of the design goals of this package is to minimize overhead when sequencing through middleware steps.  Notably, it does not support mounting paths or routing.  It does not examine the URL at all.  That is best left to middleware, perhaps middleware that routes requests into different middleware stacks depending upon route.\n\nThe composable_middleware software also does not deal with errors or unhandled requests other than routing errors to middleware that expects an error argument.  Since a middleware stack may be treated as middleware within another middleware stack, it cannot be assumed that reaching the end of the stack has any significance.  You will need to provide middleware (perhaps we should call it 'finalware') to send out 404 responses or to log errors and send 500 responses if the overall framework in which the middleware is running does not do so.\n\n### Middleware conventions supported.\n\nThe Composable Middleware package supports Connect middleware and [flatiron/union](https://github.com/flatiron/union) middleware as well as a hybrid of the two.\n\n- Connect normal middleware: `(req,res,next)`\n- Flatiron/union middleware: `()`.  The request and response are in `this.req` and `this.res`.  `this.res.emit('next')` passes the request to the next level of middleware.\n- Hybrid middleware: `(next)`. The request and response are in `this.req` and `this.res`.\n- Connect error-handling middleware: `(err,req,res,next)`\n- Hybrid error-handling middleware: `(err,next)`. The request and response are in `this.req` and `this.res`.\n\nThe middleware type is determined by checking its arity:\n- 0: flatiron/union\n- 1: hybrid normal\n- 2: hybrid error-handling\n- 3: Connect normal\n- 4: Connect error-handling\n\nError-handling middleware is skipped unless an error was passed to the `next` function.  Normal middleware is skipped if there is an error.\n\nAlthough not a convention shared by other middleware containers, this package calls all middleware serving a given request in the same context.  It should thus be possible to attach an attribute to `this` in one middleware function and access it in a different middleware function serving the same request.  This package will assure, however, that the global object is not used as the context, allocating a new object to serve as the context, if needed.  To avoid the possibility of interference, if invoked as Connect middleware, `composable-middleware` will similarly replace the Connect context with a new context.  If a new context is created, `this._middleware_common_object` will be defined.  The constructor for the new context is exported as MiddlewareCommonObject and the function used by `composable-middleware` to test whether a new context is needed is exported as `is_protected_content`.\n\n## Contributing\nIn lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).\n\n## Status\n[![Build Status](https://secure.travis-ci.org/randymized/composable-middleware.png?branch=master)](http://travis-ci.org/randymized/composable-middleware)\n\n## Release History\n- 0.3.0: Improves testing for the need to instantiate a new context to protext global variables.\n- 0.2.0: Same `this` object for all middleware serving a given request.\n- 0.1.0: Initial release.\n\n## License\nCopyright (c) 2013 Randy McLaughlin\nLicensed under the MIT license.\n",
+  "readmeFilename": "README.md",
+  "_id": "composable-middleware@0.3.0",
+  "dist": {
+    "shasum": "258c9462e9d0e9e32133f7260ee25159d0dbbe09",
+    "tarball": "http://registry.npmjs.org/composable-middleware/-/composable-middleware-0.3.0.tgz"
+  },
+  "_from": "composable-middleware@>=0.3.0 <0.4.0",
+  "_npmVersion": "1.2.18",
+  "_npmUser": {
+    "name": "randymized",
+    "email": "8b629a9884@snkmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "randymized",
+      "email": "8b629a9884@snkmail.com"
+    }
+  ],
+  "directories": {},
+  "_shasum": "258c9462e9d0e9e32133f7260ee25159d0dbbe09",
+  "_resolved": "https://registry.npmjs.org/composable-middleware/-/composable-middleware-0.3.0.tgz"
+}

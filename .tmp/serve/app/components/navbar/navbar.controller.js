@@ -1,8 +1,0 @@
-(function() {
-  angular.module("shapeConnector").controller("NavbarCtrl", function($scope) {
-    return $scope.date = new Date();
-  });
-
-}).call(this);
-
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImNvbXBvbmVudHMvbmF2YmFyL25hdmJhci5jb250cm9sbGVyLmNvZmZlZSJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUFBLE9BQU8sQ0FBQyxNQUFSLENBQWUsZ0JBQWYsQ0FDRSxDQUFDLFVBREgsQ0FDYyxZQURkLEVBQzRCLFNBQUMsTUFBRDtXQUN4QixNQUFNLENBQUMsSUFBUCxHQUFrQixJQUFBLElBQUEsQ0FBQTtFQURNLENBRDVCO0FBQUEiLCJmaWxlIjoiY29tcG9uZW50cy9uYXZiYXIvbmF2YmFyLmNvbnRyb2xsZXIuanMiLCJzb3VyY2VSb290IjoiL3NvdXJjZS8iLCJzb3VyY2VzQ29udGVudCI6WyJhbmd1bGFyLm1vZHVsZSBcInNoYXBlQ29ubmVjdG9yXCJcbiAgLmNvbnRyb2xsZXIgXCJOYXZiYXJDdHJsXCIsICgkc2NvcGUpIC0+XG4gICAgJHNjb3BlLmRhdGUgPSBuZXcgRGF0ZSgpXG4iXX0=
