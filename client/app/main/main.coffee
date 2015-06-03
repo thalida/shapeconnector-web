@@ -4,6 +4,6 @@ app
 .config ($stateProvider) ->
   $stateProvider
   .state 'main',
-    url: '/'
+    url: '/main'
     templateUrl: 'app/main/main.html'
     controller: 'MainCtrl'

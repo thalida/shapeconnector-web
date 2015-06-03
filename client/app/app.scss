@@ -1,29 +1,125 @@
-
-$fa-font-path: "/bower_components/font-awesome/fonts";
-
-@import 'font-awesome/scss/font-awesome';
-
-/**
- * App-wide Styles
- */
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
 
 .browsehappy {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
+	margin: 0.2em 0;
+	background: #ccc;
+	color: #000;
+	padding: 0.2em 0;
 }
 
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-    .container {
-        max-width: 730px;
-    }
-}
 
 // Component styles are injected through grunt
 // injector
 @import 'account/login/login.scss';
 @import 'admin/admin.scss';
+@import 'components/_template/_template.scss';
+@import 'components/game/game.scss';
+@import 'game/game.scss';
 @import 'main/main.scss';
 // endinjector
+
+
+$shape-size: 16px;
+$shape-spacer: 7px;
+
+body {
+	background-color: rgba(0,0,0,0.3);
+}
+
+.game {
+	// padding: 30px;
+	width: ( 6 * ($shape-size + ($shape-spacer * 2)) );
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.shape {
+	display: inline-block;
+	margin: $shape-spacer;
+
+	&.red {
+		background: red;
+		&.triangle {
+			background: transparent;
+			border-bottom-color: red;
+		}
+	}
+
+	&.green {
+		background: green;
+		&.triangle {
+			background: transparent;
+			border-bottom-color: green;
+		}
+	}
+
+	&.blue {
+		background: blue;
+		&.triangle {
+			background: transparent;
+			border-bottom-color: blue;
+		}
+	}
+
+	&.yellow {
+		background: yellow;
+		&.triangle {
+			background: transparent;
+			border-bottom-color: yellow;
+		}
+	}
+
+	&.square {
+		border-radius: 3px;
+		height: $shape-size;
+		width: $shape-size;
+	}
+
+	&.circle {
+		border-radius: ($shape-size / 2);
+		height: $shape-size;
+		width: $shape-size;
+	}
+
+	&.triangle {
+		border-bottom: ($shape-size - 2) solid black;
+		border-left: (($shape-size / 2) + 1) solid transparent;
+		border-right: (($shape-size / 2) + 1) solid transparent;
+		height: 0;
+		width: 0;
+	}
+
+	&.diamond {
+		$rotation: 45deg;
+		border-radius: 2px;
+		height: ($shape-size - 2);
+		width: ($shape-size - 2);
+		-ms-transform: rotate($rotation);
+	    -webkit-transform: rotate($rotation);
+	    transform: rotate($rotation);
+	}
+}
+
+
+
+
+
+
+
+
+canvas {
+	display:block;
+	background-color: #123;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
