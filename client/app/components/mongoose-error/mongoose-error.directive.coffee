@@ -3,7 +3,7 @@
 ###
 Removes server error when user updates input
 ###
-angular.module 'shapeConnectorApp'
+app
 .directive 'mongooseError', ->
   restrict: 'A'
   require: 'ngModel'

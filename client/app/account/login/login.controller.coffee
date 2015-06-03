@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .controller 'LoginCtrl', ($scope, Auth, $location) ->
   $scope.user = {}
   $scope.errors = {}

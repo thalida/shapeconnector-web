@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .controller 'NavbarCtrl', ($scope, $location, Auth) ->
   $scope.menu = [
     title: 'Home'

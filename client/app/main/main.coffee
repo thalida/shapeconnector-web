@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .config ($stateProvider) ->
   $stateProvider
   .state 'main',

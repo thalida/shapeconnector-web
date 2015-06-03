@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .controller 'AdminCtrl', ($scope, $http, Auth, User) ->
 
   $http.get '/api/users'

@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .factory 'User', ($resource) ->
   $resource '/api/users/:id/:controller',
     id: '@_id'

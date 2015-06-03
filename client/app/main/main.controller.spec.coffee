@@ -3,7 +3,7 @@
 describe 'Controller: MainCtrl', ->
 
   # load the controller's module
-  beforeEach module 'shapeConnectorApp' 
+  beforeEach module 'app' 
   beforeEach module 'socketMock' 
 
   MainCtrl = undefined

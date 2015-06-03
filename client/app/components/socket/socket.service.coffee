@@ -2,7 +2,7 @@
 
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .factory 'socket', (socketFactory) ->
 
   # socket.io now auto-configures its connection when we omit a connection url

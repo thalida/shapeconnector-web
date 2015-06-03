@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module 'shapeConnectorApp'
+app
 .controller 'MainCtrl', ($scope, $http, socket) ->
   $scope.awesomeThings = []
 
