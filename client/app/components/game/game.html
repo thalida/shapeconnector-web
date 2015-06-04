@@ -1,26 +1,3 @@
 <div class="game">
-	<span class="shape {{node.color}} {{node.type}}"
-		  data-node="{{node}}"
-		  data-x="{{node.coords.x}}"
-		  data-y="{{node.coords.x}}"
-		  ng-repeat="node in game.endNodes">
-	</span>
-	in {{game.maxMoves}} moves
-	<br />
-	<br />
-	<br />
-	<br />
-	<br />
-	<div class="game-row"
-		 ng-repeat="row in game.board">
-		<span class="shape {{node.color}} {{node.type}}"
-			  data-node="{{node}}"
-			  data-x="{{node.coords.x}}"
-			  data-y="{{node.coords.x}}"
-			  ng-repeat="node in row">
-		</span>
-	</div>
-
-	<canvas id="canvas-{{$id}}" class="canvas" width="500" height="300"></canvas>
-
+	<canvas id="canvas-{{$id}}"></canvas>
 </div>
