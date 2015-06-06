@@ -488,8 +488,13 @@ app.service 'gameService', [
 				missingAttr.name = if isKeepColor then 'type' else 'color'
 				
 				# Get the options available for the missing attr
-				missingAttr.opts = @shapes[missingAttr.name + 's']
-				
+				missingAttr.opts = []
+				missingAttr.opts = [].concat(@shapes[missingAttr.name + 's'])
+
+				# Make sure we don't get the same shape attrs
+				parentShapeAttrIdx = missingAttr.opts.indexOf(parentShape[missingAttr.name])
+				missingAttr.opts.splice(parentShapeAttrIdx, 1)
+
 				# Randomly pick an option from the available list
 				missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
 				
