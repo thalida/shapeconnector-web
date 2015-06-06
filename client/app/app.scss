@@ -38,16 +38,6 @@ body {
 	user-select: none;
 }
 
-
-.targets {
-	position: absolute;
-	display: block;
-
-	.target {
-		position: absolute;
-	}
-}
-
 canvas {
 	background-color: transparent;
 	-webkit-touch-callout: none;

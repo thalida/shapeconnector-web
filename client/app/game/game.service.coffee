@@ -82,6 +82,9 @@ app.service 'drawService', [
 
 				return
 
+			clear: (x, y, width, height) =>
+				@ctx.clearRect(x, y, width, height)
+
 			genericCircle: (x, y, width, height) =>
 				# $log.debug('making circle:', x, y, width, height)
 				@ctx.beginPath()
@@ -112,6 +115,11 @@ app.service 'drawService', [
 				@ctx.textBaseline = 'top'
 				@ctx.fillStyle = '#FFFFFF'
 
+				# $log.debug( params.color )
+
+				if params.color?
+					@ctx.fillStyle = gameDict.hexColors[params.color]
+
 				if params.x? or params.y?
 					@ctx.fillText('' + str, param.x, params.y)
 				else
@@ -126,19 +134,28 @@ app.service 'drawService', [
 				return
 
 			dashedLine: (x1, y1, x2, y2) =>
+				@ctx.save()
 				@ctx.setLineDash([2, 5])
 				@ctx.lineWidth = 2
 				@genericLine(x1, y1, x2, y2)
+				@ctx.restore()
 
 				return
 
 			solidLine: (x1, y1, x2, y2) =>
+				@ctx.save()
 				@ctx.setLineDash([0,0])
 				@genericLine(x1, y1, x2, y2)
+				@ctx.restore()
 
 				return
 
-			goalCircle: (x, y, width, height) =>
+			connectingLine: (x1, y1, x2, y2) =>
+				@ctx.dashedLine(x1, y1, x2, y2)
+
+				return
+
+			movesCircle: (x, y, width, height) =>
 				# $log.debug('making circle:', x, y, width, height)
 				@genericCircle(x, y, width, height)
 				
