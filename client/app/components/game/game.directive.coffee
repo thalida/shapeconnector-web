@@ -127,6 +127,14 @@ app.directive 'appGame', [
 
 					return isSameX and isSameY
 
+				isSameShape: (nodeA, nodeB) ->
+					return false if not nodeA? or not nodeB?
+
+					isSameColor = nodeA.color == nodeB.color
+					isSameType = nodeA.type == nodeB.type
+
+					return isSameColor and isSameType
+
 				createDrawParams: ( node, nodeStyle, clearStyle ) ->
 					if clearStyle? and clearStyle == 'small'
 						clear =
@@ -150,8 +158,13 @@ app.directive 'appGame', [
 					}
 
 				getNodeStyle: ( node ) ->
+					gameStatus.gameOver = isGameOver()
 					if node.selected == true
+						lastNode = $scope.selectedNodes[$scope.selectedNodes.length - 1]
+						
 						if utils.isSameNode(node, $scope.startNode)
+							nodeStyle = 'start'
+						else if gameStatus.gameOver and utils.isSameNode(node, lastNode)
 							nodeStyle = 'start'
 						else
 							nodeStyle = 'touched'
@@ -335,12 +348,18 @@ app.directive 'appGame', [
 						else
 							line.x2 += movesCircle.w
 						
-						draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
+						if gameStatus.gameOver
+							nodeStyle = 'start'
+							draw.solidLine(line.x1, line.y1, line.x2, line.y2)
+						else
+							nodeStyle = 'untouched'
+							draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
 
 						draw.create(
 							type: node.type
 							color: node.color
 							coords: {x, y}
+							style: nodeStyle
 						)
 
 						return
@@ -377,18 +396,37 @@ app.directive 'appGame', [
 					# $log.debug( $scope.game.board )
 					return
 
+
+				allDashedLines: () ->
+					$.each($scope.selectedNodes, (i, node) =>
+						if i > 0
+							parentNode = $scope.selectedNodes[i - 1]
+							@connectingLine(node, parentNode)
+					)
+
+				allSolidLines: () ->
+					$.each($scope.selectedNodes, (i, node) =>
+						if i > 0
+							parentNode = $scope.selectedNodes[i - 1]
+							@connectingLine(node, parentNode, 'solid')
+					)
+
+
 				#	Render the nodes of the game board
 				#---------------------------------------------------------------
-				dashedLine: ( node ) ->
-					parentNode = undefined
-
+				connectingLine: ( node, parentNode, style = 'dashed') ->
 					return false if not node.selected
 
-					$.each($scope.selectedNodes, (i, thisNode) ->
-						if utils.isSameNode( node, thisNode )
-							parentNode = $scope.selectedNodes[i - 1]
-							return
-					)
+					if angular.isString( parentNode )
+						style = parentNode + ''
+						parentNode = null
+
+					if not parentNode?
+						$.each($scope.selectedNodes, (i, thisNode) ->
+							if utils.isSameNode( node, thisNode )
+								parentNode = $scope.selectedNodes[i - 1]
+								return
+						)
 
 					return false if not parentNode?
 
@@ -398,30 +436,38 @@ app.directive 'appGame', [
 						width: _.SHAPE_OUTERSIZE
 						height: _.SHAPE_OUTERSIZE
 
+					drawlines.clear( clear )
+
+
 					x1 = node.position.x + (_.SHAPE_SIZE / 2)
 					y1 = node.position.y + (_.SHAPE_SIZE / 2)
 					
 					x2 = parentNode.position.x + (_.SHAPE_SIZE / 2)
 					y2 = parentNode.position.y + (_.SHAPE_SIZE / 2)
+					
+					if gameStatus.movesLeft < 0
+						if style is 'solid'
+							drawlines.solidRedLine(x1, y1, x2, y2)
+						else
+							drawlines.dashedRedLine(x1, y1, x2, y2)
+					else
+						if style is 'solid'
+							drawlines.solidLine(x1, y1, x2, y2)
+						else
+							drawlines.dashedLine(x1, y1, x2, y2)
+
 
 					clearNode = utils.createDrawParams(node, 'invisible', 'small').clear
 					clearParentNode = utils.createDrawParams(parentNode, 'invisible', 'small').clear
-
-					drawlines.clear( clear )
-					
-					if gameStatus.movesLeft < 0
-						drawlines.dashedRedLine(x1, y1, x2, y2)
-					else
-						drawlines.dashedLine(x1, y1, x2, y2)
 
 					drawlines.clear( clearNode )
 					drawlines.clear( clearParentNode )
 
 					return true
 				
-				#	Render the nodes of the game board
+				#	Remove the dashed lines from a node
 				#---------------------------------------------------------------
-				removeDashedLine: ( node ) ->
+				removeConnectingLine: ( node ) ->
 					clearX = node.position.x - _.SHAPE_MARGIN
 					clearY = node.position.y - _.SHAPE_MARGIN
 					clearSize = _.SHAPE_OUTERSIZE + _.SHAPE_MARGIN
@@ -430,42 +476,63 @@ app.directive 'appGame', [
 
 					return
 
+				clearLinesBoard: () ->
+					clearBoard = 
+						x: 0
+						y: 0
+						width: _.BOARD_DIMENSIONS.w
+						height: _.BOARD_DIMENSIONS.h
+
+					drawlines.clear( clearBoard )
+
+				trackingLine: (startNode, end) ->
+					startPos = 
+						x: startNode.position.x + (_.SHAPE_SIZE / 2)
+						y: startNode.position.y + (_.SHAPE_SIZE / 2)
+
+					@clearLinesBoard()
+					
+					@allDashedLines()
+
+					drawlines.dashedLine(startPos.x, startPos.y, end.x, end.y)
+					
+					clearNode = utils.createDrawParams(startNode, 'invisible', 'small').clear
+					drawlines.clear( clearNode )
+
+				#===================================================================
+				#	clearBoardMargins
+				# 		Clear the unused margins of the board
+				#-------------------------------------------------------------------
+				clearBoardMargins: () ->
+					boardLeft = 
+						x: 0
+						y: _.BOARD_MARGIN.top
+						width: _.SHAPE_MARGIN / 4
+						height: _.BOARD_DIMENSIONS.h
+					
+					boardRight = 
+						x: _.BOARD_DIMENSIONS.w - (_.SHAPE_MARGIN / 2)
+						y: _.BOARD_MARGIN.top
+						width: _.SHAPE_MARGIN
+						height: _.BOARD_DIMENSIONS.h
+
+					boardTop = 
+						x: 0
+						y: _.BOARD_MARGIN.top - _.SHAPE_MARGIN - (_.SHAPE_MARGIN / 2)
+						width: _.BOARD_DIMENSIONS.w
+						height: _.SHAPE_MARGIN
+
+					boardBottom = 
+						x: 0
+						y: _.BOARD_DIMENSIONS.h - (_.SHAPE_MARGIN / 2)
+						width: _.BOARD_DIMENSIONS.w
+						height: _.SHAPE_MARGIN
 
 
-			#===================================================================
-			#	clearBoardMargins
-			# 		Clear the unused margins of the board
-			#-------------------------------------------------------------------
-			clearBoardMargins = () ->
-				boardLeft = 
-					x: 0
-					y: _.BOARD_MARGIN.top
-					width: _.SHAPE_MARGIN / 4
-					height: _.BOARD_DIMENSIONS.h
-				
-				boardRight = 
-					x: _.BOARD_DIMENSIONS.w - (_.SHAPE_MARGIN / 2)
-					y: _.BOARD_MARGIN.top
-					width: _.SHAPE_MARGIN
-					height: _.BOARD_DIMENSIONS.h
-
-				boardTop = 
-					x: 0
-					y: _.BOARD_MARGIN.top - _.SHAPE_MARGIN - (_.SHAPE_MARGIN / 2)
-					width: _.BOARD_DIMENSIONS.w
-					height: _.SHAPE_MARGIN
-
-				boardBottom = 
-					x: 0
-					y: _.BOARD_DIMENSIONS.h - (_.SHAPE_MARGIN / 2)
-					width: _.BOARD_DIMENSIONS.w
-					height: _.SHAPE_MARGIN
-
-
-				draw.clear( boardLeft )
-				draw.clear( boardRight )
-				draw.clear( boardTop )
-				draw.clear( boardBottom )
+					draw.clear( boardLeft )
+					draw.clear( boardRight )
+					draw.clear( boardTop )
+					draw.clear( boardBottom )
 
 
 			#===================================================================
@@ -564,7 +631,7 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			saveNode = ( node ) ->
 				return if !node?
-
+								
 				# If the current node is the same as the node two moves back
 				# then the player is dragging back to "undo" the connection they 
 				# made. We need to pop this node off.
@@ -573,7 +640,7 @@ app.directive 'appGame', [
 					parentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 1 ]
 
 					$scope.game.board[parentNode.coords.x][parentNode.coords.y].selected = false
-					
+
 					# parentNode.parent = grandparentNode
 					$scope.removedNodes.push(parentNode)
 					$scope.selectedNodes.pop()
@@ -671,25 +738,19 @@ app.directive 'appGame', [
 			#	isGameOver
 			# 		Check if the game is completed
 			#-------------------------------------------------------------------
-			isGameOver = ( ) ->
-				$scope.over = false
-
+			isGameOver = () ->
 				return false if gameStatus.movesLeft > 0
 
 				[firstNode, ..., lastNode] = $scope.selectedNodes
 				[endNodeA, ..., endNodeB] = $scope.game.endNodes
 
-				isFirstEndNodeA = utils.isSameNode(firstNode, endNodeA)
-				isLastEndNodeA = utils.isSameNode(lastNode, endNodeA)
-
+				isFirstEndNodeA = utils.isSameShape(firstNode, endNodeA)
+				isLastEndNodeA = utils.isSameShape(lastNode, endNodeA)
 				return false if not isFirstEndNodeA and not isLastEndNodeA
 
-				isFirstEndNodeB = utils.isSameNode(firstNode, endNodeB)
-				isLastEndNodeB = utils.isSameNode(lastNode, endNodeB)
-
+				isFirstEndNodeB = utils.isSameShape(firstNode, endNodeB)
+				isLastEndNodeB = utils.isSameShape(lastNode, endNodeB)
 				return false if not isFirstEndNodeB and not isLastEndNodeB
-
-				$scope.over = true
 
 				return true
 
@@ -719,8 +780,6 @@ app.directive 'appGame', [
 						y: touch.pageY - canvasOffset.top
 						
 					currNode = findNode( nodePosition )
-
-					isValidStart = true
 
 					# If a START event was triggered
 					if params.start
@@ -752,10 +811,12 @@ app.directive 'appGame', [
 					if isValidStart && (params.type is 'touch' or isValidMouse)
 						e.preventDefault()
 						$scope.$apply(() ->
-							if params.start 
-								dragStart = nodePosition
+							if params.start
+								dragStart = currNode
 
 							isValidMove = checkMove(currNode, nodePosition, {save: true})
+
+							render.trackingLine(dragStart, nodePosition)
 
 							# if isValidMove and disableNewConnections and !lastTouchedNode
 							# 	$scope.disallowedNodes.push( currNode )
@@ -770,6 +831,9 @@ app.directive 'appGame', [
 							$scope.game.board[node.coords.x][node.coords.y].selected = false
 							$scope.removedNodes.push( node )
 							$scope.selectedNodes = []
+
+						render.clearLinesBoard()
+						render.allDashedLines()
 					)
 
 					# $log.debug('=================================')
@@ -862,6 +926,8 @@ app.directive 'appGame', [
 					totalNodes = nodes.length
 
 					$scope.startNode = nodes[0]
+
+					dragStart = nodes[nodes.length - 1]
 					
 					# Only update the counter when we have two or more selections
 					if totalNodes <= 1
@@ -872,9 +938,14 @@ app.directive 'appGame', [
 					render.movesLeft()
 
 					if gameStatus.movesLeft <= 0
-						gameOver = isGameOver()
-						if gameOver
+						gameStatus.gameOver = isGameOver()
+						[first, ..., last] = nodes
+						$log.debug( first, last )
+						if gameStatus.gameOver
 							removeEvents()
+							render.clearLinesBoard()
+							render.allSolidLines()
+							render.goal()
 						else
 							disableNewConnections = true
 							render.movesLeft('red')
@@ -910,25 +981,37 @@ app.directive 'appGame', [
 				#---------------------------------------------------------------
 				$scope.$watchCollection('addedNodes', (nodes) ->
 					# $log.debug('ADDED', nodes)
+					totalSelectedNodes = $scope.selectedNodes.length
 					
 					$.each(nodes, (i, node) ->
+						lineStyle = 'dashed'
+
 						# If this is the first node added it has the "start" style
-						if $scope.selectedNodes.length == 1
+						if totalSelectedNodes == 1
 							nodeStyle = 'start'
 						else
-							nodeStyle = 'touched'
+							gameStatus.gameOver = isGameOver()
+							lastSelectedNode = $scope.selectedNodes[totalSelectedNodes - 1]
+							
+							if gameStatus.gameOver and utils.isSameNode(node, lastSelectedNode)
+								nodeStyle = 'start'
+								lineStyle = 'solid'
+							else
+								nodeStyle = 'touched'
 
 						# Get the options for the node to be animated
 						drawNode = utils.createDrawParams(node, nodeStyle)
 
-						render.dashedLine( node )
+						# render.clearLinesBoard()
+						# render.allDashedLines()
+						render.connectingLine( node, lineStyle )
 
 						# Run the animation w/ the prams
 						draw.runAnimation(
 							drawNode,
 							{
 								running: (animation, shape) ->
-									clearBoardMargins()
+									render.clearBoardMargins()
 									
 									node.animation = 
 										type: 'glow'
@@ -945,7 +1028,7 @@ app.directive 'appGame', [
 									addTouchedNodes( neighborNodes )
 
 									# Clear the margins of the board
-									clearBoardMargins()
+									render.clearBoardMargins()
 
 									draw.create( drawNode )
 							}
@@ -972,7 +1055,7 @@ app.directive 'appGame', [
 
 						drawNode = utils.createDrawParams(node, 'untouched')
 
-						render.removeDashedLine( node )
+						render.removeConnectingLine( node )
 
 						draw.runAnimation(
 							drawNode,

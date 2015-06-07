@@ -484,17 +484,22 @@ app.service 'drawService', [
 			#-------------------------------------------------------------------
 			solidLine: (x1, y1, x2, y2) =>
 				@ctx.save()
-				@ctx.setLineDash([0,0])
+				@ctx.lineWidth = 2
+				@ctx.strokeStyle = 'white'
 				@genericLine(x1, y1, x2, y2)
 				@ctx.restore()
 
 				return
 
-			#	@connectingLine
-			# 		Extends @dashedLine to create a line between to nodes
+			#	@solidRedLine
+			# 		Extends @genericLine to create a solid line
 			#-------------------------------------------------------------------
-			connectingLine: (x1, y1, x2, y2) =>
-				@ctx.dashedLine(x1, y1, x2, y2)
+			solidRedLine: (x1, y1, x2, y2) =>
+				@ctx.save()
+				@ctx.lineWidth = 2
+				@ctx.strokeStyle = gameDict.hexColors['red']
+				@genericLine(x1, y1, x2, y2)
+				@ctx.restore()
 
 				return
 
