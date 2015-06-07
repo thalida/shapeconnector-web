@@ -94,6 +94,20 @@ app.service 'drawService', [
 
 				return
 
+			#	@clear
+			# 		Clear only a part of the canvas
+			#-------------------------------------------------------------------
+			clear: (x, y, width, height) =>
+				# If an object has been passed split it into the individual vars
+				if angular.isObject( x )
+					opts = angular.extend({}, {}, x)
+					x = opts.x
+					y = opts.y
+					width = opts.width
+					height = opts.height
+
+				@ctx.clearRect(x, y, width, height)
+
 			#	@create
 			# 		Helper service to draw a shape
 			# 		Calls the correct draw function based on the params, and
@@ -105,29 +119,183 @@ app.service 'drawService', [
 					color: 'white'
 					coords: {x: 0, y: 0}
 					size: {w: @defaultSize, h: @defaultSize}
+					style: 'untouched'
+
+				params = angular.extend({}, _defaults, params)
+				
+				# Convert the text color to the hex version
+				if params.color.indexOf('#') < 0
+					params.color = gameDict.hexColors[params.color]
+
+				# Do we need to clear a space?
+				if params.clear?
+					@clear( params.clear )
+
+				# Get the shape function based on the type of shape we want
+				makeShape = @[params.type]
+
+				# Draw the shape on the canvas
+				makeShape?(params.coords.x, params.coords.y, params.size.w, params.size.h)
+
+				# Set the style of the shape
+				@setShapeStyle( params )
+				
+				return
+
+			#	@runAnimation
+			# 		Helper service to animate a shape
+			# 		Calls the correct animation function based on the params, and
+			# 		styles and colors the shape
+			#-------------------------------------------------------------------
+			runAnimation: ( params, startCB, doneCB ) =>
+				_defaults = 
+					type: 'square'
+					color: 'white'
+					coords: {x: 0, y: 0}
+					size: {w: @defaultSize, h: @defaultSize}
+					style: 'untouched'
+					duration: 300
 
 				params = angular.extend({}, _defaults, params)
 				
 				# Convert the text color to the hex version
 				params.color = gameDict.hexColors[params.color]
+				
+				# Calculate/get the start and end times of the animation
+				start = new Date().getTime()
+				end = start + params.duration
 
-				# Get the shape function based on the type of shape we want
-				makeShape = @[params.type]
-				makeShape?( params.coords.x, params.coords.y, params.size.w, params.size.h)
+				# Create the animation loop
+				step = () =>
+					# Get our current progres
+					timestamp = new Date().getTime()
+					progress = Math.min((params.duration - (end - timestamp)) / params.duration, 1)
 
+					# Set the enter + leave animations
+					if params.style is 'start' or params.style is 'touched'
+						shape = @glowAnimation( params, progress )
+					else 
+						shape = @fillAnimation( params, progress )
+
+					# If the animation hasn't finished, repeat the animation loop
+					if (progress < 1)
+						animation = requestAnimationFrame(step)
+						startCB?( animation, shape )
+					else
+						doneCB?(shape)
+
+				# Start the animation
+				return step()
+
+			#	@stopAnimation
+			# 		Cancel the passed animation
+			#-------------------------------------------------------------------
+			stopAnimation: ( animation ) ->
+       			window.cancelAnimationFrame(animation)
+       			animation = undefined
+
+			#	@setShapeStyle
+			# 		Styles the shape based on it's status
+			#-------------------------------------------------------------------
+			setShapeStyle: ( params ) ->
 				@ctx.save()
-				@ctx.lineWidth = 1
-				@ctx.fillStyle = params.color
+				@ctx.lineWidth = 2
+
+				# Untouched: solid filled shape
+				if params.style is 'untouched'
+					@ctx.fillStyle = params.color
+					@ctx.strokeStyle = params.color
+
+				# Start: White outline filled shape
+				else if params.style is 'start'
+					rgb = hexToRgb(params.color)
+					rgbaColor = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.5)"
+					@ctx.fillStyle = rgbaColor
+					@ctx.strokeStyle = 'white'
+
+				# Touched: Colored outlined shape (no fill)
+				else if params.style is 'touched'
+					@ctx.fillStyle = "rgba(0,0,0,0.0)"
+					@ctx.strokeStyle = params.color
+				
+				@ctx.fill()
+				@ctx.stroke()
+				@ctx.restore()
+
+			#	@glowAnimation
+			# 		Creates a glow around the shape
+			#-------------------------------------------------------------------
+			glowAnimation: (params, progress) ->
+				# Shape width/height grows outward
+				shape = 
+					width: params.size.w + ((params.size.w * progress) * 2.5)
+					height: params.size.h + ((params.size.h * progress) * 2.5)
+
+				# Keep the glow vertically alinged w/ the main shape
+				shiftBy = (shape.width - params.size.w) / 2
+				shape.x = params.coords.x - shiftBy
+				shape.y = params.coords.y - shiftBy
+				
+				# Clear the canvas beneath the shape
+				@clear(shape)
+
+				# Draw the shape on the canvas
+				makeShape = @[params.type]
+				makeShape(
+					shape.x,
+					shape.y,
+					shape.width,
+					shape.height
+				)
+
+				# Get the rgba version of color and make opaque
+				rgb = hexToRgb(params.color)
+
+				# Fill the glow
+				@ctx.save()
+				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.2)"
 				@ctx.fill()
 				@ctx.restore()
 
-				return
+				# Don't try to clear the canvas again
+				params.clear = null
 
-			#	@clear
-			# 		Clear only a part of the canvas
+				# Draw the main shape
+				@create( params )
+
+				return shape
+
+			#	@fillAnimation
+			# 		Fills in the shape from the outside in
 			#-------------------------------------------------------------------
-			clear: (x, y, width, height) =>
-				@ctx.clearRect(x, y, width, height)
+			fillAnimation: (params, progress) ->
+				shape = 
+					width: params.size.w - (params.size.w * progress)
+					height: params.size.h - (params.size.h * progress)
+
+				shiftBy = (params.size.w - shape.width) / 2
+
+				shape.x = params.coords.x + shiftBy
+				shape.y = params.coords.y + shiftBy
+				
+				if progress == 0
+					@clear( params.clear )
+
+				makeShape = @[params.type]
+				makeShape(
+					shape.x,
+					shape.y,
+					shape.width,
+					shape.height
+				)
+
+				@ctx.save()
+				@ctx.strokeStyle = params.color
+				@ctx.lineWidth = 1
+				@ctx.stroke()
+				@ctx.restore()
+
+				return shape
 
 			#	@genericCircle
 			# 		Creates a basic circle
@@ -220,7 +388,6 @@ app.service 'drawService', [
 			# 		Extends @dashedLine to create a line between to nodes
 			#-------------------------------------------------------------------
 			connectingLine: (x1, y1, x2, y2) =>
-				$log.debug('here2')
 				@ctx.dashedLine(x1, y1, x2, y2)
 
 				return
