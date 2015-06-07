@@ -173,7 +173,7 @@ app.directive 'appGame', [
 					}
 
 				getNodeStyle: ( node ) ->
-					$scope.gameOver.won = isGameOver()
+					$scope.gameOver.won = utils.isGameOver()
 					if node.selected == true
 						lastNode = utils.selectedNodes.last()
 						
@@ -286,6 +286,65 @@ app.directive 'appGame', [
 						return $scope.selectedNodes[$scope.selectedNodes.length - 1]
 					total: () ->
 						return $scope.selectedNodes.length
+
+				#	@checkMove
+				# 		Validate that node moved to via touch/mouse is a valid one
+				#---------------------------------------------------------------
+				checkMove: ( node, pos, opts ) ->
+					# Return if no node has been found
+					return false if !node? || node is false
+
+					# If we have NO other selected nodes this move is automatically valid
+					if utils.selectedNodes.total() == 0 
+						saveNode( node ) if opts?.save
+						return true
+
+					# Return false if this node is selected and it is not a grandpa node
+					return false if node.selected == true and not utils.isGrandPaNode( node )
+
+					# Validate that move is in the accepted distance to trigger the closest node
+					isValidCanvasX = utils.validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
+					isValidCanvasY = utils.validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
+					return false if not isValidCanvasX || not isValidCanvasY
+
+					# Check that the node this move is closest to is one that we're
+					# allowed to move to (up, down, left, or right only)
+					parentNode = utils.selectedNodes.last()
+					dx = Math.abs(parentNode.coords.x - node.coords.x)
+					dy = Math.abs(parentNode.coords.y - node.coords.y)
+					isValidDirection = (dx + dy) == 1
+					return false if not isValidDirection
+
+					# Check that the node we're closest to is either the smae color
+					# or the same type as the parent node
+					sameColor = parentNode.color == node.color
+					sameType = parentNode.type == node.type
+					isValidMove = isValidDirection and (sameColor or sameType)
+					return false if not isValidMove
+
+					# Woot! We've made a valid move
+					saveNode( node )
+					
+					return isValidMove
+
+				#	@isGameOver
+				# 		Check if the game is completed
+				#---------------------------------------------------------------
+				isGameOver: () ->
+					return false if gameStatus.movesLeft > 0
+
+					[firstNode, ..., lastNode] = $scope.selectedNodes
+					[endNodeA, ..., endNodeB] = $scope.game.endNodes
+
+					isFirstEndNodeA = utils.isSameShape(firstNode, endNodeA)
+					isLastEndNodeA = utils.isSameShape(lastNode, endNodeA)
+					return false if not isFirstEndNodeA and not isLastEndNodeA
+
+					isFirstEndNodeB = utils.isSameShape(firstNode, endNodeB)
+					isLastEndNodeB = utils.isSameShape(lastNode, endNodeB)
+					return false if not isFirstEndNodeB and not isLastEndNodeB
+
+					return true
 
 
 
@@ -879,7 +938,7 @@ app.directive 'appGame', [
 								if params.start
 									dragStart = currNode
 
-								isValidMove = checkMove(currNode, nodePosition, {save: true})
+								isValidMove = utils.checkMove(currNode, nodePosition, {save: true})
 
 								render.trackingLine(dragStart, nodePosition)
 							)
@@ -1020,7 +1079,7 @@ app.directive 'appGame', [
 					render.movesLeft()
 
 					if gameStatus.movesLeft <= 0
-						$scope.gameOver.won = isGameOver()
+						$scope.gameOver.won = utils.isGameOver()
 					else
 						disableNewConnections = false
 					
@@ -1044,7 +1103,7 @@ app.directive 'appGame', [
 					# $log.debug('ADDED', nodes)
 					
 					$.each(nodes, (i, node) ->
-						$scope.gameOver.won = isGameOver()
+						$scope.gameOver.won = utils.isGameOver()
 						lastSelectedNode = utils.selectedNodes.last()
 						animation.glow( node )
 					)
@@ -1071,71 +1130,6 @@ app.directive 'appGame', [
 
 
 
-
-
-
-			#===================================================================
-			#	checkMove
-			# 		Validate that node moved to via touch/mouse is a valid one
-			#-------------------------------------------------------------------
-			checkMove = ( node, pos, opts ) ->
-				# Return if no node has been found
-				return false if !node? || node is false
-
-				# If we have NO other selected nodes this move is automatically valid
-				if utils.selectedNodes.total() == 0 
-					saveNode( node ) if opts?.save
-					return true
-
-				# Return false if this node is selected and it is not a grandpa node
-				return false if node.selected == true and not utils.isGrandPaNode( node )
-
-				# Validate that move is in the accepted distance to trigger the closest node
-				isValidCanvasX = utils.validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
-				isValidCanvasY = utils.validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
-				return false if not isValidCanvasX || not isValidCanvasY
-
-				# Check that the node this move is closest to is one that we're
-				# allowed to move to (up, down, left, or right only)
-				parentNode = utils.selectedNodes.last()
-				dx = Math.abs(parentNode.coords.x - node.coords.x)
-				dy = Math.abs(parentNode.coords.y - node.coords.y)
-				isValidDirection = (dx + dy) == 1
-				return false if not isValidDirection
-
-				# Check that the node we're closest to is either the smae color
-				# or the same type as the parent node
-				sameColor = parentNode.color == node.color
-				sameType = parentNode.type == node.type
-				isValidMove = isValidDirection and (sameColor or sameType)
-				return false if not isValidMove
-
-				# Woot! We've made a valid move
-				saveNode( node )
-				
-				return isValidMove
-
-
-
-			#===================================================================
-			#	isGameOver
-			# 		Check if the game is completed
-			#-------------------------------------------------------------------
-			isGameOver = () ->
-				return false if gameStatus.movesLeft > 0
-
-				[firstNode, ..., lastNode] = $scope.selectedNodes
-				[endNodeA, ..., endNodeB] = $scope.game.endNodes
-
-				isFirstEndNodeA = utils.isSameShape(firstNode, endNodeA)
-				isLastEndNodeA = utils.isSameShape(lastNode, endNodeA)
-				return false if not isFirstEndNodeA and not isLastEndNodeA
-
-				isFirstEndNodeB = utils.isSameShape(firstNode, endNodeB)
-				isLastEndNodeB = utils.isSameShape(lastNode, endNodeB)
-				return false if not isFirstEndNodeB and not isLastEndNodeB
-
-				return true
 
 
 
