@@ -147,7 +147,7 @@ app.service 'drawService', [
 			# 		Calls the correct animation function based on the params, and
 			# 		styles and colors the shape
 			#-------------------------------------------------------------------
-			runAnimation: ( params, startCB, doneCB ) =>
+			runAnimation: ( params, callbacks ) =>
 				_defaults = 
 					type: 'square'
 					color: 'white'
@@ -174,21 +174,22 @@ app.service 'drawService', [
 
 					# Set the enter + leave animations
 					if params.style is 'start' or params.style is 'touched'
-						shape = @glowEnterAnimation( params, progress )
+						shape = @glowEnterAnimation( params, progress, callbacks?.during)
 					else 
-						shape = @fillAnimation( params, progress )
+						shape = @fillAnimation( params, progress, callbacks?.during)
 
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
+						callbacks.before?( animation, shape )
 						animation = requestAnimationFrame(enterAnimation)
-						startCB?( animation, shape )
+						callbacks.running?( animation, shape )
+						callbacks.after?( animation, shape )
 					else
 						if params.style is 'start' or params.style is 'touched'
-							@clear(shape)
+							# @clear(shape)
 							leaveAnimation()
-							# doneCB?(shape)
 						else	
-							doneCB?(shape)
+							callbacks.done?(shape)
 
 				leaveAnimation = () =>
 					# Get our current progres
@@ -197,13 +198,16 @@ app.service 'drawService', [
 
 					# Set the enter + leave animations
 					if params.style is 'start' or params.style is 'touched'
-						shape = @glowLeaveAnimation( params, progress )
+						shape = @glowLeaveAnimation( params, progress, callbacks?.during )
 
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
-						requestAnimationFrame(leaveAnimation)
+						callbacks.before?( animation, shape )
+						animation = requestAnimationFrame(leaveAnimation)
+						callbacks.running?( animation, shape )
+						callbacks.after?( animation, shape )
 					else
-						doneCB?(shape)
+						callbacks.done?(shape)
 
 
 				# Start the animation
@@ -223,16 +227,16 @@ app.service 'drawService', [
 				@ctx.save()
 				@ctx.lineWidth = 2
 
+				rgb = hexToRgb(params.color)
+
 				# Untouched: solid filled shape
 				if params.style is 'untouched'
-					@ctx.fillStyle = params.color
+					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
 					@ctx.strokeStyle = params.color
 
 				# Start: White outline filled shape
 				else if params.style is 'start'
-					rgb = hexToRgb(params.color)
-					rgbaColor = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.5)"
-					@ctx.fillStyle = rgbaColor
+					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.5)"
 					@ctx.strokeStyle = 'white'
 
 				# Touched: Colored outlined shape (no fill)
@@ -247,8 +251,8 @@ app.service 'drawService', [
 			#	@glowEnterAnimation
 			# 		Creates a glow around the shape
 			#-------------------------------------------------------------------
-			glowEnterAnimation: (params, progress) ->
-				$log.debug('in enter animation')
+			glowEnterAnimation: (params, progress, cb) ->
+				# $log.debug('in enter animation')
 				# Shape width/height grows outward
 				shape = 
 					width: (params.size.w * progress) * 3.2
@@ -286,6 +290,9 @@ app.service 'drawService', [
 				# Don't try to clear the canvas again
 				params.clear = null
 
+
+				cb?( shape )
+
 				# Draw the main shape
 				@create( params )
 
@@ -295,7 +302,7 @@ app.service 'drawService', [
 			# 		Creates a glow around the shape
 			#-------------------------------------------------------------------
 			glowLeaveAnimation: (params, progress) ->
-				$log.debug('in leave animation')
+				# $log.debug('in leave animation')
 
 				# Shape width/height grows outward
 				shape = 
@@ -315,8 +322,6 @@ app.service 'drawService', [
 				fullSizeShift = (fullSizeShape.width - params.size.w) / 2
 				fullSizeShape.x = params.coords.x - fullSizeShift
 				fullSizeShape.y = params.coords.y - fullSizeShift
-
-				$log.debug( shape, fullSizeShape )
 
 				# Clear the canvas beneath the shape
 				@clear(fullSizeShape)
@@ -450,6 +455,20 @@ app.service 'drawService', [
 				@ctx.save()
 				@ctx.setLineDash([2, 5])
 				@ctx.lineWidth = 2
+				@ctx.strokeStyle = 'white'
+				@genericLine(x1, y1, x2, y2)
+				@ctx.restore()
+
+				return
+
+			#	@dashedRedLine
+			# 		Extends @genericLine to create a dashed line
+			#-------------------------------------------------------------------
+			dashedRedLine: (x1, y1, x2, y2) =>
+				@ctx.save()
+				@ctx.setLineDash([2, 5])
+				@ctx.lineWidth = 2
+				@ctx.strokeStyle = gameDict.hexColors['red']
 				@genericLine(x1, y1, x2, y2)
 				@ctx.restore()
 

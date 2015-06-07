@@ -21,13 +21,19 @@ app.directive 'appGame', [
 			#	Game elements
 			#-------------------------------------------------------------------
 			$window = $(window)
-			$canvas = el.find('canvas')
+			$canvas = $('#canvas-' + $scope.$id)
 			canvas = $canvas[0]
+
+			$canvaslines = $('#canvas-lines-' + $scope.$id)
+			canvaslines = $canvaslines[0]
 
 			#	Setup the variables for the draw service and canvas context
 			#-------------------------------------------------------------------
 			draw = undefined
 			ctx = undefined
+
+			drawlines = undefined
+			linesctx = undefined
 
 			#	Setup the store of general game inforamtion
 			#-------------------------------------------------------------------
@@ -38,6 +44,8 @@ app.directive 'appGame', [
 
 			$scope.enterAnimations = []
 			$scope.leaveAnimations = []
+
+			$scope.startNode = null
 
 			dragStart = {}
 			isDragging = false
@@ -117,19 +125,38 @@ app.directive 'appGame', [
 
 					return isSameX and isSameY
 
-				createDrawParams: ( node, nodeStyle ) ->
+				createDrawParams: ( node, nodeStyle, clearStyle ) ->
+					if clearStyle? and clearStyle == 'small'
+						clear =
+							x: node.position.x
+							y: node.position.y
+							width: _.SHAPE_SIZE
+							height: _.SHAPE_SIZE
+					else
+						clear =
+							x: node.position.x - (_.SHAPE_MARGIN / 2)
+							y: node.position.y - (_.SHAPE_MARGIN / 2)
+							width: _.SHAPE_OUTERSIZE
+							height: _.SHAPE_OUTERSIZE
+
 					return {
 						type: node.type
 						color: node.color
 						style: nodeStyle
 						coords: {x: node.position.x, y: node.position.y}
-						clear: {
-							x: node.position.x - (_.SHAPE_MARGIN / 2)
-							y: node.position.y - (_.SHAPE_MARGIN / 2)
-							width: _.SHAPE_OUTERSIZE
-							height: _.SHAPE_OUTERSIZE
-						}
+						clear: clear
 					}
+
+				getNodeStyle: ( node ) ->
+					if node.selected == true
+						if utils.isSameNode(node, $scope.startNode)
+							nodeStyle = 'start'
+						else
+							nodeStyle = 'touched'
+					else
+						nodeStyle = 'untouched'
+
+					return nodeStyle
 
 
 
@@ -166,6 +193,12 @@ app.directive 'appGame', [
 				# 		size of the board
 				#---------------------------------------------------------------
 				canvas: () ->
+					$canvas = el.find('.canvas')
+					canvas = $canvas[0]
+
+					$canvaslines = el.find('.canvas-lines')
+					canvaslines = $canvaslines[0]
+
 					maxBoardSize = _.BOARD_SIZE * _.SHAPE_OUTERSIZE
 					
 					# Save the outer width and height dimenions of the baord
@@ -187,12 +220,22 @@ app.directive 'appGame', [
 					canvas.style.width = _.BOARD_DIMENSIONS.w + 'px'
 					canvas.style.height = _.BOARD_DIMENSIONS.h + 'px'
 
+					canvaslines.width = _.BOARD_DIMENSIONS.w * 2
+					canvaslines.height = _.BOARD_DIMENSIONS.h * 2
+					canvaslines.style.width = _.BOARD_DIMENSIONS.w + 'px'
+					canvaslines.style.height = _.BOARD_DIMENSIONS.h + 'px'
+
 					# Get the canvas context
 					ctx = canvas.getContext('2d')
 					ctx.scale(2, 2)
 
+					# Get the canvas context
+					linesctx = canvaslines.getContext('2d')
+					linesctx.scale(2, 2)
+
 					# Setup the drawing service
 					draw = new DrawService(ctx, {size: _.SHAPE_SIZE})
+					drawlines = new DrawService(linesctx, {size: _.SHAPE_SIZE})
 
 
 
@@ -204,6 +247,7 @@ app.directive 'appGame', [
 				run: () ->
 					@board()
 					@goal()
+
 
 				#	@movesLeft
 				# 		Render the moves left circle + counter
@@ -254,8 +298,10 @@ app.directive 'appGame', [
 				# 		Render the nodes that must start and end the connections
 				#---------------------------------------------------------------
 				goal: () ->
+					draw.clear(0, 0, _.BOARD_DIMENSIONS.w, _.BOARD_MARGIN)
+
 					# Render the moves left
-					movesCirlce = @movesLeft()				
+					movesCircle = @movesLeft()				
 					
 					# Get the middle column of the board
 					middleColumn = Math.floor(_.BOARD_SIZE / 2)
@@ -270,22 +316,22 @@ app.directive 'appGame', [
 						# Calculate the x pos of the node
 						x = utils.calcCanvasX(middleColumn + direction)
 						# Center the node vertically w/ the circle
-						y = ((movesCirlce.y + movesCirlce.h) - (_.SHAPE_SIZE / 2)) / 2
+						y = ((movesCircle.y + movesCircle.h) - (_.SHAPE_SIZE / 2)) / 2
 
 						# Set the line to start and end vertically centered
 						# with the circle
 						line = 
 							y1: y + (_.SHAPE_SIZE / 2)
-							y2: movesCirlce.y + ((movesCirlce.h + 2) / 2)
+							y2: movesCircle.y + ((movesCircle.h + 2) / 2)
 
 						# Set the start and end positions of the line
 						line.x1 = x
-						line.x2 = movesCirlce.x
+						line.x2 = movesCircle.x
 
 						if direction == -1
 							line.x1 += _.SHAPE_SIZE
 						else
-							line.x2 += movesCirlce.w
+							line.x2 += movesCircle.w
 						
 						draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
 
@@ -327,6 +373,58 @@ app.directive 'appGame', [
 					)
 
 					# $log.debug( $scope.game.board )
+					return
+
+				#	Render the nodes of the game board
+				#---------------------------------------------------------------
+				dashedLine: ( node ) ->
+					parentNode = undefined
+
+					return false if not node.selected
+
+					$.each($scope.selectedNodes, (i, thisNode) ->
+						if utils.isSameNode( node, thisNode )
+							parentNode = $scope.selectedNodes[i - 1]
+							return
+					)
+
+					return false if not parentNode?
+
+					clear =
+						x: node.position.x - (_.SHAPE_MARGIN / 2)
+						y: node.position.y - (_.SHAPE_MARGIN / 2)
+						width: _.SHAPE_OUTERSIZE
+						height: _.SHAPE_OUTERSIZE
+
+					x1 = node.position.x + (_.SHAPE_SIZE / 2)
+					y1 = node.position.y + (_.SHAPE_SIZE / 2)
+					
+					x2 = parentNode.position.x + (_.SHAPE_SIZE / 2)
+					y2 = parentNode.position.y + (_.SHAPE_SIZE / 2)
+
+					clearNode = utils.createDrawParams(node, 'invisible', 'small').clear
+					clearParentNode = utils.createDrawParams(parentNode, 'invisible', 'small').clear
+
+					drawlines.clear( clear )
+					
+					if gameStatus.movesLeft < 0
+						drawlines.dashedRedLine(x1, y1, x2, y2)
+					else
+						drawlines.dashedLine(x1, y1, x2, y2)
+
+					drawlines.clear( clearNode )
+					drawlines.clear( clearParentNode )
+
+					return true
+				
+				#	Render the nodes of the game board
+				#---------------------------------------------------------------
+				removeDashedLine: ( node ) ->
+					clearX = node.position.x - _.SHAPE_MARGIN
+					clearY = node.position.y - _.SHAPE_MARGIN
+					clearSize = _.SHAPE_OUTERSIZE + _.SHAPE_MARGIN
+
+					drawlines.clear(clearX, clearY, clearSize, clearSize)
 
 					return
 
@@ -474,6 +572,7 @@ app.directive 'appGame', [
 
 					$scope.game.board[parentNode.coords.x][parentNode.coords.y].selected = false
 					
+					# parentNode.parent = grandparentNode
 					$scope.removedNodes.push(parentNode)
 					$scope.selectedNodes.pop()
 					return
@@ -617,6 +716,9 @@ app.directive 'appGame', [
 					if isValidStart && (params.type is 'touch' or (params.type is 'mouse' and isDragging))
 						e.preventDefault()
 						$scope.$apply(() ->
+							if params.start 
+								dragStart = nodePosition
+
 							checkMove(currNode, nodePosition, {save: true})
 						)
 
@@ -703,6 +805,8 @@ app.directive 'appGame', [
 				#---------------------------------------------------------------
 				$scope.$watchCollection('selectedNodes', (nodes) ->
 					totalNodes = nodes.length
+
+					$scope.startNode = nodes[0]
 					
 					# Only update the counter when we have two or more selections
 					if totalNodes <= 1
@@ -712,7 +816,7 @@ app.directive 'appGame', [
 					
 					render.movesLeft()
 					
-					$log.debug('SELECTED', nodes)
+					# $log.debug('SELECTED', nodes)
 				)
 
 
@@ -724,20 +828,9 @@ app.directive 'appGame', [
 				$scope.$watchCollection('touchedNodes', (nodes) ->
 					# $log.debug('TOUCHED', nodes)
 
-					# Get the first node selected
-					startNode = $scope.selectedNodes[0]
-					
 					$.each(nodes, (i, node) ->
-						# Figure out what style the node is
-						if node.selected == true
-							if utils.isSameNode(node, startNode)
-								nodeStyle = 'start'
-							else
-								nodeStyle = 'touched'
-						else
-							nodeStyle = 'untouched'
+						nodeStyle = utils.getNodeStyle( node )
 
-						# Redraw the node
 						draw.create( utils.createDrawParams(node, nodeStyle) )
 					)
 
@@ -763,34 +856,35 @@ app.directive 'appGame', [
 						# Get the options for the node to be animated
 						drawNode = utils.createDrawParams(node, nodeStyle)
 
+						render.dashedLine( node )
+
 						# Run the animation w/ the prams
 						draw.runAnimation(
 							drawNode,
-							# On animation start
-							( animation, shape ) ->
-								clearBoardMargins()
+							{
+								running: (animation, shape) ->
+									clearBoardMargins()
+									
+									node.animation = 
+										type: 'glow'
+										id: animation
+										clear: shape
+								
+								done: ( shape ) ->
+									node.animation = null
 
-								node.animation = 
-									type: 'glow'
-									id: animation
-									clear: shape
+									# Get the nodes surrounding this one
+									neighborNodes = getNeighborNodes( node )
+									
+									# Add the neighbor nodes to the touched list
+									addTouchedNodes( neighborNodes )
 
-							# On animation finished
-							( shape ) ->
-								$log.debug('DONE DONE DONE')
-								# Get the nodes surrounding this one
-								neighborNodes = getNeighborNodes( node )
-								# Add the neighbor nodes to the touched list
-								addTouchedNodes( neighborNodes )
+									# Clear the margins of the board
+									clearBoardMargins()
 
-								# Clear the margins of the board
-								clearBoardMargins()
-
-								# Clear the space around this shape
-								draw.clear( shape )
-
-								# Redraw the shape
-								draw.create( drawNode )
+									draw.create( drawNode )
+							}
+							
 						)
 					)
 
@@ -813,13 +907,19 @@ app.directive 'appGame', [
 
 						drawNode = utils.createDrawParams(node, 'untouched')
 
+						render.removeDashedLine( node )
+
 						draw.runAnimation(
 							drawNode,
-							( animation ) ->
-								node.animation = animation
-							( shape ) ->
-								draw.clear( shape )
-								draw.create( drawNode )
+							{
+								running: ( animation ) ->
+									node.animation = animation
+								
+								done: ( shape ) ->
+									draw.clear( shape )
+									draw.create( drawNode )
+								}
+							
 						)
 					)
 

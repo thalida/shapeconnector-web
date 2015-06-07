@@ -29,6 +29,7 @@ body {
 
 .game {
 	margin: 50px auto;
+	position: relative;
 
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -46,4 +47,17 @@ canvas {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+.canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+
+.canvas-lines {
+	position: absolute;
+	top: 0;
+	left: 0;
 }
