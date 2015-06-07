@@ -344,7 +344,7 @@ app.directive 'appGame', [
 					height: _.BOARD_DIMENSIONS.h
 				
 				boardRight = 
-					x: _.BOARD_DIMENSIONS.w - (_.SHAPE_MARGIN / 3)
+					x: _.BOARD_DIMENSIONS.w - (_.SHAPE_MARGIN / 2)
 					y: _.BOARD_MARGIN.top
 					width: _.SHAPE_MARGIN
 					height: _.BOARD_DIMENSIONS.h
@@ -357,7 +357,7 @@ app.directive 'appGame', [
 
 				boardBottom = 
 					x: 0
-					y: _.BOARD_DIMENSIONS.h - (_.SHAPE_MARGIN / 3)
+					y: _.BOARD_DIMENSIONS.h - (_.SHAPE_MARGIN / 2)
 					width: _.BOARD_DIMENSIONS.w
 					height: _.SHAPE_MARGIN
 
@@ -766,7 +766,6 @@ app.directive 'appGame', [
 						# Run the animation w/ the prams
 						draw.runAnimation(
 							drawNode,
-
 							# On animation start
 							( animation, shape ) ->
 								clearBoardMargins()
@@ -778,6 +777,7 @@ app.directive 'appGame', [
 
 							# On animation finished
 							( shape ) ->
+								$log.debug('DONE DONE DONE')
 								# Get the nodes surrounding this one
 								neighborNodes = getNeighborNodes( node )
 								# Add the neighbor nodes to the touched list

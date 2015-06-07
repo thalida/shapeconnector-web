@@ -162,30 +162,52 @@ app.service 'drawService', [
 				params.color = gameDict.hexColors[params.color]
 				
 				# Calculate/get the start and end times of the animation
-				start = new Date().getTime()
-				end = start + params.duration
+				enterStart = new Date().getTime()
+				enterEnd = enterStart + params.duration
+				leaveEnd = enterStart + (params.duration * 2)
 
 				# Create the animation loop
-				step = () =>
+				enterAnimation = () =>
 					# Get our current progres
 					timestamp = new Date().getTime()
-					progress = Math.min((params.duration - (end - timestamp)) / params.duration, 1)
+					progress = Math.min((params.duration - (enterEnd - timestamp)) / params.duration, 1)
 
 					# Set the enter + leave animations
 					if params.style is 'start' or params.style is 'touched'
-						shape = @glowAnimation( params, progress )
+						shape = @glowEnterAnimation( params, progress )
 					else 
 						shape = @fillAnimation( params, progress )
 
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
-						animation = requestAnimationFrame(step)
+						animation = requestAnimationFrame(enterAnimation)
 						startCB?( animation, shape )
+					else
+						if params.style is 'start' or params.style is 'touched'
+							@clear(shape)
+							leaveAnimation()
+							# doneCB?(shape)
+						else	
+							doneCB?(shape)
+
+				leaveAnimation = () =>
+					# Get our current progres
+					timestamp = new Date().getTime()
+					progress = Math.min((params.duration - (leaveEnd - timestamp)) / params.duration, 1)
+
+					# Set the enter + leave animations
+					if params.style is 'start' or params.style is 'touched'
+						shape = @glowLeaveAnimation( params, progress )
+
+					# If the animation hasn't finished, repeat the animation loop
+					if (progress < 1)
+						requestAnimationFrame(leaveAnimation)
 					else
 						doneCB?(shape)
 
+
 				# Start the animation
-				return step()
+				return enterAnimation()
 
 			#	@stopAnimation
 			# 		Cancel the passed animation
@@ -222,14 +244,18 @@ app.service 'drawService', [
 				@ctx.stroke()
 				@ctx.restore()
 
-			#	@glowAnimation
+			#	@glowEnterAnimation
 			# 		Creates a glow around the shape
 			#-------------------------------------------------------------------
-			glowAnimation: (params, progress) ->
+			glowEnterAnimation: (params, progress) ->
+				$log.debug('in enter animation')
 				# Shape width/height grows outward
 				shape = 
-					width: params.size.w + ((params.size.w * progress) * 2.5)
-					height: params.size.h + ((params.size.h * progress) * 2.5)
+					width: (params.size.w * progress) * 3.2
+					height: (params.size.h * progress) * 3.2
+
+					# width: params.size.w + ((params.size.w * progress) * 2.5)
+					# height: params.size.h + ((params.size.h * progress) * 2.5)
 
 				# Keep the glow vertically alinged w/ the main shape
 				shiftBy = (shape.width - params.size.w) / 2
@@ -264,6 +290,62 @@ app.service 'drawService', [
 				@create( params )
 
 				return shape
+
+			#	@glowLeaveAnimation
+			# 		Creates a glow around the shape
+			#-------------------------------------------------------------------
+			glowLeaveAnimation: (params, progress) ->
+				$log.debug('in leave animation')
+
+				# Shape width/height grows outward
+				shape = 
+					width: (params.size.w * (1 - progress)) * 3.2
+					height: (params.size.h * (1 - progress)) * 3.2
+
+				# Keep the glow vertically alinged w/ the main shape
+				shiftBy = (shape.width - params.size.w) / 2
+				shape.x = params.coords.x - shiftBy
+				shape.y = params.coords.y - shiftBy
+
+
+				fullSizeShape = 
+					width: (params.size.w * 1) * 3.4
+					height: (params.size.h * 1) * 3.4
+				
+				fullSizeShift = (fullSizeShape.width - params.size.w) / 2
+				fullSizeShape.x = params.coords.x - fullSizeShift
+				fullSizeShape.y = params.coords.y - fullSizeShift
+
+				$log.debug( shape, fullSizeShape )
+
+				# Clear the canvas beneath the shape
+				@clear(fullSizeShape)
+
+				# Draw the shape on the canvas
+				makeShape = @[params.type]
+				makeShape(
+					shape.x,
+					shape.y,
+					shape.width,
+					shape.height
+				)
+
+				# Get the rgba version of color and make opaque
+				rgb = hexToRgb(params.color)
+
+				# Fill the glow
+				@ctx.save()
+				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.2)"
+				@ctx.fill()
+				@ctx.restore()
+
+				# Don't try to clear the canvas again
+				params.clear = null
+
+				# Draw the main shape
+				@create( params )
+
+				return fullSizeShape
 
 			#	@fillAnimation
 			# 		Fills in the shape from the outside in
