@@ -35,25 +35,26 @@ app.directive 'appGame', [
 			drawlines = undefined
 			linesctx = undefined
 
-			#	Setup the store of general game inforamtion
+			#	Setup the store of general game information
 			#-------------------------------------------------------------------
 			$scope.selectedNodes = []
 			$scope.addedNodes = []
 			$scope.removedNodes = []
 			$scope.touchedNodes = []
-			$scope.disallowedNodes = []
-
-			$scope.enterAnimations = []
-			$scope.leaveAnimations = []
 
 			$scope.startNode = null
+			$scope.gameOver = 
+				won: false
+				lost: false
+			gameStatus = 
+				movesLeft: 0
 
+			#	Setup events globals
+			#-------------------------------------------------------------------
 			dragStart = {}
 			isDragging = false
 			isValidStart = false
 			disableNewConnections = false
-			gameStatus = 
-				movesLeft: 0
 
 			#	Setup the consts dictonary for the game
 			#-------------------------------------------------------------------
@@ -71,11 +72,25 @@ app.directive 'appGame', [
 
 
 
+
+
+
+
+
+
+
 			#===================================================================
-			#	utils
+			# 
+			# 
+			# 
+			#	UTILS
 			# 		General functions and calculations used to figure out where
 			# 		various aspects of the canvas or board
+			# 
+			# 
+			# 
 			#-------------------------------------------------------------------
+
 			utils = 
 				#	@calcBoardX
 				# 		With a given canvas X coord get the X column of the board
@@ -158,13 +173,13 @@ app.directive 'appGame', [
 					}
 
 				getNodeStyle: ( node ) ->
-					gameStatus.gameOver = isGameOver()
+					$scope.gameOver.won = isGameOver()
 					if node.selected == true
-						lastNode = $scope.selectedNodes[$scope.selectedNodes.length - 1]
+						lastNode = utils.selectedNodes.last()
 						
 						if utils.isSameNode(node, $scope.startNode)
 							nodeStyle = 'start'
-						else if gameStatus.gameOver and utils.isSameNode(node, lastNode)
+						else if $scope.gameOver.won and utils.isSameNode(node, lastNode)
 							nodeStyle = 'start'
 						else
 							nodeStyle = 'touched'
@@ -173,12 +188,122 @@ app.directive 'appGame', [
 
 					return nodeStyle
 
+				#	@findNode
+				# 		Based on a canvas x and y position find the node that is
+				# 		at this point
+				#---------------------------------------------------------------
+				findNode: ( pos ) ->
+					# Get the x and y coords of the board at this canvas position
+					boardX = utils.calcBoardX(pos.x)
+					boardY = utils.calcBoardY(pos.y)
+
+					# Validate that these are allowable board coords
+					isValidBoardX = utils.isValidBoardAxis(boardX)
+					isValidBoardY = utils.isValidBoardAxis(boardY)
+					
+					return if not isValidBoardX || not isValidBoardY
+						
+					return $scope.game.board[boardX][boardY]
+
+				#	@validateTouchAxis
+				# 		Check if the given touch coords are in a valid
+				# 		location to trigger the nearest node
+				#---------------------------------------------------------------
+				validateTouchAxis: ( params ) ->
+					calcCanvasName = 'calcCanvas' + params.type.toUpperCase()
+					canvasPos = utils[calcCanvasName]( params.nodeCoord )
+					minTouch = utils.calcShapeMinTrigger(canvasPos)
+					maxTouch = utils.calcShapeMaxTrigger(canvasPos)
+
+					return minTouch <= params.touchPos <= maxTouch
+
+				#	@isGrandPaNode
+				# 		Check if the given node is the SAME as the node two moves back
+				#-------------------------------------------------------------------
+				isGrandPaNode: ( node ) ->
+					grandparentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 2 ]
+					return utils.isSameNode( node, grandparentNode )
+
+				#	@getNeighborNodes
+				# 		Get all the nodes surrounding this one
+				#---------------------------------------------------------------
+				getNeighborNodes: ( node ) ->
+					nodeX = node.coords.x
+					nodeY = node.coords.y
+
+					neighbors = []
+					potentials = [
+						[nodeX + 1, nodeY]
+						[nodeX + 1, nodeY + 1]
+						[nodeX + 1, nodeY - 1]
+						[nodeX, nodeY + 1]
+						[nodeX, nodeY - 1]
+						[nodeX - 1, nodeY]
+						[nodeX - 1, nodeY + 1]
+						[nodeX - 1, nodeY - 1]
+					]
+
+					potentialIdx = 0
+					while potentialIdx < potentials.length
+						# Get the x and y coors of this potential move
+						potNode = potentials[ potentialIdx ]
+						potX = potNode[0]
+						potY = potNode[1]
+
+						# Check if the x and y coords are valid 
+						isValidX = utils.isValidBoardAxis( potX )
+						isValidY = utils.isValidBoardAxis( potY )
+
+						if isValidX and isValidY
+							node = $scope.game.board[potX][potY]
+							neighbors.push( node )
+
+						potentialIdx += 1
+
+					return neighbors
+
+				#	@checkIsTouched
+				# 		Check if a node is already in the touched array
+				#---------------------------------------------------------------
+				checkIsTouched: ( node ) ->
+					touched = false
+					$.each($scope.touchedNodes, (i, thisNode) ->
+						if utils.isSameNode( node, thisNode )
+							touched = true
+							return
+					)
+
+					return touched
+
+				#	@selectedNodes
+				# 		Get the first, last, and total elements for the 
+				# 		$scope.selectedNodes
+				#---------------------------------------------------------------
+				selectedNodes:
+					first: () ->
+						return $scope.selectedNodes[0]
+					last: () ->
+						return $scope.selectedNodes[$scope.selectedNodes.length - 1]
+					total: () ->
+						return $scope.selectedNodes.length
+
+
+
+
+
+
+
 
 
 
 			#===================================================================
-			#	setup
-			# 		General setup of the game and canvas
+			# 
+			# 
+			# 
+			#	SETUP: General setup of the game and canvas
+			# 
+			# 
+			# 
 			#-------------------------------------------------------------------
 			setup = new class GameSetup
 				constructor: () ->
@@ -254,9 +379,21 @@ app.directive 'appGame', [
 
 
 
+
+
+
+
+
+
+
 			#===================================================================
-			#	render
-			# 		Render the game elements to the canvas
+			# 
+			# 
+			# 
+			#	RENDER: Render the game elements to the canvas
+			# 
+			# 
+			# 
 			#-------------------------------------------------------------------
 			render = new class GameRender
 				run: () ->
@@ -348,7 +485,7 @@ app.directive 'appGame', [
 						else
 							line.x2 += movesCircle.w
 						
-						if gameStatus.gameOver
+						if $scope.gameOver.won
 							nodeStyle = 'start'
 							draw.solidLine(line.x1, line.y1, line.x2, line.y2)
 						else
@@ -396,7 +533,9 @@ app.directive 'appGame', [
 					# $log.debug( $scope.game.board )
 					return
 
-
+				#	@allDashedLines
+				# 		Render the connecting nodes for all nodes as dashed
+				#---------------------------------------------------------------
 				allDashedLines: () ->
 					$.each($scope.selectedNodes, (i, node) =>
 						if i > 0
@@ -404,6 +543,9 @@ app.directive 'appGame', [
 							@connectingLine(node, parentNode)
 					)
 
+				#	@allSolidLines
+				# 		Render the connecting lines for all nodes as solid
+				#---------------------------------------------------------------
 				allSolidLines: () ->
 					$.each($scope.selectedNodes, (i, node) =>
 						if i > 0
@@ -411,8 +553,8 @@ app.directive 'appGame', [
 							@connectingLine(node, parentNode, 'solid')
 					)
 
-
-				#	Render the nodes of the game board
+				# 	@connectingLine
+				#		Render the lines that connect two nodes
 				#---------------------------------------------------------------
 				connectingLine: ( node, parentNode, style = 'dashed') ->
 					return false if not node.selected
@@ -465,7 +607,8 @@ app.directive 'appGame', [
 
 					return true
 				
-				#	Remove the dashed lines from a node
+				#	@removeConnectingLine
+				#		Remove the lines connecting a node
 				#---------------------------------------------------------------
 				removeConnectingLine: ( node ) ->
 					clearX = node.position.x - _.SHAPE_MARGIN
@@ -476,6 +619,9 @@ app.directive 'appGame', [
 
 					return
 
+				#	@clearLinesBoard
+				# 		Clear the canvas used to draw the lines
+				#---------------------------------------------------------------
 				clearLinesBoard: () ->
 					clearBoard = 
 						x: 0
@@ -485,6 +631,9 @@ app.directive 'appGame', [
 
 					drawlines.clear( clearBoard )
 
+				#	@trackingLine
+				# 		Draw the line used to shown when starting to connect to a new node
+				#---------------------------------------------------------------
 				trackingLine: (startNode, end) ->
 					startPos = 
 						x: startNode.position.x + (_.SHAPE_SIZE / 2)
@@ -499,10 +648,9 @@ app.directive 'appGame', [
 					clearNode = utils.createDrawParams(startNode, 'invisible', 'small').clear
 					drawlines.clear( clearNode )
 
-				#===================================================================
-				#	clearBoardMargins
+				#	@clearBoardMargins
 				# 		Clear the unused margins of the board
-				#-------------------------------------------------------------------
+				#---------------------------------------------------------------
 				clearBoardMargins: () ->
 					boardLeft = 
 						x: 0
@@ -535,37 +683,395 @@ app.directive 'appGame', [
 					draw.clear( boardBottom )
 
 
-			#===================================================================
-			#	findNode
-			# 		Based on a canvas x and y position find the node that is
-			# 		at this point
-			#-------------------------------------------------------------------
-			findNode = ( pos ) ->
-				# Get the x and y coords of the board at this canvas position
-				boardX = utils.calcBoardX(pos.x)
-				boardY = utils.calcBoardY(pos.y)
 
-				# Validate that these are allowable board coords
-				isValidBoardX = utils.isValidBoardAxis(boardX)
-				isValidBoardY = utils.isValidBoardAxis(boardY)
-				
-				return if not isValidBoardX || not isValidBoardY
+
+
+
+
+
+
+			#===================================================================
+			# 
+			# 
+			# 
+			#	ANIMATION: Controls the canvas animations
+			# 	
+			# 
+			# 
+			#-------------------------------------------------------------------
+			animation = new class Animation
+				constructor: () ->
+
+				stop: ( node, type ) ->
+					if node.animation?.type is type
+						draw.stopAnimation( node.animation.id )
+						draw.clear( node.animation.clear )
+
+				glow: ( node ) ->
+					# Get the options for the node to be animated
+					nodeStyle = utils.getNodeStyle( node )
+					drawNode = utils.createDrawParams(node, nodeStyle)
+
+					# Run the animation w/ the prams
+					draw.runAnimation(
+						drawNode,
+						{
+							running: (animation, shape) ->
+								render.clearBoardMargins()
+								node.animation = 
+									type: 'glow'
+									id: animation
+									clear: shape
+							
+							done: ( shape ) ->
+								node.animation = null
+
+								# Add the neighbor nodes to the touched list
+								neighborNodes = utils.getNeighborNodes( node )
+								addTouchedNodes( neighborNodes )
+
+								# Clear the margins of the board
+								render.clearBoardMargins()
+
+								# Redraw the node
+								draw.create( drawNode )
+						}
+					)
+
+				fill: ( node ) ->
+					drawNode = utils.createDrawParams(node, 'untouched')
+					draw.runAnimation(
+						drawNode,
+						{
+							running: ( animation, shape ) ->
+								node.animation = 
+									type: 'fill'
+									id: animation
+									clear: shape
+							
+							done: ( shape ) ->
+								node.animation = null
+								# Clear any leftover states from animation
+								draw.clear( shape )
+								# Draw the node
+								draw.create( drawNode )
+							}
+						
+					)
+
+
+
+
+
+
+
+
+
+
+
+			#===================================================================
+			# 
+			# 
+			# 
+			#	CANVAS EVENTS: Manages the canvas events
+			# 
+			# 
+			# 
+			#-------------------------------------------------------------------
+			events = new class Events 
+				constructor: () ->
+					@onDrag = @eventsProcessor()
+					@onTouch = @touchEvents()
+					@onMouse = @mouseEvents()
+
+					return 
+
+				#	@bind
+				# 		Enable canvas events + callbacks
+				#---------------------------------------------------------------
+				bind: () =>
+					$canvas
+						.on('mousedown', @onMouse.start)
+						.on('mousemove', @onMouse.move)
+						.on('mouseup', @onMouse.end)
+
+					canvasEl = $canvas[0]
+					canvasEl.addEventListener('touchstart', @onTouch.start, false)
+					canvasEl.addEventListener('touchmove', @onTouch.move, false)
+					canvasEl.addEventListener('touchend', @onTouch.end, false)
+					canvasEl.addEventListener('touchleave', @onTouch.end, false)
+					canvasEl.addEventListener('touchcancel', @onTouch.cancel, false)
+
+					return
+
+				#	@unbind
+				# 		Enable canvas events + callbacks
+				#---------------------------------------------------------------
+				unbind: () =>
+					$canvas
+						.off('mousedown', @onMouse.start)
+						.off('mousemove', @onMouse.move)
+						.off('mouseup', @onMouse.end)
+
+					canvasEl = $canvas[0]
+					canvasEl.removeEventListener('touchstart', @onTouch.start, false)
+					canvasEl.removeEventListener('touchmove', @onTouch.move, false)
+					canvasEl.removeEventListener('touchend', @onTouch.end, false)
+					canvasEl.removeEventListener('touchleave', @onTouch.end, false)
+					canvasEl.removeEventListener('touchcancel', @onTouch.cancel, false)
+
+					return
+
+				#	@eventsProcessor
+				# 		Process the onTouch/onMouse events
+				#---------------------------------------------------------------
+				eventsProcessor: () ->
+					move: ( e, params ) =>
+						_defaults = 
+							start: false
+							type: 'touch'
+						params = angular.extend({}, _defaults, params)
+						
+						# Get the touch coords object
+						if params.type is 'touch'
+							touch = e.changedTouches[0]
+						else
+							touch = e
+
+						# Calculate the position of the touch on the canvas
+						canvasOffset = $canvas.offset()
+						nodePosition = 
+							x: touch.pageX - canvasOffset.left
+							y: touch.pageY - canvasOffset.top
+							
+						currNode = utils.findNode( nodePosition )
+
+						# If a START event was triggered
+						if params.start
+							isDragging = true
+
+							# Make sure the player starts dragging from a valid endNode
+							if utils.selectedNodes.total() == 0
+								isValidStart = false
+								$.each($scope.game.endNodes, (i, endNode) ->
+									sameColor = currNode.color == endNode.color
+									sameType = currNode.type == endNode.type
+
+									if sameColor and sameType
+										isValidStart = true
+										return
+								)
+
+							# Make sure the player starts dragging from the last selected node
+							else
+								lastTouchedNode = utils.selectedNodes.last()
+								isValidStart = utils.isSameNode( currNode, lastTouchedNode )
+
+								if isValidStart
+									$scope.addedNodes.push( lastTouchedNode )
+						
+						isValidMouse = params.type is 'mouse' and isDragging
+
+						# Check if we should process the mouse/touch event
+						if isValidStart && (params.type is 'touch' or isValidMouse)
+							e.preventDefault()
+							$scope.$apply(() ->
+								if params.start
+									dragStart = currNode
+
+								isValidMove = checkMove(currNode, nodePosition, {save: true})
+
+								render.trackingLine(dragStart, nodePosition)
+							)
+
+					end: () =>
+						isDragging = false
+
+						$scope.$apply(() ->
+							if utils.selectedNodes.total() == 1
+								node = $scope.selectedNodes[0]
+								$scope.game.board[node.coords.x][node.coords.y].selected = false
+								$scope.removedNodes.push( node )
+								$scope.selectedNodes = []
+
+							render.clearLinesBoard()
+							render.allDashedLines()
+						)
+
+						# $log.debug('=================================')
+
+					cancel: () =>
+						$scope.$apply(() ->
+							$scope.removedNodes = []
+							$scope.removedNodes = [].concat( $scope.selectedNodes )
+							$scope.selectedNodes = []
+						)
+
+				#	Touch Events
+				# 		Send the touch specific event data
+				#---------------------------------------------------------------
+				touchEvents: () ->
+					start: ( e ) =>
+						@onDrag.move(e, {start: true, type: 'touch'})
+						
+					move: ( e ) =>
+						@onDrag.move(e, {type: 'touch'})
+
+					end: ( e ) =>
+						@onDrag.end()
+
+					cancel: ( e ) =>
+						@onDrag.cancel()
+
+				#	Mouse Events
+				# 		Send the mouse specific event data
+				#---------------------------------------------------------------
+				mouseEvents: () ->
+					start: ( e ) =>
+						@onDrag.move(e, {start: true, type: 'mouse'})
+						
+					move: ( e ) =>
+						@onDrag.move(e, {type: 'mouse'})
+
+					end: ( e ) =>
+						@onDrag.end()
+
+
+
+
+
+
+
+
+
+
+			#===================================================================
+			# 
+			# 
+			# 
+			#	SCOPE WATCHING:
+			# 		Setup and manage the watches on the scope
+			# 
+			# 
+			# 
+			#-------------------------------------------------------------------
+			class ScopeWatch
+				constructor: ( @name, @callback ) ->
+					@watch = $scope.$watchCollection(@name, @callback)
+					return @watch
+
+
+			watchers = new class Watchers
+				constructor: () ->
+					@watching = []
+
+				#	@start
+				# 		Start watching the scope vars we want
+				#---------------------------------------------------------------
+				start: () ->
+					# Create an array of the scope attrs we are watching
+					@watching = [
+						new ScopeWatch('gameOver', @gameOver),
+						new ScopeWatch('selectedNodes', @selectedNodes),
+						new ScopeWatch('touchedNodes', @touchedNodes),
+						new ScopeWatch('addedNodes', @addedNodes),
+						new ScopeWatch('removedNodes', @removedNodes)
+					]
+
+				#	@end
+				# 		Stop watching the scope vars
+				#---------------------------------------------------------------
+				end: () ->
+					$.each(@watching, (i, watchFunc) ->
+						watchFunc?()
+					)
+					@watching = []
+
+				#	@gameOver
+				# 		Watch the game over status
+				#---------------------------------------------------------------
+				gameOver: (gameOver) ->
+					if gameOver.won
+						events.unbind()
+						render.clearLinesBoard()
+						render.allSolidLines()
+						render.goal()
+					else
+						if gameStatus.movesLeft <= 0
+							disableNewConnections = true
+							render.movesLeft('red')
+
+				#	@selectedNodes
+				# 		Watch if we have changed the nodes that are selected
+				#---------------------------------------------------------------
+				selectedNodes: (nodes) ->
+					totalNodes = nodes.length
+
+					$scope.startNode = nodes[0]
+
+					dragStart = nodes[nodes.length - 1]
 					
-				return $scope.game.board[boardX][boardY]
+					# Only update the counter when we have two or more selections
+					if totalNodes <= 1
+						gameStatus.movesLeft = $scope.game.maxMoves
+					else
+						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes + 1
+					
+					render.movesLeft()
+
+					if gameStatus.movesLeft <= 0
+						$scope.gameOver.won = isGameOver()
+					else
+						disableNewConnections = false
+					
+					# $log.debug('SELECTED', nodes)
+
+				#	@touchedNodes
+				# 		If a node has been "touched" by an animation re-render it
+				#---------------------------------------------------------------
+				touchedNodes: (nodes) ->
+					$.each(nodes, (i, node) ->
+						nodeStyle = utils.getNodeStyle( node )
+						draw.create( utils.createDrawParams(node, nodeStyle) )
+					)
+					$scope.touchedNodes = []
+
+				#	@addedNodes
+				# 		If a new nodes has been selected run the "glow"
+				# 		enter animation
+				#---------------------------------------------------------------
+				addedNodes: (nodes) ->
+					# $log.debug('ADDED', nodes)
+					
+					$.each(nodes, (i, node) ->
+						$scope.gameOver.won = isGameOver()
+						lastSelectedNode = utils.selectedNodes.last()
+						animation.glow( node )
+					)
+
+					$scope.addedNodes = []
+
+				#	removedNodes
+				# 		If a node has been deselected run the "leave" animation
+				#---------------------------------------------------------------
+				removedNodes: (nodes) ->
+					# $log.debug('REMOVED', nodes)
+					
+					$.each(nodes, (i, node) ->
+						animation.stop(node, 'glow')
+						render.removeConnectingLine( node )
+						animation.fill(node)
+					)
+
+					$scope.removedNodes = []
 
 
-			#===================================================================
-			#	validateTouchAxis
-			# 		Check if the given touch coords are in a valid
-			# 		location to trigger the nearest node
-			#-------------------------------------------------------------------
-			validateTouchAxis = ( params ) ->
-				calcCanvasName = 'calcCanvas' + params.type.toUpperCase()
-				canvasPos = utils[calcCanvasName]( params.nodeCoord )
-				minTouch = utils.calcShapeMinTrigger(canvasPos)
-				maxTouch = utils.calcShapeMaxTrigger(canvasPos)
 
-				return minTouch <= params.touchPos <= maxTouch
+
+
+
+
+
 
 
 			#===================================================================
@@ -573,28 +1079,25 @@ app.directive 'appGame', [
 			# 		Validate that node moved to via touch/mouse is a valid one
 			#-------------------------------------------------------------------
 			checkMove = ( node, pos, opts ) ->
-				# Get the node nearest to this position
-				# node = findNode( pos )
-
 				# Return if no node has been found
 				return false if !node? || node is false
 
 				# If we have NO other selected nodes this move is automatically valid
-				if $scope.selectedNodes.length == 0 
+				if utils.selectedNodes.total() == 0 
 					saveNode( node ) if opts?.save
 					return true
 
 				# Return false if this node is selected and it is not a grandpa node
-				return false if node.selected == true and not isGrandPaNode( node )
+				return false if node.selected == true and not utils.isGrandPaNode( node )
 
 				# Validate that move is in the accepted distance to trigger the closest node
-				isValidCanvasX = validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
-				isValidCanvasY = validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
+				isValidCanvasX = utils.validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
+				isValidCanvasY = utils.validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
 				return false if not isValidCanvasX || not isValidCanvasY
 
 				# Check that the node this move is closest to is one that we're
 				# allowed to move to (up, down, left, or right only)
-				parentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 1 ]
+				parentNode = utils.selectedNodes.last()
 				dx = Math.abs(parentNode.coords.x - node.coords.x)
 				dy = Math.abs(parentNode.coords.y - node.coords.y)
 				isValidDirection = (dx + dy) == 1
@@ -611,126 +1114,6 @@ app.directive 'appGame', [
 				saveNode( node )
 				
 				return isValidMove
-
-
-
-			#===================================================================
-			#	isGrandPaNode
-			# 		Check if the given node is the SAME as the node two moves back
-			#-------------------------------------------------------------------
-			isGrandPaNode = ( node ) ->
-				grandparentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 2 ]
-				return utils.isSameNode( node, grandparentNode )
-
-
-
-			#===================================================================
-			#	saveNode
-			# 		Save the given node if it is a new move
-			# 		Pop the past node if the user is trying to undo a move
-			#-------------------------------------------------------------------
-			saveNode = ( node ) ->
-				return if !node?
-								
-				# If the current node is the same as the node two moves back
-				# then the player is dragging back to "undo" the connection they 
-				# made. We need to pop this node off.
-				if isGrandPaNode( node )
-					grandparentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 2 ]
-					parentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 1 ]
-
-					$scope.game.board[parentNode.coords.x][parentNode.coords.y].selected = false
-
-					# parentNode.parent = grandparentNode
-					$scope.removedNodes.push(parentNode)
-					$scope.selectedNodes.pop()
-					return
-
-				return if disableNewConnections
-
-				nodeCoords = node.coords
-				$scope.game.board[nodeCoords.x][nodeCoords.y].selected = true
-				$scope.selectedNodes.push( node )
-				$scope.addedNodes.push( node )
-				return
-
-
-
-			#===================================================================
-			#	getNeighborNodes
-			# 		Get all the nodes surrounding this one
-			#-------------------------------------------------------------------
-			getNeighborNodes = ( node ) ->
-				nodeX = node.coords.x
-				nodeY = node.coords.y
-
-				neighbors = []
-				potentials = [
-					[nodeX + 1, nodeY]
-					[nodeX + 1, nodeY + 1]
-					[nodeX + 1, nodeY - 1]
-					[nodeX, nodeY + 1]
-					[nodeX, nodeY - 1]
-					[nodeX - 1, nodeY]
-					[nodeX - 1, nodeY + 1]
-					[nodeX - 1, nodeY - 1]
-				]
-
-				potentialIdx = 0
-				while potentialIdx < potentials.length
-					# Get the x and y coors of this potential move
-					potNode = potentials[ potentialIdx ]
-					potX = potNode[0]
-					potY = potNode[1]
-
-					# Check if the x and y coords are valid 
-					isValidX = utils.isValidBoardAxis( potX )
-					isValidY = utils.isValidBoardAxis( potY )
-
-					if isValidX and isValidY
-						node = $scope.game.board[potX][potY]
-						neighbors.push( node )
-
-					potentialIdx += 1
-
-				return neighbors
-
-
-
-			#===================================================================
-			#	checkIsTouched
-			# 		Check if a node is already in the touched array
-			#-------------------------------------------------------------------
-			checkIsTouched = ( node ) ->
-				touched = false
-				$.each($scope.touchedNodes, (i, thisNode) ->
-					if utils.isSameNode( node, thisNode )
-						touched = true
-						return
-				)
-
-				return touched
-
-
-
-			#===================================================================
-			#	addTouchedNodes
-			# 		Add new nodes to the touched array
-			#-------------------------------------------------------------------
-			addTouchedNodes = ( nodes ) ->
-				newTouchedNodes = []
-
-				if not angular.isArray( nodes )
-					thisNode = nodes
-					nodes = [].push( thisNode )
-
-				$.each(nodes, (i, node) ->
-					isTouched = checkIsTouched( node )
-					if not isTouched
-						newTouchedNodes.push( node )
-				)
-
-				$scope.touchedNodes = $scope.touchedNodes.concat( newTouchedNodes )
 
 
 
@@ -757,355 +1140,68 @@ app.directive 'appGame', [
 
 
 			#===================================================================
-			#	onDrag
-			# 		Process the touch and mouse events
+			#	saveNode
+			# 		Save the given node if it is a new move
+			# 		Pop the past node if the user is trying to undo a move
 			#-------------------------------------------------------------------
-			onDrag = 
-				move: ( e, params ) ->
-					_defaults = 
-						start: false
-						type: 'touch'
-					params = angular.extend({}, _defaults, params)
-					
-					# Get the touch coords object
-					if params.type is 'touch'
-						touch = e.changedTouches[0]
-					else
-						touch = e
-
-					# Calculate the position of the touch on the canvas
-					canvasOffset = $canvas.offset()
-					nodePosition = 
-						x: touch.pageX - canvasOffset.left
-						y: touch.pageY - canvasOffset.top
-						
-					currNode = findNode( nodePosition )
-
-					# If a START event was triggered
-					if params.start
-						isDragging = true
-
-						# Make sure the player starts dragging from a valid endNode
-						if $scope.selectedNodes.length == 0
-							isValidStart = false
-							$.each($scope.game.endNodes, (i, endNode) ->
-								sameColor = currNode.color == endNode.color
-								sameType = currNode.type == endNode.type
-
-								if sameColor and sameType
-									isValidStart = true
-									return
-							)
-
-						# Make sure the player starts dragging from the last selected node
-						else
-							lastTouchedNode = $scope.selectedNodes[$scope.selectedNodes.length - 1]
-							isValidStart = utils.isSameNode( currNode, lastTouchedNode )
-
-							if isValidStart
-								$scope.addedNodes.push( lastTouchedNode )
-					
-					isValidMouse = params.type is 'mouse' and isDragging
-
-					# Check if we should process the mouse/touch event
-					if isValidStart && (params.type is 'touch' or isValidMouse)
-						e.preventDefault()
-						$scope.$apply(() ->
-							if params.start
-								dragStart = currNode
-
-							isValidMove = checkMove(currNode, nodePosition, {save: true})
-
-							render.trackingLine(dragStart, nodePosition)
-
-							# if isValidMove and disableNewConnections and !lastTouchedNode
-							# 	$scope.disallowedNodes.push( currNode )
-						)
-
-				end: () ->
-					isDragging = false
-
-					$scope.$apply(() ->
-						if $scope.selectedNodes.length == 1
-							node = $scope.selectedNodes[0]
-							$scope.game.board[node.coords.x][node.coords.y].selected = false
-							$scope.removedNodes.push( node )
-							$scope.selectedNodes = []
-
-						render.clearLinesBoard()
-						render.allDashedLines()
-					)
-
-					# $log.debug('=================================')
-
-				cancel: () ->
-					$scope.$apply(() ->
-						$scope.removedNodes = []
-						$scope.removedNodes = [].concat( $scope.selectedNodes )
-						$scope.selectedNodes = []
-					)
-
-
-
-			#===================================================================
-			#	onTouch Events
-			# 		Send the touch specific event data
-			#-------------------------------------------------------------------
-			onTouch =
-				start: ( e ) ->
-					onDrag.move(e, {start: true, type: 'touch'})
-					
-				move: ( e ) ->
-					onDrag.move(e, {type: 'touch'})
-
-				end: ( e ) ->
-					onDrag.end()
-
-				cancel: ( e ) ->
-					OnDrag.cancel()
-
-			#===================================================================
-			#	onMouse Events
-			# 		Send the mouse specific event data
-			#-------------------------------------------------------------------
-			onMouse = 
-				start: ( e ) ->
-					onDrag.move(e, {start: true, type: 'mouse'})
-					
-				move: ( e ) ->
-					onDrag.move(e, {type: 'mouse'})
-
-				end: ( e ) ->
-					onDrag.end()
-
-			#===================================================================
-			#	initEvents
-			# 		Enable canvas events + callbacks
-			#-------------------------------------------------------------------
-			initEvents = () ->
-				$canvas
-					.on('mousedown', onMouse.start)
-					.on('mousemove', onMouse.move)
-					.on('mouseup', onMouse.end)
-
-				canvasEl = $canvas[0]
-				canvasEl.addEventListener('touchstart', onTouch.start, false)
-				canvasEl.addEventListener('touchmove', onTouch.move, false)
-				canvasEl.addEventListener('touchend', onTouch.end, false)
-				canvasEl.addEventListener('touchleave', onTouch.end, false)
-				canvasEl.addEventListener('touchcancel', onTouch.cancel, false)
-
-			#===================================================================
-			#	initEvents
-			# 		Enable canvas events + callbacks
-			#-------------------------------------------------------------------
-			removeEvents = () ->
-				$canvas
-					.off('mousedown', onMouse.start)
-					.off('mousemove', onMouse.move)
-					.off('mouseup', onMouse.end)
-
-				canvasEl = $canvas[0]
-				canvasEl.removeEventListener('touchstart', onTouch.start, false)
-				canvasEl.removeEventListener('touchmove', onTouch.move, false)
-				canvasEl.removeEventListener('touchend', onTouch.end, false)
-				canvasEl.removeEventListener('touchleave', onTouch.end, false)
-				canvasEl.removeEventListener('touchcancel', onTouch.cancel, false)
-
-
-			#===================================================================
-			#	startWatch
-			# 		Start watching the various scope events
-			#-------------------------------------------------------------------
-			startWatch = () ->
-
-				#	selectedNodes
-				# 		Update the move counter when we selecte a new node
-				#---------------------------------------------------------------
-				$scope.$watchCollection('selectedNodes', (nodes) ->
-					totalNodes = nodes.length
-
-					$scope.startNode = nodes[0]
-
-					dragStart = nodes[nodes.length - 1]
-					
-					# Only update the counter when we have two or more selections
-					if totalNodes <= 1
-						gameStatus.movesLeft = $scope.game.maxMoves
-					else
-						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes + 1
-					
-					render.movesLeft()
-
-					if gameStatus.movesLeft <= 0
-						gameStatus.gameOver = isGameOver()
-						[first, ..., last] = nodes
-						$log.debug( first, last )
-						if gameStatus.gameOver
-							removeEvents()
-							render.clearLinesBoard()
-							render.allSolidLines()
-							render.goal()
-						else
-							disableNewConnections = true
-							render.movesLeft('red')
-					else
-						disableNewConnections = false
-					
-					# $log.debug('SELECTED', nodes)
-				)
-
-
-
-				#	touchedNodes
-				# 		Redraw nodes that have been "touched" by another nodes
-				# 		animation or by the connecting line
-				#---------------------------------------------------------------
-				$scope.$watchCollection('touchedNodes', (nodes) ->
-					# $log.debug('TOUCHED', nodes)
-
-					$.each(nodes, (i, node) ->
-						nodeStyle = utils.getNodeStyle( node )
-
-						draw.create( utils.createDrawParams(node, nodeStyle) )
-					)
-
-					$scope.touchedNodes = []
-				)
-
-
-
-				#	addedNodes
-				# 		If a new nodes has been selected run the "glow"
-				# 		enter animation
-				#---------------------------------------------------------------
-				$scope.$watchCollection('addedNodes', (nodes) ->
-					# $log.debug('ADDED', nodes)
-					totalSelectedNodes = $scope.selectedNodes.length
-					
-					$.each(nodes, (i, node) ->
-						lineStyle = 'dashed'
-
-						# If this is the first node added it has the "start" style
-						if totalSelectedNodes == 1
-							nodeStyle = 'start'
-						else
-							gameStatus.gameOver = isGameOver()
-							lastSelectedNode = $scope.selectedNodes[totalSelectedNodes - 1]
-							
-							if gameStatus.gameOver and utils.isSameNode(node, lastSelectedNode)
-								nodeStyle = 'start'
-								lineStyle = 'solid'
-							else
-								nodeStyle = 'touched'
-
-						# Get the options for the node to be animated
-						drawNode = utils.createDrawParams(node, nodeStyle)
-
-						# render.clearLinesBoard()
-						# render.allDashedLines()
-						render.connectingLine( node, lineStyle )
-
-						# Run the animation w/ the prams
-						draw.runAnimation(
-							drawNode,
-							{
-								running: (animation, shape) ->
-									render.clearBoardMargins()
-									
-									node.animation = 
-										type: 'glow'
-										id: animation
-										clear: shape
+			saveNode = ( node ) ->
+				return if !node?
 								
-								done: ( shape ) ->
-									node.animation = null
+				# If the current node is the same as the node two moves back
+				# then the player is dragging back to "undo" the connection they 
+				# made. We need to pop this node off.
+				if utils.isGrandPaNode( node )
+					grandparentNode = $scope.selectedNodes[ $scope.selectedNodes.length - 2 ]
+					parentNode = utils.selectedNodes.last()
 
-									# Get the nodes surrounding this one
-									neighborNodes = getNeighborNodes( node )
-									
-									# Add the neighbor nodes to the touched list
-									addTouchedNodes( neighborNodes )
+					$scope.game.board[parentNode.coords.x][parentNode.coords.y].selected = false
 
-									# Clear the margins of the board
-									render.clearBoardMargins()
+					# parentNode.parent = grandparentNode
+					$scope.removedNodes.push(parentNode)
+					$scope.selectedNodes.pop()
+					return
 
-									draw.create( drawNode )
-							}
-							
-						)
-					)
+				return if disableNewConnections
 
-					$scope.addedNodes = []
+				nodeCoords = node.coords
+				$scope.game.board[nodeCoords.x][nodeCoords.y].selected = true
+				$scope.selectedNodes.push( node )
+				$scope.addedNodes.push( node )
+				return
+
+
+
+			#===================================================================
+			#	addTouchedNodes
+			# 		Add new nodes to the touched array
+			#-------------------------------------------------------------------
+			addTouchedNodes = ( nodes ) ->
+				newTouchedNodes = []
+
+				if not angular.isArray( nodes )
+					thisNode = nodes
+					nodes = [].push( thisNode )
+
+				$.each(nodes, (i, node) ->
+					isTouched = utils.checkIsTouched( node )
+					if not isTouched
+						newTouchedNodes.push( node )
 				)
 
-
-
-				#	removedNodes
-				# 		If a node has been deselected run the "leave" 
-				# 		node animation
-				#---------------------------------------------------------------
-				$scope.$watchCollection('removedNodes', (nodes) ->
-					# $log.debug('REMOVED', nodes)
-					
-					$.each(nodes, (i, node) ->
-						if node.animation?.type == 'glow'
-							draw.stopAnimation( node.animation.id )
-							draw.clear( node.animation.clear )
-
-						drawNode = utils.createDrawParams(node, 'untouched')
-
-						render.removeConnectingLine( node )
-
-						draw.runAnimation(
-							drawNode,
-							{
-								running: ( animation, shape ) ->
-									node.animation = 
-										type: 'fill'
-										id: animation
-										clear: shape
-								
-								done: ( shape ) ->
-									draw.clear( shape )
-									draw.create( drawNode )
-								}
-							
-						)
-					)
-
-					$scope.removedNodes = []
-				)
+				$scope.touchedNodes = $scope.touchedNodes.concat( newTouchedNodes )
 
 
 
-				#	disallowedNodes
-				# 		If a node has been deselected run the "leave" 
-				# 		node animation
-				#---------------------------------------------------------------
-				$scope.$watchCollection('disallowedNodes', (nodes) ->
-					# $log.debug('DISALLOWED', nodes)
-					
-					$.each(nodes, (i, node) ->
-						if node.animation?.type == 'fill'
-							draw.stopAnimation( node.animation.id )
-							draw.clear( node.animation.clear )
 
-						drawNode = utils.createDrawParams(node, 'disallowed')
-						draw.create( drawNode )
 
-						# $scope.touchedNodes.push( node )
-					)
 
-					$scope.disallowedNodes = []
-				)
+
 
 
 			initGame = (() ->
 				setup.run()
 				render.run()
-
-				startWatch()
-				initEvents()
+				watchers.start()
+				events.bind()
 			)()
 ]
