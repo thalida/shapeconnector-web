@@ -41,6 +41,7 @@ app.directive 'appGame', [
 			$scope.addedNodes = []
 			$scope.removedNodes = []
 			$scope.touchedNodes = []
+			$scope.disallowedNodes = []
 
 			$scope.enterAnimations = []
 			$scope.leaveAnimations = []
@@ -694,9 +695,6 @@ app.directive 'appGame', [
 
 
 
-
-
-
 			#===================================================================
 			#	onDrag
 			# 		Process the touch and mouse events
@@ -706,7 +704,6 @@ app.directive 'appGame', [
 					_defaults = 
 						start: false
 						type: 'touch'
-
 					params = angular.extend({}, _defaults, params)
 					
 					# Get the touch coords object
@@ -723,10 +720,10 @@ app.directive 'appGame', [
 						
 					currNode = findNode( nodePosition )
 
+					isValidStart = true
+
 					# If a START event was triggered
 					if params.start
-						# $log.debug('=================================')
-						# $log.debug('STARTED' + params.type.toUpperCase())
 						isDragging = true
 
 						# Make sure the player starts dragging from a valid endNode
@@ -748,15 +745,20 @@ app.directive 'appGame', [
 
 							if isValidStart
 								$scope.addedNodes.push( lastTouchedNode )
+					
+					isValidMouse = params.type is 'mouse' and isDragging
 
 					# Check if we should process the mouse/touch event
-					if isValidStart && (params.type is 'touch' or (params.type is 'mouse' and isDragging))
+					if isValidStart && (params.type is 'touch' or isValidMouse)
 						e.preventDefault()
 						$scope.$apply(() ->
 							if params.start 
 								dragStart = nodePosition
 
-							checkMove(currNode, nodePosition, {save: true})
+							isValidMove = checkMove(currNode, nodePosition, {save: true})
+
+							# if isValidMove and disableNewConnections and !lastTouchedNode
+							# 	$scope.disallowedNodes.push( currNode )
 						)
 
 				end: () ->
@@ -975,8 +977,11 @@ app.directive 'appGame', [
 						draw.runAnimation(
 							drawNode,
 							{
-								running: ( animation ) ->
-									node.animation = animation
+								running: ( animation, shape ) ->
+									node.animation = 
+										type: 'fill'
+										id: animation
+										clear: shape
 								
 								done: ( shape ) ->
 									draw.clear( shape )
@@ -987,6 +992,29 @@ app.directive 'appGame', [
 					)
 
 					$scope.removedNodes = []
+				)
+
+
+
+				#	disallowedNodes
+				# 		If a node has been deselected run the "leave" 
+				# 		node animation
+				#---------------------------------------------------------------
+				$scope.$watchCollection('disallowedNodes', (nodes) ->
+					# $log.debug('DISALLOWED', nodes)
+					
+					$.each(nodes, (i, node) ->
+						if node.animation?.type == 'fill'
+							draw.stopAnimation( node.animation.id )
+							draw.clear( node.animation.clear )
+
+						drawNode = utils.createDrawParams(node, 'disallowed')
+						draw.create( drawNode )
+
+						# $scope.touchedNodes.push( node )
+					)
+
+					$scope.disallowedNodes = []
 				)
 
 

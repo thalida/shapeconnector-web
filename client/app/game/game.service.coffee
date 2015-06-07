@@ -15,8 +15,8 @@ app.service 'gameDict', [
 		#-----------------------------------------------------------------------
 		levels = 
 			easy: {
-				min: 5,
-				max: 8
+				min: 3,
+				max: 5
 			}
 			medium: {
 				min: 9,
@@ -243,7 +243,12 @@ app.service 'drawService', [
 				else if params.style is 'touched'
 					@ctx.fillStyle = "rgba(0,0,0,0.0)"
 					@ctx.strokeStyle = params.color
-				
+
+				# Touched: black outline filled shape
+				else if params.style is 'disallowed'
+					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.9)"
+					@ctx.strokeStyle = 'black'
+
 				@ctx.fill()
 				@ctx.stroke()
 				@ctx.restore()
