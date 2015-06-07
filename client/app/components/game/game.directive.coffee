@@ -50,6 +50,7 @@ app.directive 'appGame', [
 			dragStart = {}
 			isDragging = false
 			isValidStart = false
+			disableNewConnections = false
 			gameStatus = 
 				movesLeft: 0
 
@@ -252,7 +253,7 @@ app.directive 'appGame', [
 				#	@movesLeft
 				# 		Render the moves left circle + counter
 				#---------------------------------------------------------------
-				movesLeft: () ->
+				movesLeft: ( color = 'white' ) ->
 					numMoves = gameStatus.movesLeft
 
 					# Get the canvas x pos of the middle column of the board
@@ -270,7 +271,7 @@ app.directive 'appGame', [
 					draw.clear(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
 					
 					# Draw the circle
-					draw.movesCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
+					draw.movesCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
 
 					# Default to white text
 					color = 'white'
@@ -577,6 +578,8 @@ app.directive 'appGame', [
 					$scope.selectedNodes.pop()
 					return
 
+				return if disableNewConnections
+
 				nodeCoords = node.coords
 				$scope.game.board[nodeCoords.x][nodeCoords.y].selected = true
 				$scope.selectedNodes.push( node )
@@ -664,6 +667,37 @@ app.directive 'appGame', [
 
 
 			#===================================================================
+			#	isGameOver
+			# 		Check if the game is completed
+			#-------------------------------------------------------------------
+			isGameOver = ( ) ->
+				$scope.over = false
+
+				return false if gameStatus.movesLeft > 0
+
+				[firstNode, ..., lastNode] = $scope.selectedNodes
+				[endNodeA, ..., endNodeB] = $scope.game.endNodes
+
+				isFirstEndNodeA = utils.isSameNode(firstNode, endNodeA)
+				isLastEndNodeA = utils.isSameNode(lastNode, endNodeA)
+
+				return false if not isFirstEndNodeA and not isLastEndNodeA
+
+				isFirstEndNodeB = utils.isSameNode(firstNode, endNodeB)
+				isLastEndNodeB = utils.isSameNode(lastNode, endNodeB)
+
+				return false if not isFirstEndNodeB and not isLastEndNodeB
+
+				$scope.over = true
+
+				return true
+
+
+
+
+
+
+			#===================================================================
 			#	onDrag
 			# 		Process the touch and mouse events
 			#-------------------------------------------------------------------
@@ -711,6 +745,9 @@ app.directive 'appGame', [
 						else
 							lastTouchedNode = $scope.selectedNodes[$scope.selectedNodes.length - 1]
 							isValidStart = utils.isSameNode( currNode, lastTouchedNode )
+
+							if isValidStart
+								$scope.addedNodes.push( lastTouchedNode )
 
 					# Check if we should process the mouse/touch event
 					if isValidStart && (params.type is 'touch' or (params.type is 'mouse' and isDragging))
@@ -792,6 +829,22 @@ app.directive 'appGame', [
 				canvasEl.addEventListener('touchleave', onTouch.end, false)
 				canvasEl.addEventListener('touchcancel', onTouch.cancel, false)
 
+			#===================================================================
+			#	initEvents
+			# 		Enable canvas events + callbacks
+			#-------------------------------------------------------------------
+			removeEvents = () ->
+				$canvas
+					.off('mousedown', onMouse.start)
+					.off('mousemove', onMouse.move)
+					.off('mouseup', onMouse.end)
+
+				canvasEl = $canvas[0]
+				canvasEl.removeEventListener('touchstart', onTouch.start, false)
+				canvasEl.removeEventListener('touchmove', onTouch.move, false)
+				canvasEl.removeEventListener('touchend', onTouch.end, false)
+				canvasEl.removeEventListener('touchleave', onTouch.end, false)
+				canvasEl.removeEventListener('touchcancel', onTouch.cancel, false)
 
 
 			#===================================================================
@@ -815,6 +868,16 @@ app.directive 'appGame', [
 						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes + 1
 					
 					render.movesLeft()
+
+					if gameStatus.movesLeft <= 0
+						gameOver = isGameOver()
+						if gameOver
+							removeEvents()
+						else
+							disableNewConnections = true
+							render.movesLeft('red')
+					else
+						disableNewConnections = false
 					
 					# $log.debug('SELECTED', nodes)
 				)

@@ -497,11 +497,11 @@ app.service 'drawService', [
 			# 		Extends @genericCircle to create the circle counting down
 			# 		the moves left in the game
 			#-------------------------------------------------------------------
-			movesCircle: (x, y, width, height) =>
+			movesCircle: (x, y, width, height, color) =>
 				# $log.debug('making circle:', x, y, width, height)
 				@genericCircle(x, y, width, height)
 				
-				@ctx.strokeStyle = '#fff'
+				@ctx.strokeStyle = gameDict.hexColors[color]
 				@ctx.lineWidth = 2
 				@ctx.stroke()
 
