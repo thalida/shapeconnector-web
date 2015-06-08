@@ -129,6 +129,9 @@ app.directive 'appGame', [
 				isValidBoardAxis: ( boardAxis ) ->
 					return 0 <= boardAxis < _.BOARD_SIZE
 
+				#	@isSameNode
+				# 		Check if two nodes share the same coords
+				#---------------------------------------------------------------
 				isSameNode: (nodeA, nodeB) ->
 					return false if not nodeA? or not nodeB?
 
@@ -137,6 +140,9 @@ app.directive 'appGame', [
 
 					return isSameX and isSameY
 
+				#	@isSameShape
+				# 		Check if two nodes are the same type + color shape
+				#---------------------------------------------------------------
 				isSameShape: (nodeA, nodeB) ->
 					return false if not nodeA? or not nodeB?
 
@@ -145,6 +151,9 @@ app.directive 'appGame', [
 
 					return isSameColor and isSameType
 
+				#	@createDrawParams
+				# 		Global utility for converting a node to the drawService params
+				#---------------------------------------------------------------
 				createDrawParams: ( node, nodeStyle, clearStyle ) ->
 					if clearStyle? and clearStyle == 'small'
 						clear =
@@ -173,6 +182,9 @@ app.directive 'appGame', [
 						clear: clear
 					}
 
+				#	@getNodeStyle
+				# 		Get the style of the node based on it's current state
+				#---------------------------------------------------------------
 				getNodeStyle: ( node ) ->
 					$scope.gameOver.won = utils.isGameOver()
 					if node.selected == true
@@ -393,6 +405,9 @@ app.directive 'appGame', [
 					# Set the num moves left to the total moves possible
 					gameStatus.movesLeft = $scope.game.maxMoves
 
+				#	@createCanvas
+				# 		Create a new canvas and draw servic
+				#---------------------------------------------------------------
 				createCanvas: ( canvasName, className ) ->
 					$selector = el.find(className)
 					canvasEl = $selector[0]
@@ -778,12 +793,22 @@ app.directive 'appGame', [
 				constructor: () ->
 					return
 
+				#	@stop
+				# 		Stop the animation currently running on this node
+				#---------------------------------------------------------------
 				stop: ( node, type ) ->
-					if node.animation?.type is type
+					if type? and (node.animation?.type is type)
 						canvas.game.render.stopAnimation( node.animation.id )
 						canvas.game.render.clear( node.animation.clear )
+					else 
+						canvas.game.render.stopAnimation( node.animation.id )
+						canvas.game.render.clear( node.animation.clear )
+
 					return
 
+				#	@glow
+				# 		Create a "glow" selected animation on the node
+				#---------------------------------------------------------------
 				glow: ( node ) ->
 					# Get the options for the node to be animated
 					nodeStyle = utils.getNodeStyle( node )
@@ -817,6 +842,9 @@ app.directive 'appGame', [
 
 					return
 
+				#	@fill
+				# 		Create a "fill" deselected animation on the node
+				#---------------------------------------------------------------
 				fill: ( node ) ->
 					drawNode = utils.createDrawParams(node, 'untouched')
 					drawNode.animation = {type: 'fill'}
@@ -839,6 +867,9 @@ app.directive 'appGame', [
 					)
 					return
 
+				#	@shadlow
+				# 		Create a "shadow" end game animation on the node
+				#---------------------------------------------------------------
 				shadow: ( node ) ->
 					# nodeStyle = utils.getNodeStyle( node )
 					drawNode = utils.createDrawParams(node, 'untouched')
@@ -863,6 +894,9 @@ app.directive 'appGame', [
 
 					return
 
+				#	@fadeOut
+				# 		Create a "fadeout" end game animation on the node
+				#---------------------------------------------------------------
 				fadeOut: ( node ) ->
 					drawNode = utils.createDrawParams(node, 'untouched')
 					drawNode.animation = {type: 'fadeOut'}
