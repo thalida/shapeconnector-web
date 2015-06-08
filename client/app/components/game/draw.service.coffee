@@ -196,8 +196,8 @@ app.service 'drawService', [
 
 				# Start: White outline filled shape
 				else if params.style is 'start'
-					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.5)"
-					@ctx.strokeStyle = 'white'
+					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
+					@ctx.strokeStyle = 'rgba(255,255,255,0.8)'
 
 				# Touched: Colored outlined shape (no fill)
 				else if params.style is 'touched'
@@ -364,22 +364,29 @@ app.service 'drawService', [
 			shadowAnimation: (params, progress) =>
 				@clear( params.clear )
 				
+
+				makeShape = @[params.type]
 				rgb = hexToRgb(params.color)
 
 				@ctx.save()
-				@ctx.lineWidth = 2
-				@ctx.shadowBlur = 10
-				@ctx.shadowOffsetX = 0
-				@ctx.shadowOffsetY = (params.size.h * progress) * 1
-				@ctx.strokeStyle = 'white'
-				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
-				@ctx.shadowColor = 'rgba(0,0,0,0.5)'
 
-				makeShape = @[params.type]
+				@ctx.shadowColor = 'rgba(0,0,0,0.5)'
+				@ctx.shadowBlur = (params.size.h * progress)
+				@ctx.shadowOffsetX = 0
+				@ctx.shadowOffsetY = (params.size.h * progress)
+				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
 				makeShape(params.coords.x, params.coords.y, params.size.w, params.size.h)
-				
 				@ctx.fill()
+
+				@ctx.shadowColor = 'rgba(0,0,0,0)'
+				@ctx.shadowBlur = 0
+				@ctx.shadowOffsetX = 0
+				@ctx.shadowOffsetY = 0
+				@ctx.lineWidth = 2
+				@ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+				makeShape(params.coords.x, params.coords.y, params.size.w, params.size.h)
 				@ctx.stroke()
+
 				@ctx.restore()
 
 				return {
@@ -462,7 +469,7 @@ app.service 'drawService', [
 				@ctx.save()
 
 				fontSize = 16
-				@ctx.font = fontSize + 'px sans-serif'
+				@ctx.font = fontSize + 'px Lato, sans-serif'
 				@ctx.textAlign = 'center'
 				@ctx.textBaseline = 'top'
 				@ctx.fillStyle = '#FFFFFF'
@@ -478,7 +485,7 @@ app.service 'drawService', [
 					# Vertically center the text in the square provided
 					x = (params.x1 + params.x2) / 2
 					y = (params.y2 + params.y1) / 2
-					y -= fontSize / 2
+					y -= fontSize / 1.5
 
 					@ctx.fillText('' + str, x, y)
 

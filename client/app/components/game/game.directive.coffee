@@ -675,12 +675,13 @@ app.directive 'appGame', [
 
 					canvas.lines.render.clear( clear )
 
+					lineThickness = 2
 
 					x1 = node.position.x + (_.SHAPE_SIZE / 2)
-					y1 = node.position.y + (_.SHAPE_SIZE / 2)
+					y1 = node.position.y + (_.SHAPE_SIZE / 2) + (lineThickness / 2)
 					
 					x2 = parentNode.position.x + (_.SHAPE_SIZE / 2)
-					y2 = parentNode.position.y + (_.SHAPE_SIZE / 2)
+					y2 = parentNode.position.y + (_.SHAPE_SIZE / 2) + (lineThickness / 2)
 					
 					if gameStatus.movesLeft < 0
 						if style is 'solid'
@@ -799,13 +800,16 @@ app.directive 'appGame', [
 				stop: ( node, type ) ->
 					return if not node? or not node.animation?
 
-					if type? and node.animation.type is type
-						canvas.game.render.stopAnimation( node.animation.id )
-						canvas.game.render.clear( node.animation.clear )
-					else
-						canvas.game.render.stopAnimation( node.animation.id )
-						canvas.game.render.clear( node.animation.clear )
+					if type?
+						return if node.animation.type isnt type
 
+						canvas.game.render.stopAnimation( node.animation.id )
+						canvas.game.render.clear( node.animation.clear )
+						return
+					
+					canvas.game.render.stopAnimation( node.animation.id )
+					canvas.game.render.clear( node.animation.clear )
+					
 					return
 
 				#	@glow
@@ -876,7 +880,7 @@ app.directive 'appGame', [
 					# nodeStyle = utils.getNodeStyle( node )
 					drawNode = utils.createDrawParams(node, 'untouched')
 					drawNode.animation = {type: 'shadow'}
-					drawNode.duration = 350
+					drawNode.duration = 200
 
 					canvas.game.render.runAnimation(
 						drawNode,
@@ -902,7 +906,7 @@ app.directive 'appGame', [
 				fadeOut: ( node ) ->
 					drawNode = utils.createDrawParams(node, 'untouched')
 					drawNode.animation = {type: 'fadeOut'}
-					drawNode.duration = 200
+					drawNode.duration = 700
 
 					canvas.game.render.runAnimation(
 						drawNode,
