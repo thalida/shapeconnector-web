@@ -797,10 +797,12 @@ app.directive 'appGame', [
 				# 		Stop the animation currently running on this node
 				#---------------------------------------------------------------
 				stop: ( node, type ) ->
-					if type? and (node.animation?.type is type)
+					return if not node? or not node.animation?
+
+					if type? and node.animation.type is type
 						canvas.game.render.stopAnimation( node.animation.id )
 						canvas.game.render.clear( node.animation.clear )
-					else 
+					else
 						canvas.game.render.stopAnimation( node.animation.id )
 						canvas.game.render.clear( node.animation.clear )
 
