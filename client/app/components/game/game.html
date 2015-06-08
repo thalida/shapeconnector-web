@@ -2,6 +2,9 @@
 	 ng-class="{
 	 	'won-game': gameOver.won == true
 	 }">
-	<canvas id="canvas-{{$id}}" class="canvas"></canvas>
-	<canvas id="canvas-lines-{{$id}}" class="canvas-lines"></canvas>
+	<canvas class="game-goal canvas-goal"></canvas>
+	<div class="game-board">
+		<canvas class="canvas-game"></canvas>
+		<canvas class="canvas-lines"></canvas>
+	</div>
 </div>

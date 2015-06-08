@@ -1,0 +1,40 @@
+$shape-size: 16px;
+$shape-spacer: 7px;
+
+.game {
+	@extend %disable-selection;
+	
+	margin: 0 auto;
+	position: relative;
+
+	canvas {
+		@extend %disable-selection;
+	}
+
+	&-goal {
+		margin-bottom: 50px;
+	}
+
+	&-board {
+		position: relative;
+
+		.canvas-game {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 2;
+		}
+
+		.canvas-lines {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+	}
+
+	&.won-game {
+		.canvas-game {
+			z-index: 0;
+		}
+	}
+}

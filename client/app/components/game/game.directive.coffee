@@ -10,7 +10,8 @@ app.directive 'appGame', [
 	'$log'
 	'gameService'
 	'drawService'
-	($log, gameService, DrawService) ->
+	'assetsService'
+	($log, gameService, DrawService, assetsService) ->
 		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
 		replace: true
@@ -21,19 +22,26 @@ app.directive 'appGame', [
 			#	Game elements
 			#-------------------------------------------------------------------
 			$window = $(window)
-			$canvas = $('#canvas-' + $scope.$id)
-			canvas = $canvas[0]
+			
+			$gameCanvas = el.find('.canvas-game')
+			gameCanvas = $gameCanvas[0]
 
-			$canvaslines = $('#canvas-lines-' + $scope.$id)
-			canvaslines = $canvaslines[0]
+			$linesCanvas = el.find('.canvas-lines')
+			linesCanvas = $linesCanvas[0]
+
+			$goalCanvas = el.find('.canvas-goal')
+			goalCanvas = $goalCanvas[0]
 
 			#	Setup the variables for the draw service and canvas context
 			#-------------------------------------------------------------------
-			draw = undefined
-			ctx = undefined
+			drawGame = undefined
+			gameCtx = undefined
 
-			drawlines = undefined
-			linesctx = undefined
+			drawLines = undefined
+			linesCtx = undefined
+
+			drawGoal = undefined
+			goalCtx = undefined
 
 			#	Setup the store of general game information
 			#-------------------------------------------------------------------
@@ -61,12 +69,11 @@ app.directive 'appGame', [
 			_ = 
 				BOARD_SIZE: 0
 				BOARD_DIMENSIONS: {}
-				BOARD_MARGIN: {
-					top: 100
-				}
+				BOARD_MARGIN: {}
 				SHAPE_SIZE: 16
 				SHAPE_MARGIN: 30
 
+			_.BOARD_MARGIN.top = _.SHAPE_MARGIN
 			_.BOARD_MARGIN.left = _.SHAPE_MARGIN
 			_.SHAPE_OUTERSIZE = _.SHAPE_SIZE + _.SHAPE_MARGIN
 
@@ -92,6 +99,13 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 
 			utils = 
+				calcGameTopMargin: () ->
+					windowMidHeight = $window.height() / 2
+					boardHalfHeight = _.BOARD_DIMENSIONS.h / 2
+					goalHeight = $goalCanvas.outerHeight(true)
+
+					return windowMidHeight - boardHalfHeight - goalHeight
+
 				#	@calcBoardX
 				# 		With a given canvas X coord get the X column of the board
 				#---------------------------------------------------------------
@@ -403,11 +417,14 @@ app.directive 'appGame', [
 				# 		size of the board
 				#---------------------------------------------------------------
 				canvas: () ->
-					$canvas = el.find('.canvas')
-					canvas = $canvas[0]
+					$gameCanvas = el.find('.canvas-game')
+					gameCanvas = $gameCanvas[0]
 
-					$canvaslines = el.find('.canvas-lines')
-					canvaslines = $canvaslines[0]
+					$linesCanvas = el.find('.canvas-lines')
+					linesCanvas = $linesCanvas[0]
+
+					$goalCanvas = el.find('.canvas-goal')
+					goalCanvas = $goalCanvas[0]
 
 					maxBoardSize = _.BOARD_SIZE * _.SHAPE_OUTERSIZE
 					
@@ -415,37 +432,42 @@ app.directive 'appGame', [
 					_.BOARD_DIMENSIONS.w = maxBoardSize + _.BOARD_MARGIN.left
 					_.BOARD_DIMENSIONS.h = maxBoardSize + _.BOARD_MARGIN.top
 
+					gameCanvas.width = _.BOARD_DIMENSIONS.w * 2
+					gameCanvas.height = _.BOARD_DIMENSIONS.h * 2
+					gameCanvas.style.width = _.BOARD_DIMENSIONS.w + 'px'
+					gameCanvas.style.height = _.BOARD_DIMENSIONS.h + 'px'
+
+					linesCanvas.width = _.BOARD_DIMENSIONS.w * 2
+					linesCanvas.height = _.BOARD_DIMENSIONS.h * 2
+					linesCanvas.style.width = _.BOARD_DIMENSIONS.w + 'px'
+					linesCanvas.style.height = _.BOARD_DIMENSIONS.h + 'px'
+
+					goalCanvas.width = _.BOARD_DIMENSIONS.w * 2
+					goalCanvas.height = _.SHAPE_OUTERSIZE * 2
+					goalCanvas.style.width = _.BOARD_DIMENSIONS.w + 'px'
+					goalCanvas.style.height = _.SHAPE_OUTERSIZE + 'px'
+
 					# Set the width + height of the game wrapper
 					el.css(
 						width: _.BOARD_DIMENSIONS.w
-						height: _.BOARD_DIMENSIONS.h
+						height: _.BOARD_DIMENSIONS.h + $goalCanvas.outerHeight( true )
+						marginTop: utils.calcGameTopMargin()
 					)
 
-					# Set the width + height of the canvas
-					# NOTE: We do a trick below w/ doubling the canvas.width
-					# and canvas.height to combat against a "blurring" issue
-					# when drawing on the canvas
-					canvas.width = _.BOARD_DIMENSIONS.w * 2
-					canvas.height = _.BOARD_DIMENSIONS.h * 2
-					canvas.style.width = _.BOARD_DIMENSIONS.w + 'px'
-					canvas.style.height = _.BOARD_DIMENSIONS.h + 'px'
+					el.find('.game-board').css(height: _.BOARD_DIMENSIONS.h)
 
-					canvaslines.width = _.BOARD_DIMENSIONS.w * 2
-					canvaslines.height = _.BOARD_DIMENSIONS.h * 2
-					canvaslines.style.width = _.BOARD_DIMENSIONS.w + 'px'
-					canvaslines.style.height = _.BOARD_DIMENSIONS.h + 'px'
+					gameCtx = gameCanvas.getContext('2d')
+					linesCtx = linesCanvas.getContext('2d')
+					goalCtx = goalCanvas.getContext('2d')
 
-					# Get the canvas context
-					ctx = canvas.getContext('2d')
-					ctx.scale(2, 2)
-
-					# Get the canvas context
-					linesctx = canvaslines.getContext('2d')
-					linesctx.scale(2, 2)
+					gameCtx.scale(2, 2)
+					linesCtx.scale(2, 2)
+					goalCtx.scale(2, 2)
 
 					# Setup the drawing service
-					draw = new DrawService(ctx, {size: _.SHAPE_SIZE})
-					drawlines = new DrawService(linesctx, {size: _.SHAPE_SIZE})
+					drawGame =  new DrawService(gameCtx, {size: _.SHAPE_SIZE})
+					drawLines =  new DrawService(linesCtx, {size: _.SHAPE_SIZE})
+					drawGoal =  new DrawService(goalCtx, {size: _.SHAPE_SIZE})
 
 
 
@@ -477,6 +499,10 @@ app.directive 'appGame', [
 				movesLeft: ( color = 'white' ) ->
 					numMoves = gameStatus.movesLeft
 
+					# Set text to red if we've used up all of our moves
+					if not $scope.gameOver.won and parseInt(numMoves, 10) <= 0
+						color = 'red'
+
 					# Get the canvas x pos of the middle column of the board
 					middleColumn = Math.floor(_.BOARD_SIZE / 2)
 					gameMiddle = utils.calcCanvasX( middleColumn )
@@ -489,21 +515,14 @@ app.directive 'appGame', [
 					movesCircle.x = gameMiddle - ( movesCircle.w / 4)
 
 					# Clear the area under the circle
-					draw.clear(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
+					drawGoal.clear(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
 					
 					# Draw the circle
-					draw.movesCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
-
-					# Default to white text
-					color = 'white'
-
-					# Set text to red if we've used up all of our moves
-					if parseInt(numMoves, 10) < 0
-						color = 'red'
+					drawGoal.movesCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
 
 					# Render the # of moves text on the canvas
 					# Center the text in the moves circle
-					draw.text(
+					drawGoal.text(
 						numMoves + '', 
 						{
 							x1: movesCircle.x,
@@ -520,7 +539,7 @@ app.directive 'appGame', [
 				# 		Render the nodes that must start and end the connections
 				#---------------------------------------------------------------
 				goal: () ->
-					draw.clear(0, 0, _.BOARD_DIMENSIONS.w, _.BOARD_MARGIN)
+					drawGoal.clear(0, 0, _.BOARD_DIMENSIONS.w, _.BOARD_MARGIN)
 
 					# Render the moves left
 					movesCircle = @movesLeft()				
@@ -557,12 +576,12 @@ app.directive 'appGame', [
 						
 						if $scope.gameOver.won
 							nodeStyle = 'start'
-							draw.solidLine(line.x1, line.y1, line.x2, line.y2)
+							drawGoal.solidLine(line.x1, line.y1, line.x2, line.y2)
 						else
 							nodeStyle = 'untouched'
-							draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
+							drawGoal.dashedLine(line.x1, line.y1, line.x2, line.y2)
 
-						draw.create(
+						drawGoal.create(
 							type: node.type
 							color: node.color
 							coords: {x, y}
@@ -591,7 +610,7 @@ app.directive 'appGame', [
 								node.selected = false
 
 								# Draw the shape
-								draw.create(
+								drawGame.create(
 									type: node.type
 									color: node.color
 									coords: {x, y}
@@ -603,7 +622,7 @@ app.directive 'appGame', [
 										animation.fadeOut( node )
 									else
 										drawNode = utils.createDrawParams(node, 'faded')
-										draw.create( drawNode )
+										drawGame.create( drawNode )
 								else
 									if params? and params.animation == true
 										animation.stop(node, 'glow')
@@ -661,7 +680,7 @@ app.directive 'appGame', [
 						width: _.SHAPE_OUTERSIZE
 						height: _.SHAPE_OUTERSIZE
 
-					drawlines.clear( clear )
+					drawLines.clear( clear )
 
 
 					x1 = node.position.x + (_.SHAPE_SIZE / 2)
@@ -672,21 +691,21 @@ app.directive 'appGame', [
 					
 					if gameStatus.movesLeft < 0
 						if style is 'solid'
-							drawlines.solidRedLine(x1, y1, x2, y2)
+							drawLines.solidRedLine(x1, y1, x2, y2)
 						else
-							drawlines.dashedRedLine(x1, y1, x2, y2)
+							drawLines.dashedRedLine(x1, y1, x2, y2)
 					else
 						if style is 'solid'
-							drawlines.solidLine(x1, y1, x2, y2)
+							drawLines.solidLine(x1, y1, x2, y2)
 						else
-							drawlines.dashedLine(x1, y1, x2, y2)
+							drawLines.dashedLine(x1, y1, x2, y2)
 
 
 					clearNode = utils.createDrawParams(node, 'invisible', 'small').clear
 					clearParentNode = utils.createDrawParams(parentNode, 'invisible', 'small').clear
 
-					drawlines.clear( clearNode )
-					drawlines.clear( clearParentNode )
+					drawLines.clear( clearNode )
+					drawLines.clear( clearParentNode )
 
 					return true
 				
@@ -698,7 +717,7 @@ app.directive 'appGame', [
 					clearY = node.position.y - _.SHAPE_MARGIN
 					clearSize = _.SHAPE_OUTERSIZE + _.SHAPE_MARGIN
 
-					drawlines.clear(clearX, clearY, clearSize, clearSize)
+					drawLines.clear(clearX, clearY, clearSize, clearSize)
 
 					return
 
@@ -712,24 +731,25 @@ app.directive 'appGame', [
 						width: _.BOARD_DIMENSIONS.w
 						height: _.BOARD_DIMENSIONS.h
 
-					drawlines.clear( clearBoard )
+					drawLines.clear( clearBoard )
 
 				#	@trackingLine
 				# 		Draw the line used to shown when starting to connect to a new node
 				#---------------------------------------------------------------
 				trackingLine: (startNode, end) ->
-					startPos = 
-						x: startNode.position.x + (_.SHAPE_SIZE / 2)
-						y: startNode.position.y + (_.SHAPE_SIZE / 2)
-
 					@clearLinesBoard()
-					
+						
 					@allDashedLines()
 
-					drawlines.dashedLine(startPos.x, startPos.y, end.x, end.y)
-					
-					clearNode = utils.createDrawParams(startNode, 'invisible', 'small').clear
-					drawlines.clear( clearNode )
+					if startNode?
+						startPos = 
+							x: startNode.position.x + (_.SHAPE_SIZE / 2)
+							y: startNode.position.y + (_.SHAPE_SIZE / 2)
+
+						drawLines.dashedLine(startPos.x, startPos.y, end.x, end.y)
+						
+						clearNode = utils.createDrawParams(startNode, 'invisible', 'small').clear
+						drawLines.clear( clearNode )
 
 				#	@clearBoardMargins
 				# 		Clear the unused margins of the board
@@ -737,21 +757,15 @@ app.directive 'appGame', [
 				clearBoardMargins: () ->
 					boardLeft = 
 						x: 0
-						y: _.BOARD_MARGIN.top
+						y: 0
 						width: _.SHAPE_MARGIN / 4
 						height: _.BOARD_DIMENSIONS.h
 					
 					boardRight = 
 						x: _.BOARD_DIMENSIONS.w - (_.SHAPE_MARGIN / 2)
-						y: _.BOARD_MARGIN.top
+						y: 0
 						width: _.SHAPE_MARGIN
 						height: _.BOARD_DIMENSIONS.h
-
-					boardTop = 
-						x: 0
-						y: _.BOARD_MARGIN.top - _.SHAPE_MARGIN - (_.SHAPE_MARGIN / 2)
-						width: _.BOARD_DIMENSIONS.w
-						height: _.SHAPE_MARGIN
 
 					boardBottom = 
 						x: 0
@@ -760,10 +774,10 @@ app.directive 'appGame', [
 						height: _.SHAPE_MARGIN
 
 
-					draw.clear( boardLeft )
-					draw.clear( boardRight )
-					draw.clear( boardTop )
-					draw.clear( boardBottom )
+					drawGame.clear( boardLeft )
+					drawGame.clear( boardRight )
+					drawGame.clear( boardBottom )
+
 
 
 
@@ -788,8 +802,8 @@ app.directive 'appGame', [
 
 				stop: ( node, type ) ->
 					if node.animation?.type is type
-						draw.stopAnimation( node.animation.id )
-						draw.clear( node.animation.clear )
+						drawGame.stopAnimation( node.animation.id )
+						drawGame.clear( node.animation.clear )
 					return
 
 				glow: ( node ) ->
@@ -799,7 +813,7 @@ app.directive 'appGame', [
 					drawNode.animation = {type: 'glow'}
 
 					# Run the animation w/ the prams
-					draw.runAnimation(
+					drawGame.runAnimation(
 						drawNode,
 						{
 							running: (animation, shape) ->
@@ -819,7 +833,7 @@ app.directive 'appGame', [
 								# Clear the margins of the board
 								render.clearBoardMargins()
 								# Redraw the node
-								draw.create( drawNode )
+								drawGame.create( drawNode )
 						}
 					)
 
@@ -828,7 +842,7 @@ app.directive 'appGame', [
 				fill: ( node ) ->
 					drawNode = utils.createDrawParams(node, 'untouched')
 					drawNode.animation = {type: 'fill'}
-					draw.runAnimation(
+					drawGame.runAnimation(
 						drawNode,
 						{
 							running: ( animation, shape ) ->
@@ -840,9 +854,9 @@ app.directive 'appGame', [
 							done: ( shape ) ->
 								node.animation = null
 								# Clear any leftover states from animation
-								draw.clear( shape )
+								drawGame.clear( shape )
 								# Draw the node
-								draw.create( drawNode )
+								drawGame.create( drawNode )
 						}
 					)
 					return
@@ -853,7 +867,7 @@ app.directive 'appGame', [
 					drawNode.animation = {type: 'shadow'}
 					drawNode.duration = 350
 
-					draw.runAnimation(
+					drawGame.runAnimation(
 						drawNode,
 						{
 							running: ( animation, shape ) ->
@@ -876,7 +890,7 @@ app.directive 'appGame', [
 					drawNode.animation = {type: 'fadeOut'}
 					drawNode.duration = 200
 
-					draw.runAnimation(
+					drawGame.runAnimation(
 						drawNode,
 						{
 							running: ( animation, shape ) ->
@@ -924,17 +938,18 @@ app.directive 'appGame', [
 				# 		Enable canvas events + callbacks
 				#---------------------------------------------------------------
 				bind: () =>
-					$canvas
+					$window.on('resize', @onResize)
+
+					$gameCanvas
 						.on('mousedown', @onMouse.start)
 						.on('mousemove', @onMouse.move)
 						.on('mouseup', @onMouse.end)
 
-					canvasEl = $canvas[0]
-					canvasEl.addEventListener('touchstart', @onTouch.start, false)
-					canvasEl.addEventListener('touchmove', @onTouch.move, false)
-					canvasEl.addEventListener('touchend', @onTouch.end, false)
-					canvasEl.addEventListener('touchleave', @onTouch.end, false)
-					canvasEl.addEventListener('touchcancel', @onTouch.cancel, false)
+					gameCanvas.addEventListener('touchstart', @onTouch.start, false)
+					gameCanvas.addEventListener('touchmove', @onTouch.move, false)
+					gameCanvas.addEventListener('touchend', @onTouch.end, false)
+					gameCanvas.addEventListener('touchleave', @onTouch.end, false)
+					gameCanvas.addEventListener('touchcancel', @onTouch.cancel, false)
 
 					return
 
@@ -942,17 +957,18 @@ app.directive 'appGame', [
 				# 		Enable canvas events + callbacks
 				#---------------------------------------------------------------
 				unbind: () =>
-					$canvas
+					# $window.off('resize', @onResize)
+
+					$gameCanvas
 						.off('mousedown', @onMouse.start)
 						.off('mousemove', @onMouse.move)
 						.off('mouseup', @onMouse.end)
 
-					canvasEl = $canvas[0]
-					canvasEl.removeEventListener('touchstart', @onTouch.start, false)
-					canvasEl.removeEventListener('touchmove', @onTouch.move, false)
-					canvasEl.removeEventListener('touchend', @onTouch.end, false)
-					canvasEl.removeEventListener('touchleave', @onTouch.end, false)
-					canvasEl.removeEventListener('touchcancel', @onTouch.cancel, false)
+					gameCanvas.removeEventListener('touchstart', @onTouch.start, false)
+					gameCanvas.removeEventListener('touchmove', @onTouch.move, false)
+					gameCanvas.removeEventListener('touchend', @onTouch.end, false)
+					gameCanvas.removeEventListener('touchleave', @onTouch.end, false)
+					gameCanvas.removeEventListener('touchcancel', @onTouch.cancel, false)
 
 					return
 
@@ -973,7 +989,7 @@ app.directive 'appGame', [
 							touch = e
 
 						# Calculate the position of the touch on the canvas
-						canvasOffset = $canvas.offset()
+						canvasOffset = $gameCanvas.offset()
 						nodePosition = 
 							x: touch.pageX - canvasOffset.left
 							y: touch.pageY - canvasOffset.top
@@ -1070,6 +1086,12 @@ app.directive 'appGame', [
 					end: ( e ) =>
 						@onDrag.end()
 
+				onResize: ( e ) ->
+					marginTop = utils.calcGameTopMargin()
+					marginTop = 50 if marginTop < 50
+					el.css({marginTop})
+
+					return
 
 
 
@@ -1126,7 +1148,7 @@ app.directive 'appGame', [
 				# 		Watch the game over status
 				#---------------------------------------------------------------
 				gameOver: (gameOver) ->
-					if gameOver.won
+					if gameOver.won == true
 						$scope.endGameAnimation = 0
 
 						gameStatus.movesLeft = 0
@@ -1135,11 +1157,14 @@ app.directive 'appGame', [
 						render.clearLinesBoard()
 						render.allSolidLines()
 						render.goal()
-						render.board({animation: true})
 
-						# $.each($scope.selectedNodes, (i, node) ->
-						# 	animation.shadow( node )
-						# )
+						assetsService.sounds.removedNode.pause()
+						assetsService.sounds.addedNode.pause()
+
+						assetsService.sounds.gameOver.currentTime = 0
+						assetsService.sounds.gameOver.play()
+
+						render.board({animation: true})
 
 					else
 						if gameStatus.movesLeft <= 0
@@ -1174,6 +1199,7 @@ app.directive 'appGame', [
 
 					if gameStatus.movesLeft <= 0
 						$scope.gameOver.won = utils.isGameOver()
+						disableNewConnections = true
 					else
 						disableNewConnections = false
 					
@@ -1185,7 +1211,7 @@ app.directive 'appGame', [
 				touchedNodes: (nodes) ->
 					$.each(nodes, (i, node) ->
 						nodeStyle = utils.getNodeStyle( node )
-						draw.create( utils.createDrawParams(node, nodeStyle) )
+						drawGame.create( utils.createDrawParams(node, nodeStyle) )
 					)
 					$scope.touchedNodes = []
 
@@ -1196,9 +1222,11 @@ app.directive 'appGame', [
 				addedNodes: (nodes) ->
 					$scope.gameOver.won = utils.isGameOver()
 					
-					if not $scope.gameOver.won
+					if not $scope.gameOver.won and nodes.length > 0
 						# $log.debug('ADDED', nodes)
 						$.each(nodes, (i, node) ->
+							assetsService.sounds.addedNode.currentTime = 0
+							assetsService.sounds.addedNode.play()
 							animation.glow( node )
 						)
 
@@ -1208,13 +1236,16 @@ app.directive 'appGame', [
 				# 		If a node has been deselected run the "leave" animation
 				#---------------------------------------------------------------
 				removedNodes: (nodes) ->
-					# $log.debug('REMOVED', nodes)
-					
-					$.each(nodes, (i, node) ->
-						animation.stop(node, 'glow')
-						render.removeConnectingLine( node )
-						animation.fill(node)
-					)
+					if nodes.length > 0
+						# $log.debug('REMOVED', nodes)
+						$.each(nodes, (i, node) ->
+							animation.stop(node, 'glow')
+							render.removeConnectingLine( node )
+
+							assetsService.sounds.removedNode.currentTime = 0
+							assetsService.sounds.removedNode.play()
+							animation.fill(node)
+						)
 
 					$scope.removedNodes = []
 
@@ -1285,10 +1316,14 @@ app.directive 'appGame', [
 
 
 
+
 			initGame = (() ->
-				setup.run()
-				render.run()
-				watchers.start()
-				events.bind()
+				assetsService.onComplete(() ->
+					setup.run()
+					render.run()
+					watchers.start()
+					events.bind()
+				)
+				assetsService.downloadAll()
 			)()
 ]

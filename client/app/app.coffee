@@ -72,6 +72,13 @@ app
 								   (callback) ->
 										return $timeout(callback, 1)
 
+	window.cancelRequestAnimFrame = window.cancelAnimationFrame ||
+									window.webkitCancelRequestAnimationFrame ||
+									window.mozCancelRequestAnimationFrame ||
+									window.oCancelRequestAnimationFrame ||
+									window.msCancelRequestAnimationFrame ||
+									clearTimeout
+
 				
 	# Redirect to login if route requires auth and you're not logged in
 	$rootScope.$on( '$stateChangeStart', (event, next) ->
