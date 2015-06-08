@@ -157,6 +157,12 @@ app.directive 'appGame', [
 							y: node.position.y
 							width: _.SHAPE_SIZE
 							height: _.SHAPE_SIZE
+					else if clearStyle? and clearStyle == 'large'
+						clear =
+							x: node.position.x - _.SHAPE_MARGIN
+							y: node.position.y - _.SHAPE_MARGIN
+							width: _.SHAPE_OUTERSIZE + _.SHAPE_MARGIN
+							height: _.SHAPE_OUTERSIZE + _.SHAPE_MARGIN
 					else
 						clear =
 							x: node.position.x - (_.SHAPE_MARGIN / 2)
@@ -227,7 +233,7 @@ app.directive 'appGame', [
 				#	@getNeighborNodes
 				# 		Get all the nodes surrounding this one
 				#---------------------------------------------------------------
-				getNeighborNodes: ( node ) ->
+				getNeighborNodes: ( node, checks ) ->
 					nodeX = node.coords.x
 					nodeY = node.coords.y
 
@@ -255,8 +261,13 @@ app.directive 'appGame', [
 						isValidY = utils.isValidBoardAxis( potY )
 
 						if isValidX and isValidY
-							node = $scope.game.board[potX][potY]
-							neighbors.push( node )
+							neighborNode = $scope.game.board[potX][potY]
+
+							if checks?
+								if checks.selected? && neighborNode.selected == checks.selected
+									neighbors.push( neighborNode )
+							else
+								neighbors.push( neighborNode )
 
 						potentialIdx += 1
 
@@ -564,26 +575,39 @@ app.directive 'appGame', [
 				#	@board
 				# 		Render the nodes of the game board
 				#---------------------------------------------------------------
-				board: () ->
+				board: ( params ) ->
 					board = $scope.game.board
 					$.each( board, ( boardX, col ) ->
 						$.each( col, ( boardY, node ) ->
-							# Get the canvas x and y coords of the node
-							x = utils.calcCanvasX(node.coords.x)
-							y = utils.calcCanvasY(node.coords.y)
+							if not $scope.gameOver.won
+								# Get the canvas x and y coords of the node
+								x = utils.calcCanvasX(node.coords.x)
+								y = utils.calcCanvasY(node.coords.y)
 
-							# Update the node w/ the canvas position
-							node.position = {x, y}
+								# Update the node w/ the canvas position
+								node.position = {x, y}
 
-							# Mark the node as unselected
-							node.selected = false
+								# Mark the node as unselected
+								node.selected = false
 
-							# Draw the shape
-							draw.create(
-								type: node.type
-								color: node.color
-								coords: {x, y}
-							)
+								# Draw the shape
+								draw.create(
+									type: node.type
+									color: node.color
+									coords: {x, y}
+								)
+							else
+								if not node.selected
+									if params? and params.animation == true
+										animation.stop(node, 'glow')
+										animation.fadeOut( node )
+									else
+										drawNode = utils.createDrawParams(node, 'faded')
+										draw.create( drawNode )
+								else
+									if params? and params.animation == true
+										animation.stop(node, 'glow')
+										animation.shadow( node )
 
 							return
 						)
@@ -760,16 +784,19 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			animation = new class Animation
 				constructor: () ->
+					return
 
 				stop: ( node, type ) ->
 					if node.animation?.type is type
 						draw.stopAnimation( node.animation.id )
 						draw.clear( node.animation.clear )
+					return
 
 				glow: ( node ) ->
 					# Get the options for the node to be animated
 					nodeStyle = utils.getNodeStyle( node )
 					drawNode = utils.createDrawParams(node, nodeStyle)
+					drawNode.animation = {type: 'glow'}
 
 					# Run the animation w/ the prams
 					draw.runAnimation(
@@ -791,14 +818,16 @@ app.directive 'appGame', [
 
 								# Clear the margins of the board
 								render.clearBoardMargins()
-
 								# Redraw the node
 								draw.create( drawNode )
 						}
 					)
 
+					return
+
 				fill: ( node ) ->
 					drawNode = utils.createDrawParams(node, 'untouched')
+					drawNode.animation = {type: 'fill'}
 					draw.runAnimation(
 						drawNode,
 						{
@@ -814,10 +843,56 @@ app.directive 'appGame', [
 								draw.clear( shape )
 								# Draw the node
 								draw.create( drawNode )
-							}
-						
+						}
+					)
+					return
+
+				shadow: ( node ) ->
+					# nodeStyle = utils.getNodeStyle( node )
+					drawNode = utils.createDrawParams(node, 'untouched')
+					drawNode.animation = {type: 'shadow'}
+					drawNode.duration = 350
+
+					draw.runAnimation(
+						drawNode,
+						{
+							running: ( animation, shape ) ->
+								node.animation = 
+									type: 'shadow'
+									id: animation
+									clear: shape
+							done: ( shape ) ->
+								node.animation = null
+								render.clearBoardMargins()
+								$scope.endGameAnimation += 1
+								$scope.$apply()
+						}
 					)
 
+					return
+
+				fadeOut: ( node ) ->
+					drawNode = utils.createDrawParams(node, 'untouched')
+					drawNode.animation = {type: 'fadeOut'}
+					drawNode.duration = 200
+
+					draw.runAnimation(
+						drawNode,
+						{
+							running: ( animation, shape ) ->
+								node.animation = 
+									type: 'fadeOut'
+									id: animation
+									clear: shape
+							done: ( shape ) ->
+								node.animation = null
+								render.clearBoardMargins()
+								$scope.endGameAnimation += 1
+								$scope.$apply()
+						}
+					)
+
+					return
 
 
 
@@ -906,7 +981,7 @@ app.directive 'appGame', [
 						currNode = utils.findNode( nodePosition )
 
 						# If a START event was triggered
-						if params.start
+						if currNode and params.start
 							isDragging = true
 
 							# Make sure the player starts dragging from a valid endNode
@@ -1034,7 +1109,8 @@ app.directive 'appGame', [
 						new ScopeWatch('selectedNodes', @selectedNodes),
 						new ScopeWatch('touchedNodes', @touchedNodes),
 						new ScopeWatch('addedNodes', @addedNodes),
-						new ScopeWatch('removedNodes', @removedNodes)
+						new ScopeWatch('removedNodes', @removedNodes),
+						new ScopeWatch('endGameAnimation', @endGameAnimation)
 					]
 
 				#	@end
@@ -1051,14 +1127,32 @@ app.directive 'appGame', [
 				#---------------------------------------------------------------
 				gameOver: (gameOver) ->
 					if gameOver.won
+						$scope.endGameAnimation = 0
+
+						gameStatus.movesLeft = 0
+
 						events.unbind()
 						render.clearLinesBoard()
 						render.allSolidLines()
 						render.goal()
+						render.board({animation: true})
+
+						# $.each($scope.selectedNodes, (i, node) ->
+						# 	animation.shadow( node )
+						# )
+
 					else
 						if gameStatus.movesLeft <= 0
 							disableNewConnections = true
 							render.movesLeft('red')
+				
+				#	@endGameAnimation
+				# 		Watch the game over status
+				#---------------------------------------------------------------
+				endGameAnimation: (endGameAnimation) ->
+					totalNodes = _.BOARD_SIZE * _.BOARD_SIZE
+					if endGameAnimation == totalNodes
+						render.board({animation: false})
 
 				#	@selectedNodes
 				# 		Watch if we have changed the nodes that are selected
@@ -1071,10 +1165,10 @@ app.directive 'appGame', [
 					dragStart = nodes[nodes.length - 1]
 					
 					# Only update the counter when we have two or more selections
-					if totalNodes <= 1
-						gameStatus.movesLeft = $scope.game.maxMoves
+					if totalNodes == 0
+						gameStatus.movesLeft = $scope.game.maxMoves - 1
 					else
-						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes + 1
+						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes
 					
 					render.movesLeft()
 
@@ -1100,13 +1194,13 @@ app.directive 'appGame', [
 				# 		enter animation
 				#---------------------------------------------------------------
 				addedNodes: (nodes) ->
-					# $log.debug('ADDED', nodes)
+					$scope.gameOver.won = utils.isGameOver()
 					
-					$.each(nodes, (i, node) ->
-						$scope.gameOver.won = utils.isGameOver()
-						lastSelectedNode = utils.selectedNodes.last()
-						animation.glow( node )
-					)
+					if not $scope.gameOver.won
+						# $log.debug('ADDED', nodes)
+						$.each(nodes, (i, node) ->
+							animation.glow( node )
+						)
 
 					$scope.addedNodes = []
 
@@ -1181,7 +1275,6 @@ app.directive 'appGame', [
 					if not isTouched
 						newTouchedNodes.push( node )
 				)
-
 				$scope.touchedNodes = $scope.touchedNodes.concat( newTouchedNodes )
 
 

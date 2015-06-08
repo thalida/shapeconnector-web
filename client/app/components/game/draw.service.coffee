@@ -65,6 +65,8 @@ app.service 'drawService', [
 				if params.color.indexOf('#') < 0
 					params.color = gameDict.hexColors[params.color]
 
+				# $log.debug( params )
+
 				# Do we need to clear a space?
 				if params.clear?
 					@clear( params.clear )
@@ -110,21 +112,34 @@ app.service 'drawService', [
 					timestamp = new Date().getTime()
 					progress = Math.min((params.duration - (enterEnd - timestamp)) / params.duration, 1)
 
-					# Set the enter + leave animations
-					if params.style is 'start' or params.style is 'touched'
-						shape = @glowEnterAnimation( params, progress, callbacks?.during)
-					else 
-						shape = @fillAnimation( params, progress, callbacks?.during)
+					animationType = params.animation.type 
+					animationFunc = null
+
+					if animationType is 'shadow'
+						animationFunc = @shadowAnimation
+
+					else if animationType is 'glow'
+						animationFunc = @glowEnterAnimation
+
+					else if animationType is 'fill'
+						animationFunc = @fillAnimation
+
+					else if animationType is 'fadeOut'
+						animationFunc = @fadeOutAnimation
+
+					shape = animationFunc?( params, progress, callbacks?.during)
 
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
 						callbacks.before?( animation, shape )
+						
 						animation = requestAnimationFrame(enterAnimation)
+						
 						callbacks.running?( animation, shape )
+
 						callbacks.after?( animation, shape )
 					else
-						if params.style is 'start' or params.style is 'touched'
-							# @clear(shape)
+						if animationType is 'glow'
 							leaveAnimation()
 						else	
 							callbacks.done?(shape)
@@ -133,16 +148,19 @@ app.service 'drawService', [
 					# Get our current progres
 					timestamp = new Date().getTime()
 					progress = Math.min((params.duration - (leaveEnd - timestamp)) / params.duration, 1)
+					animationType = params.animation.type 
 
-					# Set the enter + leave animations
-					if params.style is 'start' or params.style is 'touched'
+					if animationType is 'glow'
 						shape = @glowLeaveAnimation( params, progress, callbacks?.during )
 
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
 						callbacks.before?( animation, shape )
+
 						animation = requestAnimationFrame(leaveAnimation)
+
 						callbacks.running?( animation, shape )
+
 						callbacks.after?( animation, shape )
 					else
 						callbacks.done?(shape)
@@ -155,8 +173,8 @@ app.service 'drawService', [
 			# 		Cancel the passed animation
 			#-------------------------------------------------------------------
 			stopAnimation: ( animation ) ->
-       			window.cancelAnimationFrame(animation)
-       			animation = undefined
+				window.cancelAnimationFrame(animation)
+				animation = undefined
 
 			#	@setShapeStyle
 			# 		Styles the shape based on it's status
@@ -171,6 +189,10 @@ app.service 'drawService', [
 				if params.style is 'untouched'
 					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
 					@ctx.strokeStyle = params.color
+					@ctx.shadowColor = "rgba(0,0,0,0.0)"
+					@ctx.shadowBlur = 0
+					@ctx.shadowOffsetX = 0
+					@ctx.shadowOffsetY = 0
 
 				# Start: White outline filled shape
 				else if params.style is 'start'
@@ -187,6 +209,15 @@ app.service 'drawService', [
 					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.9)"
 					@ctx.strokeStyle = 'black'
 
+				# Touched: faded filled shape
+				else if params.style is 'faded'
+					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.2)"
+					@ctx.strokeStyle = "rgba(0,0,0,0.0)"
+					@ctx.shadowColor = "rgba(0,0,0,0.0)"
+					@ctx.shadowBlur = 0
+					@ctx.shadowOffsetX = 0
+					@ctx.shadowOffsetY = 0
+
 				@ctx.fill()
 				@ctx.stroke()
 				@ctx.restore()
@@ -194,7 +225,7 @@ app.service 'drawService', [
 			#	@glowEnterAnimation
 			# 		Creates a glow around the shape
 			#-------------------------------------------------------------------
-			glowEnterAnimation: (params, progress, cb) ->
+			glowEnterAnimation: (params, progress, cb) =>
 				# $log.debug('in enter animation')
 				# Shape width/height grows outward
 				shape = 
@@ -244,7 +275,7 @@ app.service 'drawService', [
 			#	@glowLeaveAnimation
 			# 		Creates a glow around the shape
 			#-------------------------------------------------------------------
-			glowLeaveAnimation: (params, progress) ->
+			glowLeaveAnimation: (params, progress) =>
 				# $log.debug('in leave animation')
 
 				# Shape width/height grows outward
@@ -298,7 +329,7 @@ app.service 'drawService', [
 			#	@fillAnimation
 			# 		Fills in the shape from the outside in
 			#-------------------------------------------------------------------
-			fillAnimation: (params, progress) ->
+			fillAnimation: (params, progress) =>
 				shape = 
 					width: params.size.w - (params.size.w * progress)
 					height: params.size.h - (params.size.h * progress)
@@ -326,6 +357,70 @@ app.service 'drawService', [
 				@ctx.restore()
 
 				return shape
+
+			#	@shadowAnimation
+			# 		Adds a shadow beneath the shape
+			#-------------------------------------------------------------------
+			shadowAnimation: (params, progress) =>
+				@clear( params.clear )
+				
+				rgb = hexToRgb(params.color)
+
+				@ctx.save()
+				@ctx.lineWidth = 2
+				@ctx.shadowBlur = 10
+				@ctx.shadowOffsetX = 0
+				@ctx.shadowOffsetY = (params.size.h * progress) * 1
+				@ctx.strokeStyle = 'white'
+				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
+				@ctx.shadowColor = 'rgba(0,0,0,0.5)'
+
+				makeShape = @[params.type]
+				makeShape(params.coords.x, params.coords.y, params.size.w, params.size.h)
+				
+				@ctx.fill()
+				@ctx.stroke()
+				@ctx.restore()
+
+				return {
+					x: params.coords.x, 
+					y: params.coords.y,
+					width: params.size.w, 
+					height: params.size.h
+				}
+
+				return 
+
+
+			#	@fadeOutAnimation
+			# 		Adds a shadow beneath the shape
+			#-------------------------------------------------------------------
+			fadeOutAnimation: (params, progress) =>
+				@clear( params.clear )
+
+				rgb = hexToRgb(params.color)
+				fade = (1 - progress) + 0.2
+
+				makeShape = @[params.type]
+				makeShape(params.coords.x, params.coords.y, params.size.w, params.size.h)
+
+				@ctx.save()
+				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, #{fade})"
+				@ctx.strokeStyle = "rgba(0,0,0,0.0)"
+				@ctx.shadowColor = "rgba(0,0,0,0.0)"
+				@ctx.shadowBlur = 0
+				@ctx.shadowOffsetX = 0
+				@ctx.shadowOffsetY = 0
+				@ctx.fill()
+				@ctx.restore()
+
+				return {
+					x: params.coords.x, 
+					y: params.coords.y,
+					width: params.size.w, 
+					height: params.size.h
+				}
+
 
 			#	@genericCircle
 			# 		Creates a basic circle

@@ -15,8 +15,8 @@ app.service 'gameDict', [
 		#-----------------------------------------------------------------------
 		levels = 
 			easy: {
-				min: 3,
-				max: 5
+				min: 5,
+				max: 8
 			}
 			medium: {
 				min: 9,
@@ -133,7 +133,7 @@ app.service 'gameService', [
 
 				return {
 					endNodes: @endNodes
-					maxMoves: @pathSize - 1
+					maxMoves: @pathSize
 					board: @board
 				}
 

@@ -1,4 +1,7 @@
-<div class="game">
+<div class="game"
+	 ng-class="{
+	 	'won-game': gameOver.won == true
+	 }">
 	<canvas id="canvas-{{$id}}" class="canvas"></canvas>
 	<canvas id="canvas-lines-{{$id}}" class="canvas-lines"></canvas>
 </div>
