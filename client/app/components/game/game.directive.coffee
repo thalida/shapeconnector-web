@@ -8,10 +8,13 @@
 #-------------------------------------------------------------------------------
 app.directive 'appGame', [
 	'$log'
+	'$timeout'
+	'$interval'
 	'gameService'
 	'drawService'
 	'assetsService'
-	($log, gameService, DrawService, assetsService) ->
+	'timerService'
+	($log, $timeout, $interval, gameService, DrawService, assetsService, Timer) ->
 		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
 		replace: true
@@ -21,6 +24,7 @@ app.directive 'appGame', [
 			canvas = {}
 
 			$window = $(window)
+			$gameHeader = el.find('.game-header')
 
 			#	Setup the store of general game information
 			#-------------------------------------------------------------------
@@ -28,15 +32,7 @@ app.directive 'appGame', [
 			$scope.addedNodes = []
 			$scope.removedNodes = []
 			$scope.touchedNodes = []
-
 			$scope.startNode = null
-
-			$scope.gameOver = 
-				won: false
-				lost: false
-
-			gameStatus = 
-				movesLeft: 0
 
 			#	Setup events globals
 			#-------------------------------------------------------------------
@@ -44,6 +40,10 @@ app.directive 'appGame', [
 			isDragging = false
 			isValidStart = false
 			disableNewConnections = false
+			
+			$scope.hasTimer = false
+			timer = null
+			timeRemaining = 0
 
 			#	Setup the consts dictonary for the game
 			#-------------------------------------------------------------------
@@ -80,12 +80,23 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 
 			utils = 
+				calcGameWidth: () ->
+					gameWidth = _.BOARD_DIMENSIONS.w + 150
+					if $window.width() < gameWidth
+						gameWidth = $window.width() - 30
+
+					return gameWidth
+
 				calcGameTopMargin: () ->
 					windowMidHeight = $window.height() / 2
 					boardHalfHeight = _.BOARD_DIMENSIONS.h / 2
+					headerHeight = $gameHeader.outerHeight(true)
 					goalHeight = canvas.goal.$el.outerHeight(true)
 
-					return windowMidHeight - boardHalfHeight - goalHeight
+					topMargin = windowMidHeight - boardHalfHeight - goalHeight - headerHeight
+					topMargin = 60 if topMargin < 0
+
+					return topMargin
 
 				#	@calcBoardX
 				# 		With a given canvas X coord get the X column of the board
@@ -186,13 +197,13 @@ app.directive 'appGame', [
 				# 		Get the style of the node based on it's current state
 				#---------------------------------------------------------------
 				getNodeStyle: ( node ) ->
-					$scope.gameOver.won = utils.isGameOver()
+					$scope.game.won = utils.isGameOver()
 					if node.selected == true
 						lastNode = utils.selectedNodes.last()
 						
 						if utils.isSameNode(node, $scope.startNode)
 							nodeStyle = 'start'
-						else if $scope.gameOver.won and utils.isSameNode(node, lastNode)
+						else if $scope.game.won and utils.isSameNode(node, lastNode)
 							nodeStyle = 'start'
 						else
 							nodeStyle = 'touched'
@@ -349,7 +360,7 @@ app.directive 'appGame', [
 				# 		Check if the game is completed
 				#---------------------------------------------------------------
 				isGameOver: () ->
-					return false if gameStatus.movesLeft > 0
+					return false if $scope.game.movesLeft > 0
 
 					[firstNode, ..., lastNode] = $scope.selectedNodes
 					[endNodeA, ..., endNodeB] = $scope.game.endNodes
@@ -386,8 +397,13 @@ app.directive 'appGame', [
 				constructor: () ->
 
 				run: () ->
+					$gameHeader = el.find('.game-header')
+
 					@game()
 					@canvas()
+					$scope.hasTimer = true
+					timer = new Timer( 60 )
+					timer.onTick = onTimerChange
 
 				#	@game
 				# 		Setups the game arrays and consts
@@ -398,12 +414,12 @@ app.directive 'appGame', [
 
 					# Generate the game board arrays
 					$scope.game = gameService.generateGame( difficulty: $scope.difficulty )
+					$scope.game.movesLeft = $scope.game.maxMoves
+					$scope.game.won = false
+					$scope.game.lost = false
 					
 					# Set the board size const
 					_.BOARD_SIZE = gameService.opts.dimensions
-					
-					# Set the num moves left to the total moves possible
-					gameStatus.movesLeft = $scope.game.maxMoves
 
 				#	@createCanvas
 				# 		Create a new canvas and draw servic
@@ -412,13 +428,19 @@ app.directive 'appGame', [
 					$selector = el.find(className)
 					canvasEl = $selector[0]
 
-					canvasEl.width = _.BOARD_DIMENSIONS.w * 2
-					canvasEl.style.width = _.BOARD_DIMENSIONS.w + 'px'
-
 					if canvasName is 'goal'
+						canvasEl.width = _.BOARD_DIMENSIONS.w * 2
+						canvasEl.style.width = _.BOARD_DIMENSIONS.w + 'px'
+						canvasEl.height = _.SHAPE_OUTERSIZE * 2
+						canvasEl.style.height = _.SHAPE_OUTERSIZE + 'px'
+					else if canvasName is 'timer'
+						canvasEl.width = _.SHAPE_OUTERSIZE * 2
+						canvasEl.style.width = _.SHAPE_OUTERSIZE + 'px'
 						canvasEl.height = _.SHAPE_OUTERSIZE * 2
 						canvasEl.style.height = _.SHAPE_OUTERSIZE + 'px'
 					else
+						canvasEl.width = _.BOARD_DIMENSIONS.w * 2
+						canvasEl.style.width = _.BOARD_DIMENSIONS.w + 'px'
 						canvasEl.height = _.BOARD_DIMENSIONS.h * 2
 						canvasEl.style.height = _.BOARD_DIMENSIONS.h + 'px'
 
@@ -450,17 +472,18 @@ app.directive 'appGame', [
 					@createCanvas('game', '.canvas-game')
 					@createCanvas('lines', '.canvas-lines')
 					@createCanvas('goal', '.canvas-goal')
+					@createCanvas('timer', '.canvas-timer')
 
-					$log.debug( canvas )
 
-					# Set the width + height of the game wrapper
+					$gameBoardContainer = el.find('.game-board-wrapper')
+					$gameBoard = el.find('.game-board')
+
 					el.css(
-						width: _.BOARD_DIMENSIONS.w
-						height: _.BOARD_DIMENSIONS.h + canvas.goal.$el.outerHeight( true )
+						width: utils.calcGameWidth()
 						marginTop: utils.calcGameTopMargin()
 					)
-
-					el.find('.game-board').css(height: _.BOARD_DIMENSIONS.h)
+					$gameBoardContainer.css(width: _.BOARD_DIMENSIONS.w)
+					$gameBoard.css(height: _.BOARD_DIMENSIONS.h)
 
 
 
@@ -490,10 +513,10 @@ app.directive 'appGame', [
 				# 		Render the moves left circle + counter
 				#---------------------------------------------------------------
 				movesLeft: ( color = 'white' ) ->
-					numMoves = gameStatus.movesLeft
+					numMoves = $scope.game.movesLeft
 
 					# Set text to red if we've used up all of our moves
-					if not $scope.gameOver.won and parseInt(numMoves, 10) <= 0
+					if not $scope.game.won and parseInt(numMoves, 10) <= 0
 						color = 'red'
 
 					# Get the canvas x pos of the middle column of the board
@@ -511,7 +534,7 @@ app.directive 'appGame', [
 					canvas.goal.render.clear(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
 					
 					# Draw the circle
-					canvas.goal.render.movesCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
+					canvas.goal.render.strokedCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
 
 					# Render the # of moves text on the canvas
 					# Center the text in the moves circle
@@ -567,7 +590,7 @@ app.directive 'appGame', [
 						else
 							line.x2 += movesCircle.w
 						
-						if $scope.gameOver.won
+						if $scope.game.won
 							nodeStyle = 'start'
 							canvas.goal.render.solidLine(line.x1, line.y1, line.x2, line.y2)
 						else
@@ -591,7 +614,7 @@ app.directive 'appGame', [
 					board = $scope.game.board
 					$.each( board, ( boardX, col ) ->
 						$.each( col, ( boardY, node ) ->
-							if not $scope.gameOver.won
+							if not $scope.game.won
 								# Get the canvas x and y coords of the node
 								x = utils.calcCanvasX(node.coords.x)
 								y = utils.calcCanvasY(node.coords.y)
@@ -683,7 +706,7 @@ app.directive 'appGame', [
 					x2 = parentNode.position.x + (_.SHAPE_SIZE / 2)
 					y2 = parentNode.position.y + (_.SHAPE_SIZE / 2) + (lineThickness / 2)
 					
-					if gameStatus.movesLeft < 0
+					if $scope.game.movesLeft < 0
 						if style is 'solid'
 							canvas.lines.render.solidRedLine(x1, y1, x2, y2)
 						else
@@ -772,7 +795,38 @@ app.directive 'appGame', [
 					canvas.game.render.clear( boardRight )
 					canvas.game.render.clear( boardBottom )
 
+				#	@timer
+				# 		Render the countdown timer
+				#---------------------------------------------------------------
+				timer: (color = 'white') ->
+					color = 'red' if timeRemaining.total <= 10
 
+					clearCanvas = 
+						x: 0
+						y: 0
+						width: canvas.timer.el.width
+						height: canvas.timer.el.height
+
+					circle =
+						x: 5
+						y: 5
+						width: 32
+						height: 32
+
+					canvas.timer.render.clear(clearCanvas)
+					canvas.timer.render.strokedCircle(circle.x, circle.y, circle.width, circle.height, color)
+					canvas.timer.render.text(
+						timeRemaining.total + '', 
+						{
+							x1: circle.x,
+							y1: circle.y,
+							x2: circle.x + circle.width,
+							y2: circle.y + circle.height,
+							color: color
+						}
+					)
+
+					return circle
 
 
 
@@ -1105,9 +1159,10 @@ app.directive 'appGame', [
 						@onDrag.end()
 
 				onResize: ( e ) ->
-					marginTop = utils.calcGameTopMargin()
-					marginTop = 50 if marginTop < 50
-					el.css({marginTop})
+					el.css(
+						width: utils.calcGameWidth()
+						marginTop: utils.calcGameTopMargin()
+					)
 
 					return
 
@@ -1145,7 +1200,9 @@ app.directive 'appGame', [
 				start: () ->
 					# Create an array of the scope attrs we are watching
 					@watching = [
-						new ScopeWatch('gameOver', @gameOver),
+						new ScopeWatch('game.won', @gameWon),
+						new ScopeWatch('game.lost', @gameLost),
+						new ScopeWatch('game.movesLeft', @movesLeft),
 						new ScopeWatch('selectedNodes', @selectedNodes),
 						new ScopeWatch('touchedNodes', @touchedNodes),
 						new ScopeWatch('addedNodes', @addedNodes),
@@ -1162,15 +1219,16 @@ app.directive 'appGame', [
 					)
 					@watching = []
 
-				#	@gameOver
+				#	@gameWon
 				# 		Watch the game over status
 				#---------------------------------------------------------------
-				gameOver: (gameOver) ->
-					if gameOver.won == true
+				gameWon: ( hasWon ) ->
+					if hasWon == true
 						$scope.endGameAnimation = 0
 
-						gameStatus.movesLeft = 0
+						$scope.game.movesLeft = 0
 
+						timer.pause()
 						events.unbind()
 						render.clearLinesBoard()
 						render.allSolidLines()
@@ -1183,11 +1241,24 @@ app.directive 'appGame', [
 						assetsService.sounds.gameOver.play()
 
 						render.board({animation: true})
+					return
 
-					else
-						if gameStatus.movesLeft <= 0
-							disableNewConnections = true
-							render.movesLeft('red')
+				#	@gameLost
+				# 		Watch the game over status
+				#---------------------------------------------------------------
+				gameLost: ( hasLost ) ->
+					if hasLost == true
+						events.unbind()
+					return
+
+				#	@movesLeft
+				# 		Watch the game over status
+				#---------------------------------------------------------------
+				movesLeft: ( numMoves ) ->
+					if numMoves <= 0 and not $scope.game.won and not $scope.game.lost
+						disableNewConnections = true
+						render.movesLeft('red')
+					return
 				
 				#	@endGameAnimation
 				# 		Watch the game over status
@@ -1209,14 +1280,14 @@ app.directive 'appGame', [
 					
 					# Only update the counter when we have two or more selections
 					if totalNodes == 0
-						gameStatus.movesLeft = $scope.game.maxMoves - 1
+						$scope.game.movesLeft = $scope.game.maxMoves - 1
 					else
-						gameStatus.movesLeft = $scope.game.maxMoves - totalNodes
+						$scope.game.movesLeft = $scope.game.maxMoves - totalNodes
 					
 					render.movesLeft()
 
-					if gameStatus.movesLeft <= 0
-						$scope.gameOver.won = utils.isGameOver()
+					if $scope.game.movesLeft <= 0
+						$scope.game.won = utils.isGameOver()
 						disableNewConnections = true
 					else
 						disableNewConnections = false
@@ -1238,9 +1309,9 @@ app.directive 'appGame', [
 				# 		enter animation
 				#---------------------------------------------------------------
 				addedNodes: (nodes) ->
-					$scope.gameOver.won = utils.isGameOver()
+					$scope.game.won = utils.isGameOver()
 					
-					if not $scope.gameOver.won and nodes.length > 0
+					if not $scope.game.won and nodes.length > 0
 						# $log.debug('ADDED', nodes)
 						$.each(nodes, (i, node) ->
 							assetsService.sounds.addedNode.currentTime = 0
@@ -1272,8 +1343,8 @@ app.directive 'appGame', [
 
 
 
-
-
+			
+				
 
 
 			#===================================================================
@@ -1328,6 +1399,20 @@ app.directive 'appGame', [
 
 
 
+			#===================================================================
+			#	onTimerChange
+			# 		Add new nodes to the touched array
+			#-------------------------------------------------------------------
+			onTimerChange = ( time ) ->
+				timeRemaining = time
+				render.timer()
+
+				if timeRemaining.total == 0
+					$scope.game.lost = true
+				# $log.debug( time )
+
+
+
 
 
 
@@ -1341,6 +1426,7 @@ app.directive 'appGame', [
 					render.run()
 					watchers.start()
 					events.bind()
+					timer.start()
 				)
 				assetsService.downloadAll()
 			)()

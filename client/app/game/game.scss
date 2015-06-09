@@ -11,12 +11,32 @@ $shape-spacer: 7px;
 		@extend %disable-selection;
 	}
 
-	&-goal {
+	&-header {
+		display: block;
+		position: relative;
+		overflow: hidden;
 		margin-bottom: 50px;
+		.game-timer {
+			display: block;
+			position: absolute;
+			top: 0;
+			right: 0;
+		}
+		.game-goal {
+			display: block;
+			position: relative;
+			margin: 0 auto;
+		}
 	}
+
 
 	&-board {
 		position: relative;
+
+		&-wrapper {
+			position: relative;
+			margin: 0 auto;
+		}
 
 		.canvas-game {
 			position: absolute;
@@ -32,9 +52,9 @@ $shape-spacer: 7px;
 		}
 	}
 
-	&.won-game {
+	&.won {
 		.canvas-game {
 			z-index: 0;
 		}
-	}
+	}	
 }

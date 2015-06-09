@@ -543,11 +543,10 @@ app.service 'drawService', [
 
 				return
 
-			#	@movesCircle
-			# 		Extends @genericCircle to create the circle counting down
-			# 		the moves left in the game
+			#	@strokedCircle
+			# 		Extends @genericCircle to create the circle with a stroke
 			#-------------------------------------------------------------------
-			movesCircle: (x, y, width, height, color) =>
+			strokedCircle: (x, y, width, height, color) =>
 				# $log.debug('making circle:', x, y, width, height)
 				@genericCircle(x, y, width, height)
 				
