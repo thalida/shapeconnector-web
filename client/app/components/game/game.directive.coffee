@@ -12,9 +12,9 @@ app.directive 'appGame', [
 	'$interval'
 	'gameService'
 	'drawService'
-	'assetsService'
 	'timerService'
-	($log, $timeout, $interval, gameService, DrawService, assetsService, Timer) ->
+	'assetsService'
+	($log, $timeout, $interval, GameService, DrawService, Timer, assetsService) ->
 		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
 		replace: true
@@ -128,7 +128,7 @@ app.directive 'appGame', [
 				isDragging = false
 				isValidStart = false
 				disableNewConnections = false
-				
+
 				timeRemaining = 0
 
 				render.run()
@@ -494,6 +494,7 @@ app.directive 'appGame', [
 					$scope.difficulty ?= 'easy'
 
 					# Generate the game board arrays
+					gameService = new GameService()
 					$scope.game = gameService.generateGame( difficulty: $scope.difficulty )
 					$scope.game.movesLeft = $scope.game.maxMoves
 					$scope.game.won = false
@@ -589,6 +590,9 @@ app.directive 'appGame', [
 			render = new class GameRender
 				run: () ->
 					@clearLinesBoard()
+					@clearGoalBoard()
+					@clearGameBoard()
+
 					@board()
 					@goal()
 
@@ -829,10 +833,34 @@ app.directive 'appGame', [
 					clearBoard = 
 						x: 0
 						y: 0
-						width: _.BOARD_DIMENSIONS.w
-						height: _.BOARD_DIMENSIONS.h
+						width: canvas.lines.el.width
+						height: canvas.lines.el.width
 
 					canvas.lines.render.clear( clearBoard )
+
+				#	@clearLinesBoard
+				# 		Clear the canvas used to draw the lines
+				#---------------------------------------------------------------
+				clearGoalBoard: () ->
+					clearBoard = 
+						x: 0
+						y: 0
+						width: canvas.goal.el.width
+						height: canvas.goal.el.width
+
+					canvas.goal.render.clear( clearBoard )
+
+				#	@clearLinesBoard
+				# 		Clear the canvas used to draw the lines
+				#---------------------------------------------------------------
+				clearGameBoard: () ->
+					clearBoard = 
+						x: 0
+						y: 0
+						width: canvas.game.el.width
+						height: canvas.game.el.width
+
+					canvas.game.render.clear( clearBoard )
 
 				#	@trackingLine
 				# 		Draw the line used to shown when starting to connect to a new node

@@ -76,7 +76,7 @@ app.service 'gameService', [
 	'$log'
 	'gameDict'
 	( $log, gameDict) ->
-		return new class Game
+		return class Game
 
 			#	@constructor
 			# 		Sets up the options to be used for generating the game

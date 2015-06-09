@@ -37,7 +37,10 @@ app.service 'assetsService', [
 					@assetLoaded('sounds', sound)
 
 			downloadAll: () ->
-				@downloadSounds()
+				if @assetsLoaded == @totalAssests
+					@onComplete?()
+				else
+					@downloadSounds()
 
 			downloadSounds: () =>
 				$.each(@sounds, (sound, src) =>
