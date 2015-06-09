@@ -72,7 +72,7 @@ app.directive 'appGame', [
 				isValidStart = false
 				disableNewConnections = false
 				
-				totalTime = 45
+				totalTime = 30
 				timeRemaining = 0
 
 
@@ -128,8 +128,7 @@ app.directive 'appGame', [
 				isDragging = false
 				isValidStart = false
 				disableNewConnections = false
-
-				totalTime = 45
+				
 				timeRemaining = 0
 
 				render.run()
@@ -1312,7 +1311,7 @@ app.directive 'appGame', [
 				#	@gameWon
 				# 		Watch the game over status
 				#---------------------------------------------------------------
-				gameWon: ( hasWon ) ->
+				gameWon: ( hasWon ) =>
 					if hasWon == true
 						$scope.endGameAnimation = 0
 
@@ -1338,7 +1337,7 @@ app.directive 'appGame', [
 				#	@gameLost
 				# 		Watch the game over status
 				#---------------------------------------------------------------
-				gameLost: ( hasLost ) ->
+				gameLost: ( hasLost ) =>
 					if hasLost == true
 						events.unbind()
 						@stop()
