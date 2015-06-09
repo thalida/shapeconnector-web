@@ -1,9 +1,9 @@
 'use strict'
 
-angular.module 'appApp'
+app
 .config ($stateProvider) ->
-  $stateProvider
-  .state 'main',
-    url: '/'
-    templateUrl: 'app/main/main.html'
-    controller: 'MainCtrl'
+	$stateProvider
+	.state 'main',
+		url: '/main'
+		templateUrl: 'app/main/main.html'
+		controller: 'MainCtrl'
