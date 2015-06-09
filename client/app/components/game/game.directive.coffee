@@ -21,44 +21,130 @@ app.directive 'appGame', [
 		scope:
 			difficulty: '@?'
 		link: ($scope, el, attrs) ->
-			canvas = {}
-
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
 
-			#	Setup the store of general game information
-			#-------------------------------------------------------------------
-			$scope.selectedNodes = []
-			$scope.addedNodes = []
-			$scope.removedNodes = []
-			$scope.touchedNodes = []
-			$scope.startNode = null
-
-			#	Setup events globals
-			#-------------------------------------------------------------------
-			dragStart = {}
-			isDragging = false
-			isValidStart = false
-			disableNewConnections = false
-			
-			$scope.hasTimer = false
+			_ = null
+			canvas = null
+			dragStart = null
+			isDragging = null
+			isValidStart = null
+			disableNewConnections = null
 			timer = null
-			timeRemaining = 0
-			totalTime = 45
+			timeRemaining = null
+			totalTime = null
 
-			#	Setup the consts dictonary for the game
+			#===================================================================
+			# 
+			# 
+			# 
+			#	INIT
+			# 
+			# 
+			# 
 			#-------------------------------------------------------------------
-			_ = 
-				BOARD_SIZE: 0
-				BOARD_DIMENSIONS: {}
-				BOARD_MARGIN: {}
-				SHAPE_SIZE: 16
-				SHAPE_MARGIN: 30
+			init = () ->
+				_ = 
+					BOARD_SIZE: 0
+					BOARD_DIMENSIONS: {}
+					BOARD_MARGIN: {}
+					SHAPE_SIZE: 16
+					SHAPE_MARGIN: 30
 
-			_.BOARD_MARGIN.top = _.SHAPE_MARGIN
-			_.BOARD_MARGIN.left = _.SHAPE_MARGIN
-			_.SHAPE_OUTERSIZE = _.SHAPE_SIZE + _.SHAPE_MARGIN
+				_.BOARD_MARGIN.top = _.SHAPE_MARGIN
+				_.BOARD_MARGIN.left = _.SHAPE_MARGIN
+				_.SHAPE_OUTERSIZE = _.SHAPE_SIZE + _.SHAPE_MARGIN
 
+				#	Setup the store of general game information
+				#---------------------------------------------------------------
+				$scope.selectedNodes = []
+				$scope.addedNodes = []
+				$scope.removedNodes = []
+				$scope.touchedNodes = []
+				$scope.startNode = null
+
+				canvas = {}
+
+				#	Setup events globals
+				#---------------------------------------------------------------
+				dragStart = {}
+				isDragging = false
+				isValidStart = false
+				disableNewConnections = false
+				
+				totalTime = 45
+				timeRemaining = 0
+
+
+				assetsService.onComplete(() ->
+					timer?.stop()
+					watchers?.stop()
+
+					setup.run()
+					render.run()
+					watchers.start()
+					events.bind()
+
+					$scope.hasTimer = true
+					timer = new Timer( totalTime )
+					timer.onTick = onTimerChange
+					timer.start()
+				)
+				assetsService.downloadAll()
+
+				return
+			
+			$scope.newGame = init
+
+
+
+
+			#===================================================================
+			# 
+			# 
+			# 
+			#	RESET
+			# 
+			# 
+			# 
+			#-------------------------------------------------------------------
+			reset = () ->
+				timer?.stop()
+				watchers?.stop()
+				$scope.game = $scope.origGame
+
+				#	Setup the store of general game information
+				#---------------------------------------------------------------
+				$scope.selectedNodes = []
+				$scope.addedNodes = []
+				$scope.removedNodes = []
+				$scope.touchedNodes = []
+				$scope.startNode = null
+
+
+				#	Setup events globals
+				#---------------------------------------------------------------
+				dragStart = {}
+				isDragging = false
+				isValidStart = false
+				disableNewConnections = false
+
+				totalTime = 45
+				timeRemaining = 0
+
+				render.run()
+				watchers.start()
+				events.bind()
+
+				$scope.hasTimer = true
+				timer = new Timer( totalTime )
+				timer.onTick = onTimerChange
+				timer.start()
+
+				return
+			
+			$scope.resetGame = reset
+			
 
 
 
@@ -398,13 +484,8 @@ app.directive 'appGame', [
 				constructor: () ->
 
 				run: () ->
-					$gameHeader = el.find('.game-header')
-
 					@game()
 					@canvas()
-					$scope.hasTimer = true
-					timer = new Timer( totalTime )
-					timer.onTick = onTimerChange
 
 				#	@game
 				# 		Setups the game arrays and consts
@@ -418,6 +499,8 @@ app.directive 'appGame', [
 					$scope.game.movesLeft = $scope.game.maxMoves
 					$scope.game.won = false
 					$scope.game.lost = false
+
+					$scope.origGame = angular.extend({}, {}, $scope.game)
 					
 					# Set the board size const
 					_.BOARD_SIZE = gameService.opts.dimensions
@@ -506,6 +589,7 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			render = new class GameRender
 				run: () ->
+					@clearLinesBoard()
 					@board()
 					@goal()
 
@@ -1216,10 +1300,10 @@ app.directive 'appGame', [
 						new ScopeWatch('endGameAnimation', @endGameAnimation)
 					]
 
-				#	@end
+				#	@stop
 				# 		Stop watching the scope vars
 				#---------------------------------------------------------------
-				end: () ->
+				stop: () ->
 					$.each(@watching, (i, watchFunc) ->
 						watchFunc?()
 					)
@@ -1247,6 +1331,8 @@ app.directive 'appGame', [
 						assetsService.sounds.gameOver.play()
 
 						render.board({animation: true})
+
+						@stop()
 					return
 
 				#	@gameLost
@@ -1255,6 +1341,7 @@ app.directive 'appGame', [
 				gameLost: ( hasLost ) ->
 					if hasLost == true
 						events.unbind()
+						@stop()
 					return
 
 				#	@movesLeft
@@ -1426,14 +1513,5 @@ app.directive 'appGame', [
 
 
 
-			initGame = (() ->
-				assetsService.onComplete(() ->
-					setup.run()
-					render.run()
-					watchers.start()
-					events.bind()
-					timer.start()
-				)
-				assetsService.downloadAll()
-			)()
+			init()
 ]
