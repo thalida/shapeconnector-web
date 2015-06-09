@@ -1228,7 +1228,7 @@ app.directive 'appGame', [
 
 						$scope.game.movesLeft = 0
 
-						timer.pause()
+						timer.stop()
 						events.unbind()
 						render.clearLinesBoard()
 						render.allSolidLines()

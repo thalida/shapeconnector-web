@@ -55,6 +55,11 @@ app.service 'timerService', [
 				@running = false
 				return
 
+			stop: () ->
+				$timeout.cancel(@timeout)
+				@running = false
+				return
+
 			parse: ( seconds ) ->
 				return {
 					minutes: (seconds / 60) | 0
