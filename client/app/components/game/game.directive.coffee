@@ -73,7 +73,7 @@ app.directive 'appGame', [
 				isValidStart = false
 				disableNewConnections = false
 				
-				totalTime = 10
+				totalTime = 60
 				timeRemaining = 0
 
 
