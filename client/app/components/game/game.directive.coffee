@@ -10,11 +10,11 @@ app.directive 'appGame', [
 	'$log'
 	'$timeout'
 	'$interval'
-	'gameService'
+	'gameBuilderService'
 	'drawService'
 	'timerService'
 	'assetsService'
-	($log, $timeout, $interval, GameService, DrawService, Timer, assetsService) ->
+	($log, $timeout, $interval, GameBuilderService, DrawService, Timer, assetsService) ->
 		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
 		replace: true
@@ -79,9 +79,7 @@ app.directive 'appGame', [
 				totalTime = 10
 				timeRemaining = 0
 
-
 				assetsService.onComplete(() ->
-					$log.debug('starting new game')
 					setup.run()
 					render.run()
 					watchers.start()
@@ -458,7 +456,7 @@ app.directive 'appGame', [
 					$scope.difficulty ?= 'easy'
 
 					# Generate the game board arrays
-					gameService = new GameService(difficulty: $scope.difficulty)
+					gameService = new GameBuilderService(difficulty: $scope.difficulty)
 
 					if $scope.sourceGame?
 						$scope.game = angular.extend({}, {}, $scope.sourceGame)
@@ -1516,13 +1514,14 @@ app.directive 'appGame', [
 
 
 
+
+
+
 			$scope.$on('$destroy', () ->
                 timer?.stop()
                 watchers.stop()
                 events.unbind()
             )
-
-
 
 			init()
 ]

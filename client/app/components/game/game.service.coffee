@@ -68,11 +68,11 @@ app.service 'gameDict', [
 
 #===============================================================================
 #
-#	Game Service
+#	Game Builder Service
 # 		Helper service to generate the core game pieces
 #
 #-------------------------------------------------------------------------------
-app.service 'gameService', [
+app.service 'gameBuilderService', [
 	'$log'
 	'gameDict'
 	( $log, gameDict) ->
@@ -131,8 +131,8 @@ app.service 'gameService', [
 				# Fill any empty spaces on the game board
 				@fillGrid()
 
-				$log.debug( 'BOARD', @board )
-				$log.debug( 'PATH', @path )
+				# $log.debug( 'BOARD', @board )
+				# $log.debug( 'PATH', @path )
 
 				return {
 					endNodes: @endNodes
