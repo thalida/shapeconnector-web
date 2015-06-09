@@ -11,24 +11,23 @@
 			<canvas class="canvas-game"></canvas>
 			<canvas class="canvas-lines"></canvas>
 		</div>
-	</div>
+		<div class="game-popup" ng-show="animationsDone == true">
+			<div ng-show="game.won == true">
+				<span class="popup-header">Woot!</span>
+				<span class="popup-text">
+					You finished this puzzle, up for one more?
+				</span>
 
-	<div class="game-popup">
-		<div ng-if="game.won == true">
-			<span class="popup-header">Woot!</span>
-			<span class="popup-text">
-				You finished this puzzle, up for one more?
-			</span>
+				<a ng-click="newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
+				<a ng-click="goHome()" class="btn type-text">Exit to menu</a>
+			</div>
+			<div ng-show="game.lost == true">
+				<span class="popup-header">Time&rsquo;s up!</span>
 
-			<a ng-click="newGame()" class="btn primary arrow">Next Puzzle</a>
-			<a ng-click="goHome()" class="btn text">Exit to menu</a>
-		</div>
-		<div ng-if="game.lost == true">
-			<span class="popup-header">Time&rsquo;s Up!</span>
-
-			<a ng-click="resetGame()" class="btn primary">Try again?</a>
-			<a ng-click="newGame()" class="btn secondary arrow">New Puzzle</a>
-			<a ng-click="goHome()" class="btn text">Exit to menu</a>
+				<a ng-click="resetGame()" class="btn type-primary">Try again?</a>
+				<a ng-click="newGame()" class="btn type-secondary addon-arrow">New Puzzle</a>
+				<a ng-click="goHome()" class="btn type-text">Exit to menu</a>
+			</div>
 		</div>
 	</div>
 </div>

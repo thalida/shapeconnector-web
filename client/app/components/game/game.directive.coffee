@@ -62,6 +62,7 @@ app.directive 'appGame', [
 				$scope.removedNodes = []
 				$scope.touchedNodes = []
 				$scope.startNode = null
+				$scope.animationsDone = false
 
 				canvas = {}
 
@@ -72,7 +73,7 @@ app.directive 'appGame', [
 				isValidStart = false
 				disableNewConnections = false
 				
-				totalTime = 30
+				totalTime = 10
 				timeRemaining = 0
 
 
@@ -120,7 +121,7 @@ app.directive 'appGame', [
 				$scope.removedNodes = []
 				$scope.touchedNodes = []
 				$scope.startNode = null
-
+				$scope.animationsDone = false
 
 				#	Setup events globals
 				#---------------------------------------------------------------
@@ -561,6 +562,7 @@ app.directive 'appGame', [
 
 					$gameBoardContainer = el.find('.game-board-wrapper')
 					$gameBoard = el.find('.game-board')
+					$gamePopup = el.find('.game-popup')
 
 					el.css(
 						width: utils.calcGameWidth()
@@ -568,6 +570,10 @@ app.directive 'appGame', [
 					)
 					$gameBoardContainer.css(width: _.BOARD_DIMENSIONS.w)
 					$gameBoard.css(height: _.BOARD_DIMENSIONS.h)
+					$gamePopup.css(
+						width: _.BOARD_DIMENSIONS.w
+						height: _.BOARD_DIMENSIONS.h
+					)
 
 
 
@@ -1062,10 +1068,11 @@ app.directive 'appGame', [
 									id: animation
 									clear: shape
 							done: ( shape ) ->
-								node.animation = null
-								render.clearBoardMargins()
-								$scope.endGameAnimation += 1
-								$scope.$apply()
+								$scope.$apply(() ->
+									node.animation = null
+									render.clearBoardMargins()
+									$scope.endGameAnimation += 1
+								)
 						}
 					)
 
@@ -1088,10 +1095,12 @@ app.directive 'appGame', [
 									id: animation
 									clear: shape
 							done: ( shape ) ->
-								node.animation = null
-								render.clearBoardMargins()
-								$scope.endGameAnimation += 1
-								$scope.$apply()
+								$scope.$apply(() ->
+									node.animation = null
+									render.clearBoardMargins()
+									$scope.endGameAnimation += 1
+								)
+								
 						}
 					)
 
@@ -1358,8 +1367,6 @@ app.directive 'appGame', [
 						assetsService.sounds.gameOver.play()
 
 						render.board({animation: true})
-
-						@stop()
 					return
 
 				#	@gameLost
@@ -1368,6 +1375,7 @@ app.directive 'appGame', [
 				gameLost: ( hasLost ) =>
 					if hasLost == true
 						events.unbind()
+						$scope.animationsDone = true
 						@stop()
 					return
 
@@ -1383,10 +1391,12 @@ app.directive 'appGame', [
 				#	@endGameAnimation
 				# 		Watch the game over status
 				#---------------------------------------------------------------
-				endGameAnimation: (endGameAnimation) ->
+				endGameAnimation: (endGameAnimation) =>
 					totalNodes = _.BOARD_SIZE * _.BOARD_SIZE
 					if endGameAnimation == totalNodes
 						render.board({animation: false})
+						$scope.animationsDone = true
+						@stop()
 
 				#	@selectedNodes
 				# 		Watch if we have changed the nodes that are selected
@@ -1529,7 +1539,6 @@ app.directive 'appGame', [
 
 				if timeRemaining.total == 0
 					$scope.game.lost = true
-				# $log.debug( time )
 
 
 
@@ -1541,4 +1550,22 @@ app.directive 'appGame', [
 
 
 			init()
+]
+
+app.animation '.game-popup', [
+	'$log'
+	($log) ->
+		return {
+			addClass: (element, className, done) ->
+				if className is 'ng-hide'
+					$(element).slideUp(500, done)
+				
+				return
+
+			removeClass: (element, className, done) ->
+				if className is 'ng-hide'
+					$(element).hide().slideDown(500, done)
+
+				return
+		}
 ]
