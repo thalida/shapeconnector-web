@@ -19,7 +19,10 @@ app.directive 'appGame', [
 		restrict: 'E'
 		replace: true
 		scope:
+			sourceGame: '=?'
 			difficulty: '@?'
+			onNewGame: '&?'
+			onResetGame: '&?'
 		link: ($scope, el, attrs) ->
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
@@ -73,14 +76,12 @@ app.directive 'appGame', [
 				isValidStart = false
 				disableNewConnections = false
 
-				totalTime = 60
+				totalTime = 10
 				timeRemaining = 0
 
 
 				assetsService.onComplete(() ->
-					timer?.stop()
-					watchers?.stop()
-
+					$log.debug('starting new game')
 					setup.run()
 					render.run()
 					watchers.start()
@@ -95,55 +96,17 @@ app.directive 'appGame', [
 
 				return
 
-			$scope.newGame = init
-
-
-
-
-			#===================================================================
-			#
-			#
-			#
-			#	RESET
-			#
-			#
-			#
-			#-------------------------------------------------------------------
-			reset = () ->
-				timer?.stop()
-				watchers?.stop()
-				$scope.game = $scope.origGame
-
-				#	Setup the store of general game information
-				#---------------------------------------------------------------
-				$scope.selectedNodes = []
-				$scope.addedNodes = []
-				$scope.removedNodes = []
-				$scope.touchedNodes = []
-				$scope.startNode = null
-				$scope.animationsDone = false
-
-				#	Setup events globals
-				#---------------------------------------------------------------
-				dragStart = {}
-				isDragging = false
-				isValidStart = false
-				disableNewConnections = false
-
-				timeRemaining = 0
-
-				render.run()
-				watchers.start()
-				events.bind()
-
-				$scope.hasTimer = true
-				timer = new Timer( totalTime )
-				timer.onTick = onTimerChange
-				timer.start()
-
+			$scope.newGame = () ->
+				$scope.onNewGame?(params: true)
 				return
 
-			$scope.resetGame = reset
+			$scope.resetGame = () ->
+				$scope.onResetGame?(params: $scope.sourceGame)
+				return
+
+			$scope.quitGame = () ->
+				$scope.onQuitGame?(params: true)
+				return
 
 
 
@@ -495,13 +458,20 @@ app.directive 'appGame', [
 					$scope.difficulty ?= 'easy'
 
 					# Generate the game board arrays
-					gameService = new GameService()
-					$scope.game = gameService.generateGame( difficulty: $scope.difficulty )
+					gameService = new GameService(difficulty: $scope.difficulty)
+
+					if $scope.sourceGame?
+						$scope.game = angular.extend({}, {}, $scope.sourceGame)
+					else
+						$scope.game = gameService.generateGame()
+
 					$scope.game.movesLeft = $scope.game.maxMoves
 					$scope.game.won = false
 					$scope.game.lost = false
 
-					$scope.origGame = angular.extend({}, {}, $scope.game)
+					# $scope.origGame = angular.extend({}, {}, $scope.game)
+					if not $scope.sourceGame?
+						$scope.sourceGame = angular.extend({}, {}, $scope.game)
 
 					# Set the board size const
 					_.BOARD_SIZE = gameService.opts.dimensions
@@ -1546,6 +1516,11 @@ app.directive 'appGame', [
 
 
 
+			$scope.$on('$destroy', () ->
+                timer?.stop()
+                watchers.stop()
+                events.unbind()
+            )
 
 
 

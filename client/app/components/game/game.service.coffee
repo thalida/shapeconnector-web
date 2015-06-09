@@ -1,10 +1,10 @@
 'use strict'
 
 #===============================================================================
-# 
+#
 #	Game Dictonary
 # 		Returns general global options for the game
-# 
+#
 #-------------------------------------------------------------------------------
 app.service 'gameDict', [
 	'$log'
@@ -13,9 +13,9 @@ app.service 'gameDict', [
 		#	Game Levels
 		# 		Various difficulty options w/ the range of potential connections
 		#-----------------------------------------------------------------------
-		levels = 
+		levels =
 			dev: {
-				min: 2,
+				min: 3,
 				max: 3
 			}
 			easy: {
@@ -33,7 +33,7 @@ app.service 'gameDict', [
 
 		#	Colors + Hex Colors
 		# 		The options for the node colors in plain text and hex
-		#-----------------------------------------------------------------------	
+		#-----------------------------------------------------------------------
 		colors =  [
 			'red'
 			'blue'
@@ -48,7 +48,7 @@ app.service 'gameDict', [
 			green: '#8BCA22'
 			yellow: '#E5D235'
 		}
-		
+
 		#	Types
 		# 		The types of shapes to be made in the game
 		# 		Each type corresponsds to a draw function
@@ -67,10 +67,10 @@ app.service 'gameDict', [
 
 
 #===============================================================================
-# 
+#
 #	Game Service
 # 		Helper service to generate the core game pieces
-# 
+#
 #-------------------------------------------------------------------------------
 app.service 'gameService', [
 	'$log'
@@ -81,22 +81,25 @@ app.service 'gameService', [
 			#	@constructor
 			# 		Sets up the options to be used for generating the game
 			#-------------------------------------------------------------------
-			constructor: () ->
+			constructor: ( opts ) ->
 				# Level options
 				@levels = gameDict.levels
-				
+
 				# Join shape colors + types to one object
-				@shapes = 
+				@shapes =
 					colors: gameDict.colors
 					types: gameDict.types
 
 				# Defautl to an easy 5 x 5 game board
-				@defaults = 
+				@defaults =
 					difficulty: 'easy'
 					dimensions: 5
 
-				@opts = {}
-				
+				@opts = angular.extend({}, @defaults, opts)
+
+				# Get the total # of connections needed to solve the game
+				@pathSize = @setPathSize()
+
 				# 2D array of the columns + rows of the game
 				@board = []
 
@@ -112,12 +115,7 @@ app.service 'gameService', [
 			#	@generateGame
 			# 		Initializes a new game based on the given options
 			#-------------------------------------------------------------------
-			generateGame: ( opts ) ->
-				@opts = angular.extend({}, @defaults, opts)
-
-				# Get the total # of connections needed to solve the game
-				@pathSize = @setPathSize()
-
+			generateGame: () ->
 				# Get the nodes that will make up the final path
 				@generatePathNodes( @pathNodes )
 
@@ -133,7 +131,7 @@ app.service 'gameService', [
 				# Fill any empty spaces on the game board
 				@fillGrid()
 
-				$log.debug( 'BOARD', @board ) 
+				$log.debug( 'BOARD', @board )
 				$log.debug( 'PATH', @path )
 
 				return {
@@ -156,10 +154,10 @@ app.service 'gameService', [
 				colorOpts = @shapes.colors
 				typeOpts = @shapes.types
 
-				colorIndex = getRandomInt(0, colorOpts.length - 1)	
-				typeIndex = getRandomInt(0, colorOpts.length - 1)	
+				colorIndex = getRandomInt(0, colorOpts.length - 1)
+				typeIndex = getRandomInt(0, colorOpts.length - 1)
 
-				newShape = 
+				newShape =
 					color: colorOpts[ colorIndex ]
 					type: typeOpts[ typeIndex ]
 
@@ -173,8 +171,8 @@ app.service 'gameService', [
 			#-------------------------------------------------------------------
 			saveEndNodes: () ->
 				[first, ..., last] = @path
-				
-				@endNodes.push( first ) 
+
+				@endNodes.push( first )
 				@endNodes.push( last )
 
 				return @endNodes
@@ -191,15 +189,15 @@ app.service 'gameService', [
 
 				# Init the new shape as a duplicate of the parent
 				newShape = angular.extend({}, {}, parentShape)
-				
+
 				# Decide if to keep the color or the shape type
 				isKeepColor = coinFlip()
-				
+
 				missingAttr = {}
 
 				# Figure out which attr we need to get
 				missingAttr.name = if isKeepColor then 'type' else 'color'
-				
+
 				# Get the options available for the missing attr
 				missingAttr.opts = []
 				missingAttr.opts = [].concat(@shapes[missingAttr.name + 's'])
@@ -210,10 +208,10 @@ app.service 'gameService', [
 
 				# Randomly pick an option from the available list
 				missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
-				
+
 				# Update the color or type of the new shape
 				newShape[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
-				
+
 				# Add the new shape
 				pathNodes.push( newShape )
 
@@ -247,7 +245,7 @@ app.service 'gameService', [
 
 				# Get the first node of the path
 				@path[0] = angular.extend({}, {}, @pathNodes[0]);
-				
+
 				# Save the coords to the node
 				@path[0].coords = {x, y}
 
@@ -305,7 +303,7 @@ app.service 'gameService', [
 						potX = potNode[0]
 						potY = potNode[1]
 
-						# Check if the x and y coords are valid 
+						# Check if the x and y coords are valid
 						isValidX = 0 <= potX < @opts.dimensions
 						isValidY = 0 <= potY < @opts.dimensions
 
@@ -350,7 +348,7 @@ app.service 'gameService', [
 
 						# Add the node to the board
 						@board[ newNode.coords.x ][ newNode.coords.y ] = newNode
-						
+
 						# Generate the next set of coords based on this node
 						@generatePathCoords( newNode )
 
@@ -376,7 +374,7 @@ app.service 'gameService', [
 						if not node?
 							colorIndex = getRandomInt(0, @shapes.colors.length - 1)
 							typeIndex = getRandomInt(0, @shapes.types.length - 1)
-							node = 
+							node =
 								color: @shapes.colors[ colorIndex ]
 								type: @shapes.types[ typeIndex ]
 								coords: {x, y}
