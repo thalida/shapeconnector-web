@@ -44,6 +44,7 @@ app.directive 'appGame', [
 			$scope.hasTimer = false
 			timer = null
 			timeRemaining = 0
+			totalTime = 45
 
 			#	Setup the consts dictonary for the game
 			#-------------------------------------------------------------------
@@ -402,7 +403,7 @@ app.directive 'appGame', [
 					@game()
 					@canvas()
 					$scope.hasTimer = true
-					timer = new Timer( 60 )
+					timer = new Timer( totalTime )
 					timer.onTick = onTimerChange
 
 				#	@game
@@ -799,7 +800,10 @@ app.directive 'appGame', [
 				# 		Render the countdown timer
 				#---------------------------------------------------------------
 				timer: (color = 'white') ->
-					color = 'red' if timeRemaining.total <= 10
+					if timeRemaining.total <= 10
+						color = 'red'
+					
+					spacer = 100 - ((timeRemaining.total / totalTime) * 100)
 
 					clearCanvas = 
 						x: 0
@@ -813,8 +817,10 @@ app.directive 'appGame', [
 						width: 32
 						height: 32
 
+					# $log.debug( spacer )
+
 					canvas.timer.render.clear(clearCanvas)
-					canvas.timer.render.strokedCircle(circle.x, circle.y, circle.width, circle.height, color)
+					canvas.timer.render.strokedCircle(circle.x, circle.y, circle.width, circle.height, color, spacer)
 					canvas.timer.render.text(
 						timeRemaining.total + '', 
 						{

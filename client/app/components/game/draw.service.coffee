@@ -546,13 +546,18 @@ app.service 'drawService', [
 			#	@strokedCircle
 			# 		Extends @genericCircle to create the circle with a stroke
 			#-------------------------------------------------------------------
-			strokedCircle: (x, y, width, height, color) =>
+			strokedCircle: (x, y, width, height, color, spacer) =>
 				# $log.debug('making circle:', x, y, width, height)
+				circumference = 2 * (Math.PI * (width / 2))
+				spacer ?= 100
+				# spacer = 100
+				@ctx.save()
 				@genericCircle(x, y, width, height)
-				
 				@ctx.strokeStyle = gameDict.hexColors[color]
 				@ctx.lineWidth = 2
+				@ctx.setLineDash([spacer, circumference])
 				@ctx.stroke()
+				@ctx.restore()
 
 				return
 
