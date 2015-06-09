@@ -39,6 +39,7 @@ $color-red: #FF5252;
 		&-wrapper {
 			position: relative;
 			margin: 0 auto;
+			overflow: hidden;
 		}
 
 		.canvas-game {
@@ -60,7 +61,7 @@ $color-red: #FF5252;
 	}
 
 	&-popup{
-		background: white;
+		background: transparent;
 		border-radius: 5px;
 		box-shadow: 0px 1px 2px 0px rgba(black,0.60);
 		color: black;
@@ -70,14 +71,15 @@ $color-red: #FF5252;
 		text-align: center;
 		top: 0;
 		left: 0;
-		z-index: 3;
 
 		.game.won & {
 			background: $color-teal;
+			z-index: 3;
 		}
 
 		.game.lost & {
 			background: $color-red;
+			z-index: 3;
 		}
 
 		.popup-header {
@@ -101,5 +103,5 @@ $color-red: #FF5252;
 				margin-bottom: 15px;
 			}
 		}
-	}	
+	}
 }

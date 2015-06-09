@@ -1532,13 +1532,24 @@ app.animation '.game-popup', [
 		return {
 			addClass: (element, className, done) ->
 				if className is 'ng-hide'
-					$(element).slideUp(500, done)
+					$el = $(element)
+					$el.show()
+					$el.css(top: '0%')
+					$el.animate({top: '100%'}, 500, () ->
+						$el.hide()
+						$el.css(top: '100%')
+					)
 
 				return
 
 			removeClass: (element, className, done) ->
 				if className is 'ng-hide'
-					$(element).hide().slideDown(500, done)
+					$el = $(element)
+					$el.hide().css(top: '100%')
+					$el.show().animate({top: '0%'}, 500, () ->
+						$el.show()
+						$el.css(top: '0%')
+					)
 
 				return
 		}
