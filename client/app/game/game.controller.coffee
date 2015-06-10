@@ -11,6 +11,8 @@ app.controller 'GameCtrl', [
 						<app:game difficulty='dev' source-game="game" on-new-game='createNewGame(params)' on-reset-game='resetGame(params)'></app:game>
 						"""
 
+		# $scope.$storage = $localstorage
+
 		$scope.compileGame = () ->
 			gameScope = $scope.$new()
 			compiledDirective = $compile(gameDirective)

@@ -6,6 +6,7 @@ window.app = angular.module 'app', [
 	'ngResource'
 	'ngSanitize'
 	'ui.router'
+	'ngStorage'
 ]
 
 app
