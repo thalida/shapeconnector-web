@@ -106,9 +106,6 @@ app.service 'gameBuilderService', [
 				# The node path to solve the game
 				@path = []
 
-				# The individual nodes that will make up the final path
-				@pathNodes = []
-
 				# The nodes that bookend the path
 				@endNodes = []
 
@@ -116,14 +113,11 @@ app.service 'gameBuilderService', [
 			# 		Initializes a new game based on the given options
 			#-------------------------------------------------------------------
 			generateGame: () ->
-				# Get the nodes that will make up the final path
-				@generatePathNodes( @pathNodes )
-
 				# Create an empty board
 				@generateGrid()
 
 				# Set the board coordinates for the path
-				@generatePathCoords()
+				@generatePath()
 
 				# Save the start + end nodes for the final path
 				@saveEndNodes()
@@ -131,8 +125,8 @@ app.service 'gameBuilderService', [
 				# Fill any empty spaces on the game board
 				@fillGrid()
 
-				# $log.debug( 'BOARD', @board )
-				# $log.debug( 'PATH', @path )
+				$log.debug( 'BOARD', @board )
+				$log.debug( 'PATH', @path )
 
 				return {
 					endNodes: @endNodes
@@ -147,24 +141,6 @@ app.service 'gameBuilderService', [
 				range = @levels[ @opts.difficulty ]
 				@pathSize = getRandomInt( range.min, range.max )
 
-			#	@setFirstNode
-			# 		Randomly pick a color and type to start the game with
-			#-------------------------------------------------------------------
-			setFirstNode: () ->
-				colorOpts = @shapes.colors
-				typeOpts = @shapes.types
-
-				colorIndex = getRandomInt(0, colorOpts.length - 1)
-				typeIndex = getRandomInt(0, colorOpts.length - 1)
-
-				newShape =
-					color: colorOpts[ colorIndex ]
-					type: typeOpts[ typeIndex ]
-
-				# Add the new shape to the nodes that will end up making
-				# the final path
-				return newShape
-
 			#	@saveEndNodes
 			# 		Get the first and last nodes of the path and save them
 			# 		for easy access in the future
@@ -176,51 +152,6 @@ app.service 'gameBuilderService', [
 				@endNodes.push( last )
 
 				return @endNodes
-
-			#	@generatePathNodes
-			# 		Based on the parent shape randomly pick a new shape that
-			# 		has either the same color and/or the same shape type
-			#-------------------------------------------------------------------
-			generatePathNodes: ( pathNodes, parentShape ) ->
-				# Generate the start of the nodes
-				if not parentShape?
-					parentShape = @setFirstNode()
-					@pathNodes.push( parentShape )
-
-				# Init the new shape as a duplicate of the parent
-				newShape = angular.extend({}, {}, parentShape)
-
-				# Decide if to keep the color or the shape type
-				isKeepColor = coinFlip()
-
-				missingAttr = {}
-
-				# Figure out which attr we need to get
-				missingAttr.name = if isKeepColor then 'type' else 'color'
-
-				# Get the options available for the missing attr
-				missingAttr.opts = []
-				missingAttr.opts = [].concat(@shapes[missingAttr.name + 's'])
-
-				# Make sure we don't get the same shape attrs
-				parentShapeAttrIdx = missingAttr.opts.indexOf(parentShape[missingAttr.name])
-				missingAttr.opts.splice(parentShapeAttrIdx, 1)
-
-				# Randomly pick an option from the available list
-				missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
-
-				# Update the color or type of the new shape
-				newShape[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
-
-				# Add the new shape
-				pathNodes.push( newShape )
-
-				# If we haven't reached the end of the path
-				# Continue getting more nodes
-				if pathNodes.length < @pathSize
-					@generatePathNodes(pathNodes, newShape)
-				else
-					return pathNodes
 
 			#	@generateGrid
 			# 		Setup an empty 2D array for the game board
@@ -235,34 +166,19 @@ app.service 'gameBuilderService', [
 
 				return @board
 
-			#	@getFirstPathCoord
-			# 		Randomly pick and x and y coord of the board to start the
-			# 		goal path at
-			#-------------------------------------------------------------------
-			getFirstPathCoord: () ->
-				x = getRandomInt(0, @opts.dimensions - 1)
-				y = getRandomInt(0, @opts.dimensions - 1)
-
-				# Get the first node of the path
-				@path[0] = angular.extend({}, {}, @pathNodes[0]);
-
-				# Save the coords to the node
-				@path[0].coords = {x, y}
-
-				# Add this node to the board
-				@board[x][y] = @path[0]
-
-				return @path[0]
-
-			#	@generatePathCoords
+			#	@generatePath
 			# 		Figure out the path for the nodes in the game board
 			# 		We need to generate this path to guarantee that a player
 			# 		has a way to solve the game
 			#-------------------------------------------------------------------
-			generatePathCoords: ( parentNode ) ->
+			generatePath: ( parentNode ) ->
 				# Return if the path is the correct size
 				if @path.length >= @pathSize
 					return @path
+
+				colorOpts = @shapes.colors
+				typeOpts = @shapes.types
+
 
 				# If we don't have a node then this is the start of the path
 				# we need to generate the first coords
@@ -270,87 +186,110 @@ app.service 'gameBuilderService', [
 					# Setup an array of nodes we have already checked
 					@visited = []
 
-					# Get the first node of the path and mark it as visited
-					parentNode = @getFirstPathCoord()
+					x = getRandomInt(0, @opts.dimensions - 1)
+					y = getRandomInt(0, @opts.dimensions - 1)
+					colorIndex = getRandomInt(0, colorOpts.length - 1)
+					typeIndex = getRandomInt(0, colorOpts.length - 1)
+
+					# Create the first node of the path and mark it as visited
+					parentNode =
+						color: colorOpts[ colorIndex ]
+						type: typeOpts[ typeIndex ]
+						coords: {x, y}
+
 					@visited.push( parentNode )
+					@path.push( parentNode )
+					@board[ parentNode.coords.x ][ parentNode.coords.y ] = parentNode
 
-					# Call this function again to start recursivley plotting
-					# the other pathNodes on the coordinate system
-					@generatePathCoords( parentNode )
-				else
-					# Get the x and y coords of the parentNode
-					parentNodeX = parentNode.coords.x
-					parentNodeY = parentNode.coords.y
+					# Call this function again to start plotting the remaining nodes
+					@generatePath( parentNode )
+					return
 
-					# Calculate the potential coords the new (next) node
-					# can be plotted on
-					potentials = [
-						[parentNodeX, parentNodeY - 1],
-						[parentNodeX, parentNodeY + 1],
-						[parentNodeX - 1, parentNodeY],
-						[parentNodeX + 1, parentNodeY],
-					]
 
-					# Setup an empty list of the allowable coords
-					allowables = []
+				# Get the x and y coords of the parentNode
+				parentNodeX = parentNode.coords.x
+				parentNodeY = parentNode.coords.y
 
-					# Loop through the potential coords and check if they
-					# would count as a valid move
-					potentialIdx = 0
-					while potentialIdx < potentials.length
-						# Get the x and y coors of this potential move
-						potNode = potentials[ potentialIdx ]
-						potX = potNode[0]
-						potY = potNode[1]
+				# Calculate the potential coords the new (next) node
+				# can be plotted on
+				potentials = [
+					[parentNodeX, parentNodeY - 1],
+					[parentNodeX, parentNodeY + 1],
+					[parentNodeX - 1, parentNodeY],
+					[parentNodeX + 1, parentNodeY],
+				]
 
-						# Check if the x and y coords are valid
-						isValidX = 0 <= potX < @opts.dimensions
-						isValidY = 0 <= potY < @opts.dimensions
+				# Setup an empty list of the allowable coords
+				allowables = []
 
-						# Check if we have already visited this node
-						isVisited = @checkVisited( potX, potY )
+				# Loop through the potential coords and check if they
+				# would count as a valid move
+				potentialIdx = 0
+				while potentialIdx < potentials.length
+					# Get the x and y coors of this potential move
+					potNode = potentials[ potentialIdx ]
+					potX = potNode[0]
+					potY = potNode[1]
 
-						# If it's a valid x and y and we haven't visited the
-						# node yet add it to the allowed moves
-						if isValidY && isValidX && !isVisited
-							allowables.push( potNode )
+					# Check if the x and y coords are valid
+					isValidX = 0 <= potX < @opts.dimensions
+					isValidY = 0 <= potY < @opts.dimensions
 
-						potentialIdx += 1
+					# Check if we have already visited this node
+					isVisited = @checkVisited( potX, potY )
 
-					# If we haven't found any allowed moves
-					if allowables.length == 0
-						# Remove the last move we made (since it was bad)
-						@path.pop()
+					# If it's a valid x and y and we haven't visited the
+					# node yet add it to the allowed moves
+					if isValidY && isValidX && !isVisited
+						allowables.push( potNode )
 
-						# Go back to he move before that and try again
-						@generatePathCoords( @path[@path.length - 1] )
-					else
-						# Randomly pick an allowed moves
-						randomIdx = getRandomInt(0, allowables.length - 1)
-						newCoords = allowables[ randomIdx ]
+					potentialIdx += 1
 
-						# Get the next move in the path
-						pathNodeIdx = @path.length
-						newNode = angular.extend({}, {}, @pathNodes[pathNodeIdx])
+				# If we haven't found any allowed moves
+				if allowables.length == 0
+					# Remove the last move we made (since it was bad)
+					@path.pop()
 
-						# Add the coords of the allowed move to the node
-						newNode.coords = {
-							x: newCoords[0]
-							y: newCoords[1]
-						}
+					# Go back to the move before that and try again
+					@generatePath( @path[@path.length - 1] )
+					return
 
-						# Add this node to the visited list (so that we don't)
-						# try to move here again
-						@visited.push( newNode )
 
-						# Add the node to the game path
-						@path.push( newNode )
+				# Randomly pick an allowed moves
+				randomIdx = getRandomInt(0, allowables.length - 1)
+				newCoords = allowables[ randomIdx ]
 
-						# Add the node to the board
-						@board[ newNode.coords.x ][ newNode.coords.y ] = newNode
+				newNode = angular.extend({}, {}, parentNode)
 
-						# Generate the next set of coords based on this node
-						@generatePathCoords( newNode )
+				# Add the coords of the allowed move to the node
+				newNode.coords = {
+					x: newCoords[0]
+					y: newCoords[1]
+				}
+
+				# Decide if to keep the color or the shape type
+				isKeepColor = coinFlip()
+				missingAttr =
+					name: (if isKeepColor then 'type' else 'color')
+
+				# Get the options available for the missing attr
+				missingAttr.opts = [].concat(@shapes[missingAttr.name + 's'])
+
+				# Make sure we don't get the same shape attrs
+				parentAttrIdx = missingAttr.opts.indexOf(parentNode[missingAttr.name])
+				missingAttr.opts.splice(parentAttrIdx, 1)
+
+				# Randomly pick an option from the available list
+				missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
+				newNode[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
+
+
+				@visited.push( newNode )
+				@path.push( newNode )
+				@board[ newNode.coords.x ][ newNode.coords.y ] = newNode
+				@generatePath( newNode )
+
+				return
 
 			#	@checkVisited
 			# 		Check if a node (x, y coodrd) is in the visited list
