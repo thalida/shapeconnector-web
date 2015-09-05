@@ -27,9 +27,9 @@ app.service 'gameManagerService', [
 				@isDragging = false
 				@isValidStart = false
 
-				@hasTimer = false
+				@hasTimer = true
 				@timer = null
-				@totalTime = 90
+				@totalTime = 10
 				@timeRemaining = 0
 
 				@getSelectedNodes =
@@ -252,7 +252,6 @@ app.service 'gameManagerService', [
 			onGameLost: ( hasLost ) =>
 				if hasLost == true
 					@animationsDone = true
-					@stop()
 				return
 
 			#	@movesLeft
@@ -277,7 +276,6 @@ app.service 'gameManagerService', [
 			# 		Watch if we have changed the nodes that are selected
 			#---------------------------------------------------------------
 			onSelectedNodesChange: (nodes) =>
-				console.log( nodes )
 				nodes ?= []
 
 				totalNodes = nodes.length
