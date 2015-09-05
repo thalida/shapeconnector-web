@@ -2,98 +2,34 @@
 
 #===============================================================================
 #
-#	Game Dictonary
-# 		Returns general global options for the game
-#
-#-------------------------------------------------------------------------------
-app.service 'gameDict', [
-	'$log'
-	( $log ) ->
-
-		#	Game Levels
-		# 		Various difficulty options w/ the range of potential connections
-		#-----------------------------------------------------------------------
-		levels =
-			dev: {
-				min: 3,
-				max: 3
-			}
-			easy: {
-				min: 5,
-				max: 8
-			}
-			medium: {
-				min: 9,
-				max: 13
-			}
-			hard: {
-				min: 14,
-				max: 18
-			}
-
-		#	Colors + Hex Colors
-		# 		The options for the node colors in plain text and hex
-		#-----------------------------------------------------------------------
-		colors =  [
-			'red'
-			'blue'
-			'green'
-			'yellow'
-		]
-
-		hexColors = {
-			white: '#FFFFFF'
-			red: '#FF5252'
-			blue: '#4B9CFF'
-			green: '#8BCA22'
-			yellow: '#E5D235'
-		}
-
-		#	Types
-		# 		The types of shapes to be made in the game
-		# 		Each type corresponsds to a draw function
-		#-----------------------------------------------------------------------
-		types = [
-			'square'
-			'circle'
-			'diamond'
-			'triangle'
-		]
-
-		return {levels, colors, types, hexColors}
-]
-
-
-
-
-#===============================================================================
-#
 #	Game Builder Service
 # 		Helper service to generate the core game pieces
 #
 #-------------------------------------------------------------------------------
-app.service 'gameBuilderService', [
+app.service 'GameBuilderService', [
 	'$log'
-	'gameDict'
-	( $log, gameDict) ->
-		return class Game
+	'LEVELS'
+	'SHAPES'
+	'BOARD'
+	( $log, LEVELS, SHAPES, BOARD) ->
+		return class Builder
 
 			#	@constructor
 			# 		Sets up the options to be used for generating the game
 			#-------------------------------------------------------------------
 			constructor: ( opts ) ->
 				# Level options
-				@levels = gameDict.levels
+				@levels = LEVELS
 
 				# Join shape colors + types to one object
 				@shapes =
-					colors: gameDict.colors
-					types: gameDict.types
+					colors: SHAPES.COLORS
+					types: SHAPES.TYPES
 
-				# Defautl to an easy 5 x 5 game board
+				# Default to an easy 5 x 5 game board
 				@defaults =
 					difficulty: 'easy'
-					dimensions: 5
+					dimensions: BOARD.SIZE
 
 				@opts = angular.extend({}, @defaults, opts)
 
@@ -138,7 +74,7 @@ app.service 'gameBuilderService', [
 			# 		Based on the difficulty randomly get the path size
 			#-------------------------------------------------------------------
 			setPathSize: () ->
-				range = @levels[ @opts.difficulty ]
+				range = LEVELS[ @opts.difficulty.toUpperCase() ]
 				@pathSize = getRandomInt( range.min, range.max )
 
 			#	@saveEndNodes

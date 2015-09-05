@@ -1,16 +1,18 @@
+'use strict'
 
 #===============================================================================
-# 
+#
 #	Draw Service
 # 		Helper service to draw the various items on the cavans
-# 
+#
 #-------------------------------------------------------------------------------
-app.service 'drawService', [
+app.service 'DrawService', [
 	'$log'
-	'gameDict'
-	( $log, gameDict ) ->
+	'SHAPE'
+	'HEXCOLORS'
+	( $log, SHAPE, HEXCOLORS ) ->
 		return class Draw
-		
+
 			#	@constructor
 			# 		Inits the drawService when new is called
 			#-------------------------------------------------------------------
@@ -19,7 +21,7 @@ app.service 'drawService', [
 					# Radius for the rounded cornders
 					radius: 3
 					# Size of the shape
-					size: 16
+					size: SHAPE.SIZE
 
 				@opts = angular.extend({}, @_defaults, opts)
 
@@ -52,7 +54,7 @@ app.service 'drawService', [
 			# 		styles and colors the shape
 			#-------------------------------------------------------------------
 			create: ( params ) ->
-				_defaults = 
+				_defaults =
 					type: 'square'
 					color: 'white'
 					coords: {x: 0, y: 0}
@@ -60,10 +62,10 @@ app.service 'drawService', [
 					style: 'untouched'
 
 				params = angular.extend({}, _defaults, params)
-				
+
 				# Convert the text color to the hex version
 				if params.color.indexOf('#') < 0
-					params.color = gameDict.hexColors[params.color]
+					params.color = HEXCOLORS[params.color]
 
 				# $log.debug( params )
 
@@ -79,8 +81,39 @@ app.service 'drawService', [
 
 				# Set the style of the shape
 				@setShapeStyle( params )
-				
+
 				return
+
+			#	@createDrawParams
+			# 		Global utility for converting a node to the drawService params
+			#---------------------------------------------------------------
+			createDrawParams: ( node, nodeStyle, clearStyle ) ->
+				if clearStyle? and clearStyle == 'small'
+					clear =
+						x: node.position.x
+						y: node.position.y
+						width: SHAPE.SIZE
+						height: SHAPE.SIZE
+				else if clearStyle? and clearStyle == 'large'
+					clear =
+						x: node.position.x - SHAPE.MARGIN
+						y: node.position.y - SHAPE.MARGIN
+						width: SHAPE.OUTERSIZE + SHAPE.MARGIN
+						height: SHAPE.OUTERSIZE + SHAPE.MARGIN
+				else
+					clear =
+						x: node.position.x - (SHAPE.MARGIN / 2)
+						y: node.position.y - (SHAPE.MARGIN / 2)
+						width: SHAPE.OUTERSIZE
+						height: SHAPE.OUTERSIZE
+
+				return {
+					type: node.type
+					color: node.color
+					style: nodeStyle
+					coords: {x: node.position.x, y: node.position.y}
+					clear: clear
+				}
 
 			#	@runAnimation
 			# 		Helper service to animate a shape
@@ -88,7 +121,7 @@ app.service 'drawService', [
 			# 		styles and colors the shape
 			#-------------------------------------------------------------------
 			runAnimation: ( params, callbacks ) =>
-				_defaults = 
+				_defaults =
 					type: 'square'
 					color: 'white'
 					coords: {x: 0, y: 0}
@@ -97,10 +130,10 @@ app.service 'drawService', [
 					duration: 300
 
 				params = angular.extend({}, _defaults, params)
-				
+
 				# Convert the text color to the hex version
-				params.color = gameDict.hexColors[params.color]
-				
+				params.color = HEXCOLORS[params.color]
+
 				# Calculate/get the start and end times of the animation
 				enterStart = new Date().getTime()
 				enterEnd = enterStart + params.duration
@@ -112,7 +145,7 @@ app.service 'drawService', [
 					timestamp = new Date().getTime()
 					progress = Math.min((params.duration - (enterEnd - timestamp)) / params.duration, 1)
 
-					animationType = params.animation.type 
+					animationType = params.animation.type
 					animationFunc = null
 
 					if animationType is 'shadow'
@@ -132,23 +165,23 @@ app.service 'drawService', [
 					# If the animation hasn't finished, repeat the animation loop
 					if (progress < 1)
 						callbacks.before?( animation, shape )
-						
+
 						animation = requestAnimationFrame(enterAnimation)
-						
+
 						callbacks.running?( animation, shape )
 
 						callbacks.after?( animation, shape )
 					else
 						if animationType is 'glow'
 							leaveAnimation()
-						else	
+						else
 							callbacks.done?(shape)
 
 				leaveAnimation = () =>
 					# Get our current progres
 					timestamp = new Date().getTime()
 					progress = Math.min((params.duration - (leaveEnd - timestamp)) / params.duration, 1)
-					animationType = params.animation.type 
+					animationType = params.animation.type
 
 					if animationType is 'glow'
 						shape = @glowLeaveAnimation( params, progress, callbacks?.during )
@@ -189,7 +222,7 @@ app.service 'drawService', [
 				if params.style is 'untouched'
 					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1)"
 					@ctx.strokeStyle = params.color
-					@ctx.shadowColor = "rgba(0,0,0,0.0)"
+					@ctx.shadowColor = 'rgba(0,0,0,0.0)'
 					@ctx.shadowBlur = 0
 					@ctx.shadowOffsetX = 0
 					@ctx.shadowOffsetY = 0
@@ -201,7 +234,7 @@ app.service 'drawService', [
 
 				# Touched: Colored outlined shape (no fill)
 				else if params.style is 'touched'
-					@ctx.fillStyle = "rgba(0,0,0,0.0)"
+					@ctx.fillStyle = 'rgba(0,0,0,0.0)'
 					@ctx.strokeStyle = params.color
 
 				# Touched: black outline filled shape
@@ -212,8 +245,8 @@ app.service 'drawService', [
 				# Touched: faded filled shape
 				else if params.style is 'faded'
 					@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.2)"
-					@ctx.strokeStyle = "rgba(0,0,0,0.0)"
-					@ctx.shadowColor = "rgba(0,0,0,0.0)"
+					@ctx.strokeStyle = 'rgba(0,0,0,0.0)'
+					@ctx.shadowColor = 'rgba(0,0,0,0.0)'
 					@ctx.shadowBlur = 0
 					@ctx.shadowOffsetX = 0
 					@ctx.shadowOffsetY = 0
@@ -228,7 +261,7 @@ app.service 'drawService', [
 			glowEnterAnimation: (params, progress, cb) =>
 				# $log.debug('in enter animation')
 				# Shape width/height grows outward
-				shape = 
+				shape =
 					width: (params.size.w * progress) * 3.2
 					height: (params.size.h * progress) * 3.2
 
@@ -239,7 +272,7 @@ app.service 'drawService', [
 				shiftBy = (shape.width - params.size.w) / 2
 				shape.x = params.coords.x - shiftBy
 				shape.y = params.coords.y - shiftBy
-				
+
 				# Clear the canvas beneath the shape
 				@clear(shape)
 
@@ -279,7 +312,7 @@ app.service 'drawService', [
 				# $log.debug('in leave animation')
 
 				# Shape width/height grows outward
-				shape = 
+				shape =
 					width: (params.size.w * (1 - progress)) * 3.2
 					height: (params.size.h * (1 - progress)) * 3.2
 
@@ -289,10 +322,10 @@ app.service 'drawService', [
 				shape.y = params.coords.y - shiftBy
 
 
-				fullSizeShape = 
+				fullSizeShape =
 					width: (params.size.w * 1) * 3.4
 					height: (params.size.h * 1) * 3.4
-				
+
 				fullSizeShift = (fullSizeShape.width - params.size.w) / 2
 				fullSizeShape.x = params.coords.x - fullSizeShift
 				fullSizeShape.y = params.coords.y - fullSizeShift
@@ -330,7 +363,7 @@ app.service 'drawService', [
 			# 		Fills in the shape from the outside in
 			#-------------------------------------------------------------------
 			fillAnimation: (params, progress) =>
-				shape = 
+				shape =
 					width: params.size.w - (params.size.w * progress)
 					height: params.size.h - (params.size.h * progress)
 
@@ -338,7 +371,7 @@ app.service 'drawService', [
 
 				shape.x = params.coords.x + shiftBy
 				shape.y = params.coords.y + shiftBy
-				
+
 				if progress == 0
 					@clear( params.clear )
 
@@ -363,7 +396,7 @@ app.service 'drawService', [
 			#-------------------------------------------------------------------
 			shadowAnimation: (params, progress) =>
 				@clear( params.clear )
-				
+
 
 				makeShape = @[params.type]
 				rgb = hexToRgb(params.color)
@@ -390,13 +423,13 @@ app.service 'drawService', [
 				@ctx.restore()
 
 				return {
-					x: params.coords.x, 
+					x: params.coords.x,
 					y: params.coords.y,
-					width: params.size.w, 
+					width: params.size.w,
 					height: params.size.h
 				}
 
-				return 
+				return
 
 
 			#	@fadeOutAnimation
@@ -413,8 +446,8 @@ app.service 'drawService', [
 
 				@ctx.save()
 				@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, #{fade})"
-				@ctx.strokeStyle = "rgba(0,0,0,0.0)"
-				@ctx.shadowColor = "rgba(0,0,0,0.0)"
+				@ctx.strokeStyle = 'rgba(0,0,0,0.0)'
+				@ctx.shadowColor = 'rgba(0,0,0,0.0)'
 				@ctx.shadowBlur = 0
 				@ctx.shadowOffsetX = 0
 				@ctx.shadowOffsetY = 0
@@ -422,9 +455,9 @@ app.service 'drawService', [
 				@ctx.restore()
 
 				return {
-					x: params.coords.x, 
+					x: params.coords.x,
 					y: params.coords.y,
-					width: params.size.w, 
+					width: params.size.w,
 					height: params.size.h
 				}
 
@@ -441,7 +474,7 @@ app.service 'drawService', [
 				centerY = Math.floor(y + ( height / 2 ))
 
 				@ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false)
-				
+
 				@ctx.closePath()
 
 				return
@@ -459,10 +492,10 @@ app.service 'drawService', [
 				return
 
 			#	@text
-			# 		Writes out a str at a given x or y coord, it can also 
+			# 		Writes out a str at a given x or y coord, it can also
 			# 		optionally vertically center text in a square
-			# 
-			# 		Params: 
+			#
+			# 		Params:
 			# 			x, y OR x1, y1, x2, y2
 			#-------------------------------------------------------------------
 			text: ( str, params ) =>
@@ -476,7 +509,7 @@ app.service 'drawService', [
 
 				# If a color has been passed set the fillStyles
 				if params.color?
-					@ctx.fillStyle = gameDict.hexColors[params.color]
+					@ctx.fillStyle = HEXCOLORS[params.color]
 
 				# If both x and y coords have been passed draw the text
 				if params.x? and params.y?
@@ -513,7 +546,7 @@ app.service 'drawService', [
 				@ctx.save()
 				@ctx.setLineDash([2, 5])
 				@ctx.lineWidth = 2
-				@ctx.strokeStyle = gameDict.hexColors['red']
+				@ctx.strokeStyle = HEXCOLORS.red
 				@genericLine(x1, y1, x2, y2)
 				@ctx.restore()
 
@@ -537,7 +570,7 @@ app.service 'drawService', [
 			solidRedLine: (x1, y1, x2, y2) =>
 				@ctx.save()
 				@ctx.lineWidth = 2
-				@ctx.strokeStyle = gameDict.hexColors['red']
+				@ctx.strokeStyle = HEXCOLORS.red
 				@genericLine(x1, y1, x2, y2)
 				@ctx.restore()
 
@@ -553,7 +586,7 @@ app.service 'drawService', [
 				# spacer = 100
 				@ctx.save()
 				@genericCircle(x, y, width, height)
-				@ctx.strokeStyle = gameDict.hexColors[color]
+				@ctx.strokeStyle = HEXCOLORS[color]
 				@ctx.lineWidth = 2
 				@ctx.setLineDash([spacer, circumference])
 				@ctx.stroke()
@@ -580,25 +613,25 @@ app.service 'drawService', [
 
 				# Start at the top left of the shape
 				@ctx.moveTo(x, y + @radius)
-				
+
 				# Draw the left side
 				@ctx.lineTo(x, y + height - @radius)
 
 				# Draw the bottom left curve
 				@ctx.quadraticCurveTo(x, y + height, x + @radius, y + height)
-				
+
 				# Draw the bottom side
 				@ctx.lineTo(x + width - @radius, y + height)
 
 				# Draw the bottom right curve
 				@ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - @radius)
-				
+
 				# Draw the right side
 				@ctx.lineTo(x + width, y + @radius)
 
 				# Draw the top right curve
 				@ctx.quadraticCurveTo(x + width, y, x + width - @radius, y)
-				
+
 				# Draw the top
 				@ctx.lineTo(x + @radius, y)
 
@@ -623,19 +656,19 @@ app.service 'drawService', [
 
 				# Start at the top center
 				@ctx.moveTo(x + (width / 2), y)
-				
+
 				# Draw top left side
 				@ctx.lineTo(x, y + (height / 2))
-				
+
 				# Draw bottom left side
 				@ctx.lineTo(x + (width / 2), y + height)
-				
+
 				# Draw bottom right side
 				@ctx.lineTo(x + width, y + (height / 2))
-				
+
 				# Draw top right side
 				@ctx.lineTo(x + (width / 2), y)
-				
+
 				@ctx.closePath()
 
 				return
@@ -649,25 +682,25 @@ app.service 'drawService', [
 
 				# Start at the top center
 				@ctx.moveTo(x + (width / 2) - @radius, y + @radius)
-				
+
 				# Draw left side
 				@ctx.lineTo(x, y + height - @radius)
 
 				# Draw bottom left curve
 				@ctx.quadraticCurveTo(x, y + height, x + @radius, y + height)
-				
+
 				# Draw bottom side
 				@ctx.lineTo(x + width - @radius, y + height)
-				
+
 				# Draw bottom right curve
 				@ctx.quadraticCurveTo(x + width, y + height, x + width, y + height - @radius)
-				
+
 				# Draw right side
 				@ctx.lineTo(x + (width / 2) + @radius, y + @radius)
-				
+
 				# Draw top curve
 				@ctx.quadraticCurveTo(x + (width / 2), y - @radius, x + (width / 2) - @radius, y + @radius)
-				
+
 				@ctx.closePath()
 
 				return

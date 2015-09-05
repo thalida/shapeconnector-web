@@ -6,7 +6,7 @@
 # 		http://stackoverflow.com/questions/20618355/the-simplest-possible-javascript-countdown-timer
 #
 #-------------------------------------------------------------------------------
-app.service 'timerService', [
+app.service 'TimerService', [
 	'$log'
 	'$timeout'
 	( $log, $timeout ) ->
