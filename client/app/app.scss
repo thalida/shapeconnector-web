@@ -74,6 +74,6 @@ body {
 // injector
 @import 'components/_template/_template.scss';
 @import 'components/game/game.scss';
-@import 'game/game.scss';
-@import 'main/main.scss';
+@import 'views/game/game.scss';
+@import 'views/main/main.scss';
 // endinjector

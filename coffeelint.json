@@ -36,7 +36,7 @@
 	"indentation": {
 		"name": "indentation",
 		"value": 4,
-		"level": "error"
+		"level": "ignore"
 	},
 	"line_endings": {
 		"name": "line_endings",

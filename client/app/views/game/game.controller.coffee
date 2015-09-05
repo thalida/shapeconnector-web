@@ -1,5 +1,13 @@
 'use strict'
 
+app.config ($stateProvider) ->
+	$stateProvider.state('game',
+		url: '/'
+		templateUrl: 'app/views/game/game.html'
+		controller: 'GameCtrl'
+	)
+
+
 app.controller 'GameCtrl', [
 	'$log'
 	'$scope'

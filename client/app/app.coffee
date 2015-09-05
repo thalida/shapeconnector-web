@@ -9,12 +9,11 @@ window.app = angular.module 'app', [
 	'ngStorage'
 ]
 
-app
-.config ($stateProvider, $urlRouterProvider, $locationProvider) ->
+app.config ($stateProvider, $urlRouterProvider, $locationProvider) ->
 	$urlRouterProvider.otherwise('/')
 	$locationProvider.html5Mode(true)
 
-.run ($rootScope, $location, $timeout) ->
+app.run ($rootScope, $location, $timeout) ->
 	window.getRandomInt = (min, max) ->
 		return Math.floor(Math.random() * (max - min + 1)) + min
 
@@ -32,7 +31,7 @@ app
 			return r + r + g + g + b + b
 		)
 
-		result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
 
 		if result
 			return {

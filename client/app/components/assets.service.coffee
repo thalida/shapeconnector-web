@@ -6,10 +6,10 @@ app.service 'assetsService', [
 		# http://blog.sklambert.com/html5-game-tutorial-game-ui-canvas-vs-dom/
 		return new class AssetLoader
 			constructor: () ->
-				@sounds = 
-					addedNode: '/assets/sound/buttonclick2.wav'
-					removedNode: '/assets/sound/undoconnection.wav'
-					gameOver: '/assets/sound/newconnection3.wav'
+				@sounds =
+					addedNode: '/app/assets/sound/buttonclick2.wav'
+					removedNode: '/app/assets/sound/undoconnection.wav'
+					gameOver: '/app/assets/sound/newconnection3.wav'
 
 				@assetsLoaded = 0
 				@totalSounds = Object.keys(@sounds).length
@@ -27,7 +27,7 @@ app.service 'assetsService', [
 
 				asset.status = 'loaded'
 				@assetsLoaded += 1
-				
+
 				# finished callback
 				@onComplete?() if @assetsLoaded == @totalAssests
 
@@ -47,7 +47,7 @@ app.service 'assetsService', [
 					@sounds[sound] = new Audio()
 					@sounds[sound].status = 'loading'
 					@sounds[sound].name = sound
-					
+
 					@sounds[sound].addEventListener('canplay', () =>
 						@checkAudioState( sound )
 					)
