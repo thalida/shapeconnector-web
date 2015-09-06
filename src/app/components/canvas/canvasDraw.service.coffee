@@ -213,7 +213,7 @@ app.service 'CanvasDrawService', [
 			#-------------------------------------------------------------------
 			setShapeStyle: ( params ) ->
 				@ctx.save()
-				@ctx.lineWidth = 2
+				@ctx.lineWidth = SHAPE.BORDER
 
 				rgb = hexToRgb(params.color)
 
@@ -580,12 +580,12 @@ app.service 'CanvasDrawService', [
 			strokedCircle: (x, y, width, height, color, spacer) =>
 				# $log.debug('making circle:', x, y, width, height)
 				circumference = 2 * (Math.PI * (width / 2))
-				spacer ?= 100
+				spacer ?= circumference * 2
 				# spacer = 100
 				@ctx.save()
 				@genericCircle(x, y, width, height)
 				@ctx.strokeStyle = HEXCOLORS[color]
-				@ctx.lineWidth = 2
+				@ctx.lineWidth = SHAPE.BORDER
 				@ctx.setLineDash([spacer, circumference])
 				@ctx.stroke()
 				@ctx.restore()

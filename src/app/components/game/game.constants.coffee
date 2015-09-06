@@ -75,6 +75,7 @@ boardConsts =
 shapeConsts = {}
 shapeConsts.SIZE = 18 # size in px for each node
 shapeConsts.MARGIN = shapeConsts.SIZE * 2 # padding around each shape
+shapeConsts.BORDER = 2
 
 # Give the board top + left margins that match the shape margins
 boardConsts.MARGIN.top = shapeConsts.MARGIN

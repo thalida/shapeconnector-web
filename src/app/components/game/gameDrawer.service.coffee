@@ -67,13 +67,18 @@ app.service 'GameDrawerService', [
 
 				# Setup the position and dimensions of the moves circle
 				movesCircle =
-					y: 5
-					w: 32
-					h: 32
-				movesCircle.x = gameMiddle - ( movesCircle.w / 4)
+					y: SHAPE.BORDER
+					w: (SHAPE.SIZE * 2)
+				movesCircle.h = movesCircle.w
+				movesCircle.x = gameMiddle - (movesCircle.w / 4)
 
 				# Clear the area under the circle
-				@canvas.goal.draw.clear(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h)
+				@canvas.goal.draw.clear(
+					movesCircle.x - SHAPE.BORDER,
+					movesCircle.y - SHAPE.BORDER,
+					movesCircle.w + (SHAPE.BORDER * 2),
+					movesCircle.h + (SHAPE.BORDER * 3)
+				)
 
 				# Draw the circle
 				@canvas.goal.draw.strokedCircle(movesCircle.x, movesCircle.y, movesCircle.w, movesCircle.h, color)
@@ -122,19 +127,23 @@ app.service 'GameDrawerService', [
 					# Set the line to start and end vertically centered with the circle
 					line =
 						y1: y + (SHAPE.SIZE / 2)
-						y2: movesCircle.y + ((movesCircle.h + 2) / 2)
+						y2: y + (SHAPE.SIZE / 2)
+						# y2: movesCircle.y + ((movesCircle.h + 2) / 2)
 						x1: x
 						x2: movesCircle.x
 
 					if direction is -1
 						line.x1 += SHAPE.SIZE
+						line.x2 -= SHAPE.BORDER
 					else
 						line.x2 += movesCircle.w
 
 					if isGameWon
+						line.x2 += SHAPE.BORDER if direction is 1
 						nodeStyle = 'start'
 						@canvas.goal.draw.solidLine(line.x1, line.y1, line.x2, line.y2)
 					else
+						line.x2 += (SHAPE.BORDER / 2) if direction is 1
 						nodeStyle = 'untouched'
 						@canvas.goal.draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
 
