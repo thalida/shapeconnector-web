@@ -1,31 +1,43 @@
 'use strict'
 
-app.service 'GameDrawer', [
+#===============================================================================
+#
+#	Game Drawer Service
+# 		Helper service to draw game comentents + run animations
+#
+#-------------------------------------------------------------------------------
+
+app.service 'GameDrawerService', [
 	'$rootScope'
 	'$log'
 	'BOARD'
 	'SHAPE'
 	'gameUtils'
 	( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
-		return class Drawer
-			constructor: ( @game, @canvas ) ->
-				return
+		class GameDrawer
+			#	@constructor: Saves instance of the game + canvases
+			#-------------------------------------------------------------------
+			constructor: ( @game, @canvas ) -> return
 
-			run: () ->
+			#	@run: Clear off the canvases + render the game & goal
+			#-------------------------------------------------------------------
+			run: ->
+				# Make sure the canvases are clear
 				@clearLinesBoard()
 				@clearGoalBoard()
 				@clearGameBoard()
 
-				@board( @game.board, @game.won )
-				@goal( @game.endNodes, @game.won )
+				# Render the game board
+				@board()
 
+				# Render the game goal
+				@goal()
 
 			#	@getNodeStyle
 			# 		Get the style of the node based on it's current state
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			getNodeStyle: ( node, lastNode ) ->
-				# $scope.game.won = utils.isGameOver()
-				if node.selected == true
+				if node.selected is true
 					lastNode = @game.getSelectedNodes.last()
 
 					if gameUtils.isSameNode(node, @game.startNode)
@@ -42,7 +54,7 @@ app.service 'GameDrawer', [
 			#	@movesLeft
 			# 		Render the moves left circle + counter
 			#---------------------------------------------------------------
-			movesLeft: ( numMoves, isGameWon, color = 'white' ) =>
+			movesLeft: ( isGameWon, color = 'white' ) =>
 				numMoves = @game.movesLeft
 
 				# Set text to red if we've used up all of our moves
@@ -85,6 +97,9 @@ app.service 'GameDrawer', [
 			# 		Render the nodes that must start and end the connections
 			#---------------------------------------------------------------
 			goal: (endNodes, isGameWon) ->
+				endNodes ?= @game.endNodes
+				isGameWon ?= @game.won
+
 				@canvas.goal.draw.clear(0, 0, BOARD.DIMENSIONS.w, BOARD.MARGIN)
 
 				# Render the moves left
@@ -96,8 +111,7 @@ app.service 'GameDrawer', [
 				# For each of the game nodes
 				# Render them to the board and draw the dashed connecting line
 				$.each(endNodes, (i, node) =>
-					# Get if we are rendering to the left or right of the
-					# middle column
+					# Are we rendering to the left or right of the middle column
 					direction = if i == 0 then -1 else 1
 
 					# Calculate the x pos of the node
@@ -105,17 +119,14 @@ app.service 'GameDrawer', [
 					# Center the node vertically w/ the circle
 					y = ((movesCircle.y + movesCircle.h) - (SHAPE.SIZE / 2)) / 2
 
-					# Set the line to start and end vertically centered
-					# with the circle
+					# Set the line to start and end vertically centered with the circle
 					line =
 						y1: y + (SHAPE.SIZE / 2)
 						y2: movesCircle.y + ((movesCircle.h + 2) / 2)
+						x1: x
+						x2: movesCircle.x
 
-					# Set the start and end positions of the line
-					line.x1 = x
-					line.x2 = movesCircle.x
-
-					if direction == -1
+					if direction is -1
 						line.x1 += SHAPE.SIZE
 					else
 						line.x2 += movesCircle.w
@@ -140,8 +151,10 @@ app.service 'GameDrawer', [
 			#	@board
 			# 		Render the nodes of the game board
 			#---------------------------------------------------------------
-			board: ( board, isGameWon, opts ) ->
+			board: ( isGameWon, opts ) ->
 				board = @game.board
+				isGameWon ?= @game.won
+
 				$.each( board, ( boardX, col ) =>
 					$.each( col, ( boardY, node ) =>
 						if not isGameWon
@@ -163,14 +176,14 @@ app.service 'GameDrawer', [
 							)
 						else
 							if not node.selected
-								if opts? and opts.animation == true
+								if opts? and opts.animation is true
 									@stopAnimation( node, 'glow' )
 									@fadeOutAnimation( node )
 								else
 									drawNode = @canvas.game.draw.createDrawParams( node, 'faded' )
 									@canvas.game.draw.create( drawNode )
 							else
-								if opts? and opts.animation == true
+								if opts? and opts.animation is true
 									@stopAnimation( node, 'glow' )
 									@shadowAnimation( node )
 
@@ -178,13 +191,12 @@ app.service 'GameDrawer', [
 					)
 				)
 
-				# $log.debug( $scope.game.board )
 				return
 
 			#	@allDashedLines
 			# 		Render the connecting nodes for all nodes as dashed
 			#---------------------------------------------------------------
-			allDashedLines: () ->
+			allDashedLines: ->
 				$.each(@game.selectedNodes, (i, node) =>
 					if i > 0
 						parentNode = @game.selectedNodes[i - 1]
@@ -194,7 +206,7 @@ app.service 'GameDrawer', [
 			#	@allSolidLines
 			# 		Render the connecting lines for all nodes as solid
 			#---------------------------------------------------------------
-			allSolidLines: () ->
+			allSolidLines: ->
 				$.each(@game.selectedNodes, (i, node) =>
 					if i > 0
 						parentNode = @game.selectedNodes[i - 1]
@@ -271,7 +283,7 @@ app.service 'GameDrawer', [
 			#	@clearLinesBoard
 			# 		Clear the canvas used to draw the lines
 			#---------------------------------------------------------------
-			clearLinesBoard: () ->
+			clearLinesBoard: ->
 				clearBoard =
 					x: 0
 					y: 0
@@ -283,7 +295,7 @@ app.service 'GameDrawer', [
 			#	@clearLinesBoard
 			# 		Clear the canvas used to draw the lines
 			#---------------------------------------------------------------
-			clearGoalBoard: () ->
+			clearGoalBoard: ->
 				clearBoard =
 					x: 0
 					y: 0
@@ -295,7 +307,7 @@ app.service 'GameDrawer', [
 			#	@clearLinesBoard
 			# 		Clear the canvas used to draw the lines
 			#---------------------------------------------------------------
-			clearGameBoard: () ->
+			clearGameBoard: ->
 				clearBoard =
 					x: 0
 					y: 0
@@ -325,7 +337,7 @@ app.service 'GameDrawer', [
 			#	@clearBoardMargins
 			# 		Clear the unused margins of the board
 			#---------------------------------------------------------------
-			clearBoardMargins: () ->
+			clearBoardMargins: ->
 				boardLeft =
 					x: 0
 					y: 0
@@ -373,8 +385,6 @@ app.service 'GameDrawer', [
 					width: 32
 					height: 32
 
-				# $log.debug( spacer )
-
 				@canvas.timer.draw.clear(clearCanvas)
 				@canvas.timer.draw.strokedCircle(circle.x, circle.y, circle.width, circle.height, color, spacer)
 				@canvas.timer.draw.text(
@@ -390,8 +400,7 @@ app.service 'GameDrawer', [
 
 				return circle
 
-
-			#	@stop
+			#	@stopAnimation
 			# 		Stop the animation currently running on this node
 			#---------------------------------------------------------------
 			stopAnimation: ( node, type ) ->
@@ -409,7 +418,7 @@ app.service 'GameDrawer', [
 
 				return
 
-			#	@glow
+			#	@glowAnimation
 			# 		Create a "glow" selected animation on the node
 			#---------------------------------------------------------------
 			glowAnimation: ( node ) ->
@@ -451,6 +460,7 @@ app.service 'GameDrawer', [
 			fillAnimation: ( node ) ->
 				drawNode = @canvas.game.draw.createDrawParams(node, 'untouched')
 				drawNode.animation = {type: 'fill'}
+
 				@canvas.game.draw.runAnimation(
 					drawNode,
 					{
@@ -488,10 +498,11 @@ app.service 'GameDrawer', [
 								id: animation
 								clear: shape
 						done: ( shape ) =>
-							node.animation = null
-							@clearBoardMargins()
-							@game.endGameAnimation += 1
-							$rootScope.$apply()
+							$rootScope.$apply(() =>
+								node.animation = null
+								@clearBoardMargins()
+								@game.endGameAnimation += 1
+							)
 					}
 				)
 

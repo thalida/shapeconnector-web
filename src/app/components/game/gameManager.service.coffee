@@ -8,7 +8,7 @@ app.service 'GameManagerService', [
 	'SHAPE'
 	'TimerService'
 	'GameBuilderService'
-	'GameDrawer'
+	'GameDrawerService'
 	'WatcherService'
 	'assetsService'
 	'gameUtils'
@@ -258,7 +258,7 @@ app.service 'GameManagerService', [
 					assetsService.sounds.gameOver.currentTime = 0
 					assetsService.sounds.gameOver.play()
 
-					@render.board(@board, hasWon, {animation: true})
+					@render.board(hasWon, {animation: true})
 				return
 
 			#	@gameLost
@@ -275,7 +275,7 @@ app.service 'GameManagerService', [
 			onMovesLeftChange: ( numMoves ) =>
 				if numMoves <= 0 and not @won and not @lost
 					@disableNewConnections = true
-					@render.movesLeft(numMoves, @won, 'red')
+					@render.movesLeft(@won, 'red')
 				return
 
 			#	@endGameAnimation
@@ -284,7 +284,7 @@ app.service 'GameManagerService', [
 			onEndGameAnimationChange: (endGameAnimation) =>
 				totalNodes = BOARD.SIZE * BOARD.SIZE
 				if endGameAnimation == totalNodes
-					@render.board(@board, @won, {animation: false})
+					@render.board(@won, {animation: false})
 					@animationsDone = true
 
 			#	@selectedNodes
@@ -305,7 +305,7 @@ app.service 'GameManagerService', [
 				else
 					@movesLeft = @maxMoves - totalNodes
 
-				@render.movesLeft( @movesLeft, @won )
+				@render.movesLeft( @won )
 
 				if @movesLeft <= 0
 					@won = @isGameOver()
