@@ -209,14 +209,15 @@ app.service 'GameManagerService', [
 				[endNodeA, ..., endNodeB] = @endNodes
 
 				isFirstEndNodeA = gameUtils.isSameShape(firstNode, endNodeA)
-				isLastEndNodeA = gameUtils.isSameShape(lastNode, endNodeA)
-				return false if not isFirstEndNodeA and not isLastEndNodeA
+				isLastEndNodeB = gameUtils.isSameShape(lastNode, endNodeB)
 
 				isFirstEndNodeB = gameUtils.isSameShape(firstNode, endNodeB)
-				isLastEndNodeB = gameUtils.isSameShape(lastNode, endNodeB)
-				return false if not isFirstEndNodeB and not isLastEndNodeB
+				isLastEndNodeA = gameUtils.isSameShape(lastNode, endNodeA)
 
-				return true
+				if (isFirstEndNodeA and isLastEndNodeB) or (isFirstEndNodeB and isLastEndNodeA)
+					return true
+				else
+					return false
 
 			#	saveNode
 			# 		Save the given node if it is a new move
