@@ -3,17 +3,17 @@
 #===============================================================================
 #
 #	Game Builder Service
-# 		Helper service to generate the core game pieces
+# 		Helper service to generate the core game nodes and goal path
 #
 #-------------------------------------------------------------------------------
+
 app.service 'GameBuilderService', [
 	'$log'
 	'LEVELS'
 	'SHAPES'
 	'BOARD'
 	( $log, LEVELS, SHAPES, BOARD) ->
-		return class Builder
-
+		class GameBuilder
 			#	@constructor
 			# 		Sets up the options to be used for generating the game
 			#-------------------------------------------------------------------
@@ -73,15 +73,17 @@ app.service 'GameBuilderService', [
 			#	@setPathSize
 			# 		Based on the difficulty randomly get the path size
 			#-------------------------------------------------------------------
-			setPathSize: () ->
+			setPathSize: ->
 				range = LEVELS[ @opts.difficulty.toUpperCase() ]
 				@pathSize = getRandomInt( range.min, range.max )
+
+				return @pathSize
 
 			#	@saveEndNodes
 			# 		Get the first and last nodes of the path and save them
 			# 		for easy access in the future
 			#-------------------------------------------------------------------
-			saveEndNodes: () ->
+			saveEndNodes: ->
 				[first, ..., last] = @path
 
 				@endNodes.push( first )
@@ -92,7 +94,7 @@ app.service 'GameBuilderService', [
 			#	@generateGrid
 			# 		Setup an empty 2D array for the game board
 			#-------------------------------------------------------------------
-			generateGrid: () ->
+			generateGrid: ->
 				@board = new Array( @opts.dimensions )
 
 				i = 0
@@ -109,12 +111,10 @@ app.service 'GameBuilderService', [
 			#-------------------------------------------------------------------
 			generatePath: ( parentNode ) ->
 				# Return if the path is the correct size
-				if @path.length >= @pathSize
-					return @path
+				return @path if @path.length >= @pathSize
 
 				colorOpts = @shapes.colors
 				typeOpts = @shapes.types
-
 
 				# If we don't have a node then this is the start of the path
 				# we need to generate the first coords
@@ -128,26 +128,23 @@ app.service 'GameBuilderService', [
 					typeIndex = getRandomInt(0, colorOpts.length - 1)
 
 					# Create the first node of the path and mark it as visited
-					parentNode =
+					node =
 						color: colorOpts[ colorIndex ]
 						type: typeOpts[ typeIndex ]
 						coords: {x, y}
 
-					@visited.push( parentNode )
-					@path.push( parentNode )
-					@board[ parentNode.coords.x ][ parentNode.coords.y ] = parentNode
+					@visited.push( node )
+					@path.push( node )
+					@board[ node.coords.x ][ node.coords.y ] = node
 
 					# Call this function again to start plotting the remaining nodes
-					@generatePath( parentNode )
+					@generatePath( parentNode = node )
 					return
 
-
 				# Get the x and y coords of the parentNode
-				parentNodeX = parentNode.coords.x
-				parentNodeY = parentNode.coords.y
+				[parentNodeX, parentNodeY] = [parentNode.coords.x, parentNode.coords.y]
 
-				# Calculate the potential coords the new (next) node
-				# can be plotted on
+				# Calculate the potential coords the new (next) node can be plotted on
 				potentials = [
 					[parentNodeX, parentNodeY - 1],
 					[parentNodeX, parentNodeY + 1],
@@ -155,17 +152,15 @@ app.service 'GameBuilderService', [
 					[parentNodeX + 1, parentNodeY],
 				]
 
-				# Setup an empty list of the allowable coords
+				# Setup the allowable coords
 				allowables = []
 
-				# Loop through the potential coords and check if they
-				# would count as a valid move
+				# Loop through the potential coords and check if they're valid
 				potentialIdx = 0
 				while potentialIdx < potentials.length
 					# Get the x and y coors of this potential move
 					potNode = potentials[ potentialIdx ]
-					potX = potNode[0]
-					potY = potNode[1]
+					[potX, potY] = potNode
 
 					# Check if the x and y coords are valid
 					isValidX = 0 <= potX < @opts.dimensions
@@ -176,32 +171,29 @@ app.service 'GameBuilderService', [
 
 					# If it's a valid x and y and we haven't visited the
 					# node yet add it to the allowed moves
-					if isValidY && isValidX && !isVisited
-						allowables.push( potNode )
+					allowables.push( potNode ) if isValidY and isValidX and not isVisited
 
 					potentialIdx += 1
 
 				# If we haven't found any allowed moves
-				if allowables.length == 0
+				if allowables.length is 0
 					# Remove the last move we made (since it was bad)
 					@path.pop()
 
-					# Go back to the move before that and try again
+					# Go back to the previous node and try again
 					@generatePath( @path[@path.length - 1] )
 					return
-
 
 				# Randomly pick an allowed moves
 				randomIdx = getRandomInt(0, allowables.length - 1)
 				newCoords = allowables[ randomIdx ]
 
-				newNode = angular.extend({}, {}, parentNode)
+				newNode = angular.copy(parentNode)
 
 				# Add the coords of the allowed move to the node
-				newNode.coords = {
+				newNode.coords =
 					x: newCoords[0]
 					y: newCoords[1]
-				}
 
 				# Decide if to keep the color or the shape type
 				isKeepColor = coinFlip()
@@ -219,7 +211,6 @@ app.service 'GameBuilderService', [
 				missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
 				newNode[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
 
-
 				@visited.push( newNode )
 				@path.push( newNode )
 				@board[ newNode.coords.x ][ newNode.coords.y ] = newNode
@@ -233,7 +224,7 @@ app.service 'GameBuilderService', [
 			checkVisited: ( x, y ) ->
 				isVisited = false
 				$.each( @visited, (i, node) ->
-					if node.coords.x == x and node.coords.y == y
+					if node.coords.x is x and node.coords.y is y
 						isVisited = true
 						return
 				)
