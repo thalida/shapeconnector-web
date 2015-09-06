@@ -1,65 +1,88 @@
-$shape-size: 16px;
-$shape-spacer: 7px;
+//==============================================================================
+//
+//	Game Styles
+//
+//------------------------------------------------------------------------------
+
 $color-teal: #8AE8B2;
 $color-red: #FF5252;
 
+// .game :- game wrapper
+//------------------------------------------------------------------------------
 .game {
 	@extend %disable-selection;
+
 	margin: 0 auto;
 	position: relative;
 
+	// Make all canvas elements seem interactable
 	canvas {
 		@extend %clickable;
 	}
 
+	// &-header => .game-header :- header which hoses the goal + timer
+	//--------------------------------------------------------------------------
 	&-header {
 		@extend %disable-selection;
 		display: block;
 		position: relative;
 		overflow: hidden;
 		margin-bottom: 50px;
-		.game-timer {
-			display: block;
-			position: absolute;
-			top: 0;
-			right: 0;
-		}
-		.game-goal {
-			display: block;
-			position: relative;
-			margin: 0 auto;
-		}
 	}
 
+	// &-timer => .game-timer :- the countdown timer
+	//--------------------------------------------------------------------------
+	&-timer {
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
 
+	// &-goal => .game-goal :- the "goal" for the game
+	//--------------------------------------------------------------------------
+	&-goal {
+		display: block;
+		position: relative;
+		margin: 0 auto;
+	}
+
+	// &-board => .game-board
+	// 	includes the canvases for both the actual gameboard and the lines
+	//--------------------------------------------------------------------------
 	&-board {
 		@extend %clickable;
 		position: relative;
 
+		// &-wrapper => .game-board-wrapper :- Parent el around the game board
 		&-wrapper {
 			position: relative;
 			margin: 0 auto;
 			overflow: hidden;
 		}
 
-		.canvas-game {
+		// &-game_canvas => .game-board-game_canvas :- The canvas w/ the shapes
+		&-game_canvas {
 			position: absolute;
 			top: 0;
 			left: 0;
-			z-index: 2;
+			z-index: 2; // Lift above the lines canvas
 
 			.game.won & {
-				z-index: 0;
+				z-index: 0; // Hide below the win popup
 			}
 		}
 
-		.canvas-lines {
+		// &-lines_canvas => .game-board-lines_canvas :- The canvas w/ the lines
+		&-lines_canvas {
 			position: absolute;
 			top: 0;
 			left: 0;
 		}
 	}
 
+	// &-popup => .game-popup :- The container for the win/lose popups
+	//--------------------------------------------------------------------------
 	&-popup{
 		background: transparent;
 		border-radius: 5px;
@@ -82,7 +105,8 @@ $color-red: #FF5252;
 			z-index: 3;
 		}
 
-		.popup-header {
+		// &-header => .game-popup-header :- The main title on the popup
+		&-header {
 			display: block;
 			font-weight: 300;
 			font-size: 36px;
@@ -90,7 +114,8 @@ $color-red: #FF5252;
 			padding-bottom: 15px;
 		}
 
-		.popup-text {
+		// &-text => .game-popup-text :- The secondary text on the popup
+		&-text {
 			display: block;
 			font-size: 18px;
 			line-height: 1.3;

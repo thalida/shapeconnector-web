@@ -1,11 +1,20 @@
 'use strict'
 
+#===============================================================================
+#
+#	Assets Service
+# 		Loads the sound assets needed for the game
+#		http://blog.sklambert.com/html5-game-tutorial-game-ui-canvas-vs-dom/
+#
+#-------------------------------------------------------------------------------
+
 app.service 'assetsService', [
 	'$log'
 	($log) ->
-		# http://blog.sklambert.com/html5-game-tutorial-game-ui-canvas-vs-dom/
 		return new class AssetLoader
-			constructor: () ->
+			# @constructor: Setup the file paths & initalise vars
+			#-------------------------------------------------------------------
+			constructor: ->
 				@sounds =
 					addedNode: '/assets/sound/buttonclick2.wav'
 					removedNode: '/assets/sound/undoconnection.wav'
@@ -13,12 +22,18 @@ app.service 'assetsService', [
 
 				@assetsLoaded = 0
 				@totalSounds = Object.keys(@sounds).length
-				@totalAssests = @totalSounds + 0
+				@totalAssests = parseInt(@totalSounds, 10)
 
+			# @onComplete: Callback for when ALL assets have finished loaded
+			#-------------------------------------------------------------------
 			onComplete: ( cb ) ->
 				cb?()
 				return
 
+			# @assetLoaded
+			# 	Check if an asset has finished loaded. After all assets are
+			# 	loaded call @onComplete
+			#-------------------------------------------------------------------
 			assetLoaded: (dict, name) ->
 				asset = @[dict][name]
 
@@ -31,24 +46,31 @@ app.service 'assetsService', [
 				# finished callback
 				@onComplete?() if @assetsLoaded == @totalAssests
 
+			# @checkAudioState: Check if an audio asset has been downloaded
+			#-------------------------------------------------------------------
 			checkAudioState: ( sound ) =>
 				thisSound = @sounds[sound]
 				if thisSound.status is 'loading' and thisSound.readyState == 4
 					@assetLoaded('sounds', sound)
 
-			downloadAll: () ->
+			# @downloadAll: Download the sound assets (only if we haven't already)
+			#-------------------------------------------------------------------
+			downloadAll: ->
 				if @assetsLoaded == @totalAssests
 					@onComplete?()
 				else
 					@downloadSounds()
 
-			downloadSounds: () =>
+			# @downlonadSounds: For each of the sound files convert to an
+			# Audio element and donwload
+			#-------------------------------------------------------------------
+			downloadSounds: =>
 				$.each(@sounds, (sound, src) =>
 					@sounds[sound] = new Audio()
 					@sounds[sound].status = 'loading'
 					@sounds[sound].name = sound
 
-					@sounds[sound].addEventListener('canplay', () =>
+					@sounds[sound].addEventListener('canplay', =>
 						@checkAudioState( sound )
 					)
 
