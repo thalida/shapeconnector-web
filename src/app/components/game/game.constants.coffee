@@ -72,9 +72,9 @@ boardConsts =
 	DIMENSIONS: {} # only width & height dimensions
 	MARGIN: {} # only the top & left margins
 
-shapeConsts =
-	SIZE: 16 # size in px for each node
-	MARGIN: 32 # padding around each shape
+shapeConsts = {}
+shapeConsts.SIZE = 18 # size in px for each node
+shapeConsts.MARGIN = shapeConsts.SIZE * 2 # padding around each shape
 
 # Give the board top + left margins that match the shape margins
 boardConsts.MARGIN.top = shapeConsts.MARGIN

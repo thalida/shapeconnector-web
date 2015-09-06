@@ -12,7 +12,8 @@ app.controller 'PlayCtrl', [
 	'$log'
 	'$scope'
 	($log, $scope) ->
-		$scope.difficulty = (if window.location.hostname is 'localhost' then 'dev' else 'medium')
+		isProdSite = (window.location.hostname.indexOf('shapeconnector') >= 0)
+		$scope.difficulty = (if not isProdSite then 'dev' else 'medium')
 
 		$scope.rebuildGame = false
 
