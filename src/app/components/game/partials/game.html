@@ -19,6 +19,7 @@
 	<div class="game-board-wrapper">
 		<div class="game-board">
 			<app:canvas
+				classes="game-board-game_canvas"
 				name="game"
 				size="{{canvasDimensions.board}}"
 				canvas="canvasCollection.game"
@@ -26,6 +27,7 @@
 			</app:canvas>
 
 			<app:canvas
+				classes="game-board-lines_canvas"
 				name="lines"
 				size="{{canvasDimensions.board}}"
 				canvas="canvasCollection.lines">
