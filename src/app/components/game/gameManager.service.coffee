@@ -1,15 +1,17 @@
 'use strict'
 
-app.service 'gameManagerService', [
+app.service 'GameManagerService', [
+	'$rootScope'
 	'$log'
 	'BOARD'
 	'SHAPE'
 	'TimerService'
 	'GameBuilderService'
 	'GameDrawer'
+	'WatcherService'
 	'assetsService'
 	'gameUtils'
-	( $log, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, assetsService, gameUtils ) ->
+	( $rootScope, $log, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
 		return class Manager
 			constructor: ( canvasCollection, difficulty, board ) ->
 				# If no difficulty was passed default to easy
@@ -51,6 +53,9 @@ app.service 'gameManagerService', [
 				@canvas = canvasCollection
 
 				@setBoard( gameBoard )
+				@watch()
+
+				$rootScope.game = this
 
 				return this
 
@@ -60,9 +65,18 @@ app.service 'gameManagerService', [
 				@maxMoves = game.maxMoves
 				@movesLeft = @maxMoves
 
-			start: ( board ) ->
-				@setBoard(board) if board?
+			watch: () ->
+				watcher = new Watcher( $rootScope )
+				watcher.start('game.won', @onGameWon)
+				watcher.start('game.lost', @onGameLost)
+				watcher.start('game.movesLeft', @onMovesLeftChange)
+				watcher.start('game.selectedNodes', @onSelectedNodesChange)
+				watcher.start('game.touchedNodes', @onTouchedNodesChange)
+				watcher.start('game.addedNodes', @onAddedNodesChange)
+				watcher.start('game.removedNodes', @onRemovedNodesChange)
+				watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
 
+			start: ( ) ->
 				@render = new GameDrawer( this, @canvas )
 
 				@won = false
