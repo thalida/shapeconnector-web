@@ -248,6 +248,10 @@ app.service 'GameManagerService', [
 				@addedNodes.push( node )
 				return
 
+			playBadMoveSound: () ->
+				assetsService.sounds.badMove.currentTime = 0
+				assetsService.sounds.badMove.play()
+
 			#	addTouchedNodes
 			#-------------------------------------------------------------------
 			addTouchedNodes: ( nodes ) ->
@@ -291,8 +295,8 @@ app.service 'GameManagerService', [
 					assetsService.sounds.removedNode.pause()
 					assetsService.sounds.addedNode.pause()
 
-					assetsService.sounds.gameOver.currentTime = 0
-					assetsService.sounds.gameOver.play()
+					assetsService.sounds.gameWon.currentTime = 0
+					assetsService.sounds.gameWon.play()
 
 					@render.board(hasWon, {animation: true})
 
@@ -302,6 +306,9 @@ app.service 'GameManagerService', [
 			onGameLost: ( hasLost ) =>
 				if hasLost is true
 					@animationsDone = true
+
+					assetsService.sounds.gameLost.currentTime = 0
+					assetsService.sounds.gameLost.play()
 
 			#	@movesLeft: Watcher Callback
 			# 		Are there any available moves left?
@@ -410,6 +417,7 @@ app.service 'GameManagerService', [
 
 				# Get the touch coords object
 				if params.type is 'touch'
+					e.preventDefault()
 					touch = e.changedTouches[0]
 				else
 					touch = e
@@ -440,19 +448,22 @@ app.service 'GameManagerService', [
 					else
 						lastTouchedNode = @getSelectedNodes.last()
 						@isValidStart = gameUtils.isSameNode( currNode, lastTouchedNode )
-						@addedNodes.push( lastTouchedNode ) if @isValidStart
+						# @addedNodes.push( lastTouchedNode ) if @isValidStart
 
 
 				isValidMouse = params.type is 'mouse' and @isDragging
 				isValidTouch = params.type is 'touch'
 
 				# Check if we should process the mouse/touch event
-				if @isValidStart && (isValidTouch or isValidMouse)
-					e.preventDefault()
-					@dragStart = currNode if params.start
+				if (isValidTouch or isValidMouse)
+					if @isValidStart
+						@dragStart = currNode if params.start
 
-					@checkMove(currNode, nodePosition, {save: true})
-					@render.trackingLine(@dragStart, nodePosition)
+						@checkMove(currNode, nodePosition, {save: true})
+						@render.trackingLine(@dragStart, nodePosition)
+					else
+						console.log( e, params )
+						@playBadMoveSound()
 
 			#	onEndEvent
 			# 		Callback if the user has triggered a mouse/touch end events

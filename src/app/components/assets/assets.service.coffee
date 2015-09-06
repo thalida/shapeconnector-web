@@ -16,11 +16,11 @@ app.service 'assetsService', [
 			#-------------------------------------------------------------------
 			constructor: ->
 				@sounds =
-					addedNode: '/assets/sound/newconnection6.wav'
-					removedNode: '/assets/sound/undoconnection2.wav'
-					badMove: '/assets/sound/badmove.wav'
-					gameOver: '/assets/sound/gameWon.wav'
-					# gameOver: '/assets/sound/newconnection3.wav'
+					addedNode: '/assets/sound/add2.wav'
+					removedNode: '/assets/sound/undo3.wav'
+					gameWon: '/assets/sound/win1.wav'
+					gameLost: '/assets/sound/lose1.wav'
+					badMove: '/assets/sound/bad2.wav'
 
 				@assetsLoaded = 0
 				@totalSounds = Object.keys(@sounds).length
