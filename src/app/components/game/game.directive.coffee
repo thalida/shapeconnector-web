@@ -105,11 +105,7 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			saveGameBoard = ->
 				if not $scope.sourceGame?
-					$scope.sourceGame = angular.copy({
-						board: Game.board
-						endNodes: Game.endNodes
-						maxMoves: Game.maxMoves
-					})
+					$scope.sourceGame = angular.copy(Game.cacheGameBoard)
 
 
 			# positionBoard: Update the position of the board on the screen
@@ -147,7 +143,7 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			$scope.actions =
 				newGame: -> $scope.onNewGame?(params: true)
-				resetGame: -> $scope.onResetGame?(params: $scope.sourceGame)
+				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
 
 

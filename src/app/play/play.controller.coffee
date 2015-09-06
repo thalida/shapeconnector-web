@@ -15,12 +15,11 @@ app.controller 'PlayCtrl', [
 		$scope.rebuildGame = false
 
 		$scope.createNewGame = () ->
-			$scope.game = null
+			$scope.gameCopy = null
 			$scope.rebuildGame = true
 			return
 
-		$scope.resetGame = ( sourceGame ) ->
-			$scope.game = sourceGame
+		$scope.resetGame = () ->
 			$scope.rebuildGame = true
 			return
 ]
