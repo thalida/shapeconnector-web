@@ -3,18 +3,17 @@
 #===============================================================================
 #
 #	Canvas Draw Service
-# 		Helper service to draw the various items on the cavans
+# 		Helper service to drawing shapes + animations on the canvas
 #
 #-------------------------------------------------------------------------------
+
 app.service 'CanvasDrawService', [
 	'$log'
 	'SHAPE'
 	'HEXCOLORS'
 	( $log, SHAPE, HEXCOLORS ) ->
-		return class Draw
-
+		class CanvasDrawService
 			#	@constructor
-			# 		Inits the drawService when new is called
 			#-------------------------------------------------------------------
 			constructor: ( ctx, opts ) ->
 				@_defaults =
@@ -85,7 +84,7 @@ app.service 'CanvasDrawService', [
 				return
 
 			#	@createDrawParams
-			# 		Global utility for converting a node to the drawService params
+			# 		utility for converting a node to the correct params
 			#---------------------------------------------------------------
 			createDrawParams: ( node, nodeStyle, clearStyle ) ->
 				if clearStyle? and clearStyle == 'small'
@@ -320,7 +319,6 @@ app.service 'CanvasDrawService', [
 				shiftBy = (shape.width - params.size.w) / 2
 				shape.x = params.coords.x - shiftBy
 				shape.y = params.coords.y - shiftBy
-
 
 				fullSizeShape =
 					width: (params.size.w * 1) * 3.4
