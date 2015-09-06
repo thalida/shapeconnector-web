@@ -28,7 +28,7 @@ app.service 'GameBuilderService', [
 
 				# Default to an easy 5 x 5 game board
 				@defaults =
-					difficulty: 'easy'
+					difficulty: LEVELS.DEFAULT.name
 					dimensions: BOARD.SIZE
 
 				@opts = angular.extend({}, @defaults, opts)

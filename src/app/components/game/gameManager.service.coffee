@@ -3,6 +3,7 @@
 app.service 'GameManagerService', [
 	'$rootScope'
 	'$log'
+	'LEVELS'
 	'BOARD'
 	'SHAPE'
 	'TimerService'
@@ -11,11 +12,11 @@ app.service 'GameManagerService', [
 	'WatcherService'
 	'assetsService'
 	'gameUtils'
-	( $rootScope, $log, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
+	( $rootScope, $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
 		return class Manager
 			constructor: ( canvasCollection, difficulty, board ) ->
 				# If no difficulty was passed default to easy
-				difficulty ?= 'easy'
+				difficulty ?= LEVELS.DEFAULT.name
 
 				@selectedNodes = []
 				@addedNodes = []

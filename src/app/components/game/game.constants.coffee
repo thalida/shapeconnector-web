@@ -9,7 +9,7 @@
 
 # Levels: Game level min + max # of nodes and total time allowed
 #-------------------------------------------------------------------------------
-app.constant 'LEVELS', {
+gameLevels =
 	DEV: {
 		min: 3,
 		max: 3,
@@ -30,7 +30,10 @@ app.constant 'LEVELS', {
 		max: 18,
 		timer: 60
 	}
-}
+
+gameLevels.DEFAULT = {name: 'easy', info: gameLevels.EASY}
+
+app.constant 'LEVELS', gameLevels
 
 
 # Hex Colors: Hex versions of the colors used

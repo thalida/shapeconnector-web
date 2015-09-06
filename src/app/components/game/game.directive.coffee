@@ -9,11 +9,12 @@
 
 app.directive 'appGame', [
 	'$log'
+	'LEVELS'
 	'BOARD'
 	'SHAPE'
 	'GameManagerService'
 	'WatcherService'
-	($log, BOARD, SHAPE, GameManager, Watcher) ->
+	($log, LEVELS, BOARD, SHAPE, GameManager, Watcher) ->
 		templateUrl: 'app/components/game/partials/game.html'
 		restrict: 'E'
 		scope:
@@ -55,7 +56,7 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			setup = ->
 				# Default the game difficulty to easy
-				$scope.difficulty ?= 'easy'
+				$scope.difficulty ?= LEVELS.DEFAULT.name
 
 				# Collection of canvases to be drawn on
 				$scope.canvasCollection = {}
