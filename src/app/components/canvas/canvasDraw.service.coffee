@@ -2,11 +2,11 @@
 
 #===============================================================================
 #
-#	Draw Service
+#	Canvas Draw Service
 # 		Helper service to draw the various items on the cavans
 #
 #-------------------------------------------------------------------------------
-app.service 'DrawService', [
+app.service 'CanvasDrawService', [
 	'$log'
 	'SHAPE'
 	'HEXCOLORS'

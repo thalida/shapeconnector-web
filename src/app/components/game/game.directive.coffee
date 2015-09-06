@@ -16,7 +16,6 @@ app.directive 'appGame', [
 	($log, BOARD, SHAPE, GameManager, Watcher) ->
 		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
-		replace: true
 		scope:
 			sourceGame: '=?'
 			difficulty: '@?'
@@ -115,15 +114,15 @@ app.directive 'appGame', [
 			# positionBoard: Update the position of the board on the screen
 			#-------------------------------------------------------------------
 			positionBoard = ->
-				el.css(
+				$game = el.find('.game')
+				$gameBoardContainer = $game.find('.game-board-wrapper')
+				$gameBoard = $game.find('.game-board')
+				$gamePopup = $game.find('.game-popup')
+
+				$game.css(
 					width: utils.calcGameWidth()
 					marginTop: utils.calcGameTopMargin()
 				)
-
-				$gameBoardContainer = el.find('.game-board-wrapper')
-				$gameBoard = el.find('.game-board')
-				$gamePopup = el.find('.game-popup')
-
 				$gameBoardContainer.css(width: BOARD.DIMENSIONS.w)
 				$gameBoard.css(height: BOARD.DIMENSIONS.h)
 				$gamePopup.css(
