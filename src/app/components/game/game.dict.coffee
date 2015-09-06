@@ -1,24 +1,40 @@
 'use strict'
 
+#===============================================================================
+#
+#	Game Dict: General game constants
+#
+#-------------------------------------------------------------------------------
+
+
+# Levels: Game level min + max # of nodes and total time allowed
+#-------------------------------------------------------------------------------
 app.constant 'LEVELS', {
 	DEV: {
 		min: 3,
-		max: 3
+		max: 3,
+		timer: 10
 	}
 	EASY: {
 		min: 5,
-		max: 8
+		max: 8,
+		timer: 90
 	}
 	MEDIUM: {
 		min: 9,
-		max: 13
+		max: 13,
+		timer: 60
 	}
 	HARD: {
 		min: 14,
-		max: 18
+		max: 18,
+		timer: 60
 	}
 }
 
+
+# Hex Colors: Hex versions of the colors used
+#-------------------------------------------------------------------------------
 app.constant 'HEXCOLORS', {
 	white: '#FFFFFF'
 	red: '#FF5252'
@@ -27,6 +43,9 @@ app.constant 'HEXCOLORS', {
 	yellow: '#E5D235'
 }
 
+
+# Shapes: The allowed colors + types for the game boards nodes
+#-------------------------------------------------------------------------------
 app.constant 'SHAPES', {
 	COLORS: [
 		'red'
@@ -42,22 +61,28 @@ app.constant 'SHAPES', {
 	]
 }
 
+
+# Board & Shape: The dimensions of the game board and shapes
+#-------------------------------------------------------------------------------
 boardConsts =
-	SIZE: 5
-	DIMENSIONS: {}
-	MARGIN: {}
+	SIZE: 5 # game board grid size - n x n
+	DIMENSIONS: {} # only width & height dimensions
+	MARGIN: {} # only the top & left margins
 
 shapeConsts =
-	SIZE: 16
-	MARGIN: 30
+	SIZE: 16 # size in px for each node
+	MARGIN: 32 # padding around each shape
 
+# Give the board top + left margins that match the shape margins
 boardConsts.MARGIN.top = shapeConsts.MARGIN
 boardConsts.MARGIN.left = shapeConsts.MARGIN
+
 shapeConsts.OUTERSIZE = shapeConsts.SIZE + shapeConsts.MARGIN
 
-maxBoardSize = boardConsts.SIZE * shapeConsts.OUTERSIZE
-boardConsts.DIMENSIONS.w = maxBoardSize + boardConsts.MARGIN.left
-boardConsts.DIMENSIONS.h = maxBoardSize + boardConsts.MARGIN.top
+# Calculate the total width + height of the game board
+boardSize = boardConsts.SIZE * shapeConsts.OUTERSIZE
+boardConsts.DIMENSIONS.w = boardSize + boardConsts.MARGIN.left
+boardConsts.DIMENSIONS.h = boardSize + boardConsts.MARGIN.top
 
 app.constant 'BOARD', boardConsts
 app.constant 'SHAPE', shapeConsts
