@@ -20,7 +20,7 @@ app.service 'GameManagerService', [
 	'assetsService'
 	'gameUtils'
 	( $rootScope, $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
-		return class Manager
+		class GameManager
 			#	@constructor: Sets up all of the variables to be used
 			#-------------------------------------------------------------------
 			constructor: ( @canvas, @difficulty, board ) ->
