@@ -1,0 +1,40 @@
+<div class="game"ng-class="{'won': game.won == true, 'lost': game.lost == true}">
+	<div class="game-header">
+		<app:canvas
+			classes="game-goal"
+			name="goal"
+			size="{{canvasDimensions.goal}}"
+			canvas="canvasCollection.goal">
+		</app:canvas>
+
+		<app:canvas
+			ng-show="game.hasTimer == true"
+			classes="game-timer"
+			name="timer"
+			size="{{canvasDimensions.timer}}"
+			canvas="canvasCollection.timer">
+		</app:canvas>
+	</div>
+
+	<div class="game-board-wrapper">
+		<div class="game-board">
+			<app:canvas
+				name="game"
+				size="{{canvasDimensions.board}}"
+				canvas="canvasCollection.game"
+				events="gameCanvasEvents">
+			</app:canvas>
+
+			<app:canvas
+				name="lines"
+				size="{{canvasDimensions.board}}"
+				canvas="canvasCollection.lines">
+			</app:canvas>
+		</div>
+
+		<div class="game-popup" ng-show="game.animationsDone == true">
+			<ng-include ng-if="game.won == true" src="'app/components/game/partials/winPopup.html'"></ng-include>
+			<ng-include ng-if="game.lost == true" src="'app/components/game/partials/losePopup.html'"></ng-include>
+		</div>
+	</div>
+</div>

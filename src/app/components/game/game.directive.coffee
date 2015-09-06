@@ -14,7 +14,7 @@ app.directive 'appGame', [
 	'GameManagerService'
 	'WatcherService'
 	($log, BOARD, SHAPE, GameManager, Watcher) ->
-		templateUrl: 'app/components/game/game.html'
+		templateUrl: 'app/components/game/partials/game.html'
 		restrict: 'E'
 		scope:
 			sourceGame: '=?'
