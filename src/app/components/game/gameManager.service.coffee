@@ -82,7 +82,7 @@ app.service 'GameManagerService', [
 
 			#	@start: Namespaced quick actions for selectedNodes
 			#-------------------------------------------------------------------
-			start: ( ) ->
+			start: ->
 				# Setup the game canvases
 				@render = new GameDrawer( this, @canvas )
 
@@ -196,7 +196,7 @@ app.service 'GameManagerService', [
 			#	@isGameOver
 			# 		Check if the game is completed
 			#-------------------------------------------------------------------
-			isGameOver: () ->
+			isGameOver: ->
 				return false if @movesLeft > 0
 
 				[firstNode, ..., lastNode] = @selectedNodes
@@ -450,7 +450,7 @@ app.service 'GameManagerService', [
 			#	onEndEvent
 			# 		Callback if the user has triggered a mouse/touch end events
 			#-------------------------------------------------------------------
-			onEndEvent: () =>
+			onEndEvent: =>
 				@isDragging = false
 
 				# If the user has tried to leave only one node selected
@@ -467,7 +467,7 @@ app.service 'GameManagerService', [
 			#	onCancelEvent
 			# 		Callback if the user has triggered a touch cancel event
 			#-------------------------------------------------------------------
-			onCancelEvent: () =>
+			onCancelEvent: =>
 				@removedNodes = []
 				@removedNodes = [].concat( @selectedNodes )
 				@selectedNodes = []
