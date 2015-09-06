@@ -89,19 +89,19 @@ $color-red: #FF5252;
 		box-shadow: 0px 1px 2px 0px rgba(black,0.60);
 		color: black;
 		display: none;
-		padding: 20px 30px;
+		padding: 30px 40px;
 		position: absolute;
 		text-align: center;
 		top: 0;
 		left: 0;
 
 		.game.won & {
-			background: $color-teal;
+			background: rgba($color-teal, 1.0);
 			z-index: 3;
 		}
 
 		.game.lost & {
-			background: $color-red;
+			background: rgba($color-red, 1.0);
 			z-index: 3;
 		}
 
@@ -119,14 +119,13 @@ $color-red: #FF5252;
 			display: block;
 			font-size: 18px;
 			line-height: 1.3;
-			margin-bottom: 15px;
+			margin-bottom: 25px;
 		}
 
 		.btn {
-			margin: 0 auto 5px;
-			.game.lost & {
-				margin-bottom: 15px;
-			}
+			width: 200px;
+			padding: 15px 10px;
+			margin: 0 auto 15px;
 		}
 	}
 }
