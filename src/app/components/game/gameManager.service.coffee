@@ -79,6 +79,8 @@ app.service 'GameManagerService', [
 				else
 					gameBoard = gameBuilder.generateGame()
 
+				@cacheGameBoard = angular.copy( gameBoard )
+
 				@board = gameBoard.board
 				@endNodes = gameBoard.endNodes
 				@maxMoves = gameBoard.maxMoves
