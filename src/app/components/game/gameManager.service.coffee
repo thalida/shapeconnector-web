@@ -1,5 +1,12 @@
 'use strict'
 
+#===============================================================================
+#
+#	Game Manager Service
+# 		The core game logic - builds the board and controlls the game events
+#
+#-------------------------------------------------------------------------------
+
 app.service 'GameManagerService', [
 	'$rootScope'
 	'$log'
@@ -14,9 +21,11 @@ app.service 'GameManagerService', [
 	'gameUtils'
 	( $rootScope, $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
 		return class Manager
-			constructor: ( canvasCollection, difficulty, board ) ->
+			#	@constructor: Sets up all of the variables to be used
+			#-------------------------------------------------------------------
+			constructor: ( @canvas, @difficulty, board ) ->
 				# If no difficulty was passed default to easy
-				difficulty ?= LEVELS.DEFAULT.name
+				@difficulty ?= LEVELS.DEFAULT.name
 
 				@selectedNodes = []
 				@addedNodes = []
@@ -26,6 +35,7 @@ app.service 'GameManagerService', [
 
 				@animationsDone = false
 				@disableNewConnections = null
+
 				@dragStart = {}
 				@isDragging = false
 				@isValidStart = false
@@ -35,6 +45,17 @@ app.service 'GameManagerService', [
 				@totalTime = 10
 				@timeRemaining = 0
 
+				@selectedNodesHelper()
+
+				@setBoard( board )
+
+				$rootScope.game = this
+
+				return this
+
+			#	@selectedNodesHelper: Namespaced quick actions for selectedNodes
+			#-------------------------------------------------------------------
+			selectedNodesHelper: ->
 				@getSelectedNodes =
 					first: () =>
 						return @selectedNodes[0]
@@ -43,29 +64,52 @@ app.service 'GameManagerService', [
 					total: () =>
 						return @selectedNodes.length
 
+			#	@setBoard: Generate a new game OR used passed game AND save
+			#-------------------------------------------------------------------
+			setBoard: ( game ) ->
 				# Generate the game board arrays
-				gameBuilder = new GameBuilderService(difficulty: difficulty)
+				gameBuilder = new GameBuilderService(difficulty: @difficulty)
 
-				if board?
-					gameBoard = angular.extend({}, {}, board)
+				if game?
+					gameBoard = angular.copy( game )
 				else
 					gameBoard = gameBuilder.generateGame()
 
-				@canvas = canvasCollection
+				@board = gameBoard.board
+				@endNodes = gameBoard.endNodes
+				@maxMoves = gameBoard.maxMoves
+				@movesLeft = @maxMoves
 
-				@setBoard( gameBoard )
+			#	@start: Namespaced quick actions for selectedNodes
+			#-------------------------------------------------------------------
+			start: ( ) ->
+				# Setup the game canvases
+				@render = new GameDrawer( this, @canvas )
+
+				@won = false
+				@lost = false
+
+				# Start the game watchers
 				@watch()
 
-				$rootScope.game = this
+				# Finish rendering the board & optionally start the timer after
+				# all of the assets have finished downloading
+				assetsService.onComplete(() =>
+					@render.run()
+
+					if @hasTimer == true
+						@timer = new Timer( @totalTime )
+						@timer.onTick = @onTimerChange
+						@timer.start()
+				)
+
+				# Start downloading the assets
+				assetsService.downloadAll()
 
 				return this
 
-			setBoard: ( game ) ->
-				@board = game.board
-				@endNodes = game.endNodes
-				@maxMoves = game.maxMoves
-				@movesLeft = @maxMoves
-
+			#	@watch: Assign watchers to various aspects of the ggame
+			#-------------------------------------------------------------------
 			watch: () ->
 				watcher = new Watcher( $rootScope )
 				watcher.start('game.won', @onGameWon)
@@ -77,25 +121,6 @@ app.service 'GameManagerService', [
 				watcher.start('game.removedNodes', @onRemovedNodesChange)
 				watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
 
-			start: ( ) ->
-				@render = new GameDrawer( this, @canvas )
-
-				@won = false
-				@lost = false
-
-				assetsService.onComplete(() =>
-					@render.run()
-
-					if @hasTimer == true
-						@timer = new Timer( @totalTime )
-						@timer.onTick = @onTimerChange
-						@timer.start()
-				)
-
-				assetsService.downloadAll()
-
-				return this
-
 			#	@isGrandPaNode
 			# 		Check if the given node is the SAME as the node two moves back
 			#-------------------------------------------------------------------
@@ -105,9 +130,10 @@ app.service 'GameManagerService', [
 
 			#	@checkIsTouched
 			# 		Check if a node is already in the touched array
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			checkIsTouched: ( node ) =>
 				touched = false
+
 				$.each(@touchedNodes, (i, thisNode) ->
 					if gameUtils.isSameNode( node, thisNode )
 						touched = true
@@ -116,7 +142,9 @@ app.service 'GameManagerService', [
 
 				return touched
 
-
+			#	@validateTouchAxis
+			# 		Check if the user has touched in a valid section
+			#-------------------------------------------------------------------
 			validateTouchAxis: ( params ) ->
 				calcCanvasName = 'calcCanvas' + params.type.toUpperCase()
 				canvasPos = gameUtils[calcCanvasName]( params.nodeCoord )
@@ -127,7 +155,7 @@ app.service 'GameManagerService', [
 
 			#	@checkMove
 			# 		Validate that node moved to via touch/mouse is a valid one
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			checkMove: ( node, pos, opts ) ->
 				# Return if no node has been found
 				return false if !node? || node is false
@@ -143,17 +171,17 @@ app.service 'GameManagerService', [
 				# Validate that move is in the accepted distance to trigger the closest node
 				isValidCanvasX = @validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
 				isValidCanvasY = @validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
-				return false if not isValidCanvasX || not isValidCanvasY
+				return false if not isValidCanvasX or not isValidCanvasY
 
 				# Check that the node this move is closest to is one that we're
 				# allowed to move to (up, down, left, or right only)
 				parentNode = @getSelectedNodes.last()
 				dx = Math.abs(parentNode.coords.x - node.coords.x)
 				dy = Math.abs(parentNode.coords.y - node.coords.y)
-				isValidDirection = (dx + dy) == 1
+				isValidDirection = (dx + dy) is 1
 				return false if not isValidDirection
 
-				# Check that the node we're closest to is either the smae color
+				# Check that the node we're closest to is either the same color
 				# or the same type as the parent node
 				sameColor = parentNode.color == node.color
 				sameType = parentNode.type == node.type
@@ -167,7 +195,7 @@ app.service 'GameManagerService', [
 
 			#	@isGameOver
 			# 		Check if the game is completed
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			isGameOver: () ->
 				return false if @movesLeft > 0
 
@@ -184,13 +212,12 @@ app.service 'GameManagerService', [
 
 				return true
 
-			#===================================================================
 			#	saveNode
 			# 		Save the given node if it is a new move
 			# 		Pop the past node if the user is trying to undo a move
 			#-------------------------------------------------------------------
 			saveNode: ( node ) ->
-				return if !node?
+				return if not node?
 
 				# If the current node is the same as the node two moves back
 				# then the player is dragging back to "undo" the connection they
@@ -219,7 +246,7 @@ app.service 'GameManagerService', [
 			addTouchedNodes: ( nodes ) ->
 				newTouchedNodes = []
 
-				if not angular.isArray( nodes )
+				if not Array.isArray( nodes )
 					thisNode = nodes
 					nodes = [].push( thisNode )
 
@@ -228,26 +255,28 @@ app.service 'GameManagerService', [
 					if not isTouched
 						newTouchedNodes.push( node )
 				)
+
 				@touchedNodes = @touchedNodes.concat( newTouchedNodes )
 
-			#	onTimerChange
+			#	onTimerChange: Watcher callback
 			#-------------------------------------------------------------------
 			onTimerChange: ( time ) =>
 				@timeRemaining = time
 				@render.timer()
 
-				if @timeRemaining.total == 0
+				if @timeRemaining.total is 0
 					@lost = true
 
-			#	@gameWon
-			# 		Watch the game over status
-			#---------------------------------------------------------------
+			#	@gameWon: Watcher callback
+			# 		Check to see if the user has won the game
+			#-------------------------------------------------------------------
 			onGameWon: ( hasWon ) =>
-				if hasWon == true
+				if hasWon is true
 					@endGameAnimation = 0
 					@movesLeft = 0
 
 					@timer?.stop?()
+
 					@render.clearLinesBoard()
 					@render.allSolidLines( @selectedNodes )
 					@render.goal( @endNodes, hasWon )
@@ -259,37 +288,35 @@ app.service 'GameManagerService', [
 					assetsService.sounds.gameOver.play()
 
 					@render.board(hasWon, {animation: true})
-				return
 
-			#	@gameLost
-			# 		Watch the game over status
-			#---------------------------------------------------------------
+			#	@gameLost: Watcher Callback
+			# 		Check to see if the user has lost the game
+			#-------------------------------------------------------------------
 			onGameLost: ( hasLost ) =>
-				if hasLost == true
+				if hasLost is true
 					@animationsDone = true
-				return
 
-			#	@movesLeft
-			# 		Watch the game over status
-			#---------------------------------------------------------------
+			#	@movesLeft: Watcher Callback
+			# 		Are there any available moves left?
+			#-------------------------------------------------------------------
 			onMovesLeftChange: ( numMoves ) =>
 				if numMoves <= 0 and not @won and not @lost
 					@disableNewConnections = true
 					@render.movesLeft(@won, 'red')
-				return
 
 			#	@endGameAnimation
-			# 		Watch the game over status
-			#---------------------------------------------------------------
+			#		Wait for the end game animations to finish
+			#-------------------------------------------------------------------
 			onEndGameAnimationChange: (endGameAnimation) =>
 				totalNodes = BOARD.SIZE * BOARD.SIZE
-				if endGameAnimation == totalNodes
+				# Have all the nodes animated
+				if endGameAnimation is totalNodes
 					@render.board(@won, {animation: false})
 					@animationsDone = true
 
 			#	@selectedNodes
 			# 		Watch if we have changed the nodes that are selected
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			onSelectedNodesChange: (nodes) =>
 				nodes ?= []
 
@@ -313,11 +340,9 @@ app.service 'GameManagerService', [
 				else
 					@disableNewConnections = false
 
-				# $log.debug('SELECTED', nodes)
-
 			#	@touchedNodes
 			# 		If a node has been "touched" by an animation re-render it
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			onTouchedNodesChange: (nodes) =>
 				nodes ?= []
 
@@ -326,12 +351,13 @@ app.service 'GameManagerService', [
 					params = @canvas.game.draw.createDrawParams(node, nodeStyle)
 					@canvas.game.draw.create( params )
 				)
+
 				@touchedNodes = []
 
 			#	@addedNodes
 			# 		If a new nodes has been selected run the "glow"
 			# 		enter animation
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			onAddedNodesChange: (nodes) =>
 				nodes ?= []
 
@@ -348,7 +374,7 @@ app.service 'GameManagerService', [
 
 			#	removedNodes
 			# 		If a node has been deselected run the "leave" animation
-			#---------------------------------------------------------------
+			#-------------------------------------------------------------------
 			onRemovedNodesChange: (nodes) =>
 				nodes ?= []
 
@@ -365,6 +391,9 @@ app.service 'GameManagerService', [
 
 				@removedNodes = []
 
+			#	onMoveEvent
+			# 		Callback if the user has triggered a mouse/touch move events
+			#-------------------------------------------------------------------
 			onMoveEvent: ( e, params ) =>
 				_defaults =
 					start: false
@@ -384,6 +413,7 @@ app.service 'GameManagerService', [
 					x: touch.pageX - canvasOffset.left
 					y: touch.pageY - canvasOffset.top
 
+				# Get the node at this position
 				currNode = gameUtils.findNode( @board, nodePosition )
 
 				# If a START event was triggered
@@ -391,39 +421,41 @@ app.service 'GameManagerService', [
 					@isDragging = true
 
 					# Make sure the player starts dragging from a valid endNode
-					if @getSelectedNodes.total() == 0
+					if @getSelectedNodes.total() is 0
 						@isValidStart = false
 						$.each(@endNodes, (i, endNode) =>
-							sameColor = currNode.color == endNode.color
-							sameType = currNode.type == endNode.type
-
-							if sameColor and sameType
-								@isValidStart = true
-								return
+							sameColor = currNode.color is endNode.color
+							sameType = currNode.type is endNode.type
+							return @isValidStart = true if sameColor and sameType
 						)
 
 					# Make sure the player starts dragging from the last selected node
 					else
 						lastTouchedNode = @getSelectedNodes.last()
 						@isValidStart = gameUtils.isSameNode( currNode, lastTouchedNode )
+						@addedNodes.push( lastTouchedNode ) if @isValidStart
 
-						if @isValidStart
-							@addedNodes.push( lastTouchedNode )
 
 				isValidMouse = params.type is 'mouse' and @isDragging
+				isValidTouch = params.type is 'touch'
 
 				# Check if we should process the mouse/touch event
-				if @isValidStart && (params.type is 'touch' or isValidMouse)
+				if @isValidStart && (isValidTouch or isValidMouse)
 					e.preventDefault()
-					if params.start
-						@dragStart = currNode
+					@dragStart = currNode if params.start
 
-					isValidMove = @checkMove(currNode, nodePosition, {save: true})
+					@checkMove(currNode, nodePosition, {save: true})
 					@render.trackingLine(@dragStart, nodePosition)
 
+			#	onEndEvent
+			# 		Callback if the user has triggered a mouse/touch end events
+			#-------------------------------------------------------------------
 			onEndEvent: () =>
 				@isDragging = false
-				if @getSelectedNodes.total() == 1
+
+				# If the user has tried to leave only one node selected
+				# REMOVE it! A node only "counts" when it has a pair
+				if @getSelectedNodes.total() is 1
 					node = @selectedNodes[0]
 					@board[node.coords.x][node.coords.y].selected = false
 					@removedNodes.push( node )
@@ -432,12 +464,11 @@ app.service 'GameManagerService', [
 				@render.clearLinesBoard()
 				@render.allDashedLines()
 
-				# $log.debug('=================================')
-
+			#	onCancelEvent
+			# 		Callback if the user has triggered a touch cancel event
+			#-------------------------------------------------------------------
 			onCancelEvent: () =>
 				@removedNodes = []
 				@removedNodes = [].concat( @selectedNodes )
 				@selectedNodes = []
-
-
 ]
