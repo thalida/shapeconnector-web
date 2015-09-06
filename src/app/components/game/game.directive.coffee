@@ -161,6 +161,11 @@ app.directive 'appGame', [
 					stopCanvasWatch()
 					start()
 			)
+
+			# Destroy the Game class on directive $destroy
+			$scope.$on('$destroy', () ->
+				Game.destroy()
+			)
 ]
 
 

@@ -17,8 +17,8 @@ app.directive 'appCanvas', [
 		restrict: 'E'
 		scope:
 			name: '@'
+			size: '@'
 			classes: '@?'
-			size: '@?'
 			canvas: '=?'
 			events: '=?'
 		link: ($scope, el, attrs) ->
@@ -43,7 +43,7 @@ app.directive 'appCanvas', [
 				ctx.scale(2, 2)
 
 				save()
-				events.setup()
+				events.bind()
 
 
 			# setDimensions: Set the width/height of the canvas
@@ -69,7 +69,7 @@ app.directive 'appCanvas', [
 			# events: sets up the optional events bindings
 			#-------------------------------------------------------------------
 			events =
-				setup: () ->
+				bind: () ->
 					return if !$scope.events?
 
 					if $scope.events.start?
@@ -88,6 +88,20 @@ app.directive 'appCanvas', [
 					if $scope.events.cancel?
 						canvas.el.addEventListener('touchcancel', @cancel, false)
 
+				unbind: () ->
+					$log.debug('Canvas - unbinding')
+
+					canvas.$el
+						.off('mousedown')
+						.off('mousemove')
+						.off('mouseup')
+
+					canvas.el.removeEventListener('touchstart', @start, false)
+					canvas.el.removeEventListener('touchmove', @move, false)
+					canvas.el.removeEventListener('touchend', @end, false)
+					canvas.el.removeEventListener('touchleave', @end, false)
+					canvas.el.removeEventListener('touchcancel', @cancel, false)
+
 				process: (evtType, e, isMouse) =>
 					trigger = (if isMouse then 'mouse' else 'touch')
 					$scope.events[evtType]?(e, {start: evtType == 'start', type: trigger })
@@ -98,6 +112,20 @@ app.directive 'appCanvas', [
 				cancel: ( e, isMouse ) -> @process('cancel', e, isMouse)
 
 
-			# Kick things off!
-			render()
+			# sizeWatch: Watch for the canvas size to be set before rendering
+			#-------------------------------------------------------------------
+			stopSizeWatch = $scope.$watch('size', (size) ->
+				return if !size?
+				stopSizeWatch()
+
+				# Kick things off!
+				render()
+			)
+
+
+			# destory: unbind the events on destory
+			#-------------------------------------------------------------------
+			$scope.$on('$destroy', () ->
+				events.unbind()
+			)
 ]

@@ -42,7 +42,7 @@ app.service 'GameManagerService', [
 
 				@hasTimer = true
 				@timer = null
-				@totalTime = 10
+				@totalTime = LEVELS[ @difficulty.toUpperCase() ].timer
 				@timeRemaining = 0
 
 				@selectedNodesHelper()
@@ -52,6 +52,10 @@ app.service 'GameManagerService', [
 				$rootScope.game = this
 
 				return this
+
+			destroy: ->
+				@watcher.stopAll()
+				@timer?.stop()
 
 			#	@selectedNodesHelper: Namespaced quick actions for selectedNodes
 			#-------------------------------------------------------------------
@@ -111,15 +115,15 @@ app.service 'GameManagerService', [
 			#	@watch: Assign watchers to various aspects of the ggame
 			#-------------------------------------------------------------------
 			watch: () ->
-				watcher = new Watcher( $rootScope )
-				watcher.start('game.won', @onGameWon)
-				watcher.start('game.lost', @onGameLost)
-				watcher.start('game.movesLeft', @onMovesLeftChange)
-				watcher.start('game.selectedNodes', @onSelectedNodesChange)
-				watcher.start('game.touchedNodes', @onTouchedNodesChange)
-				watcher.start('game.addedNodes', @onAddedNodesChange)
-				watcher.start('game.removedNodes', @onRemovedNodesChange)
-				watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
+				@watcher = new Watcher( $rootScope )
+				@watcher.start('game.won', @onGameWon)
+				@watcher.start('game.lost', @onGameLost)
+				@watcher.start('game.movesLeft', @onMovesLeftChange)
+				@watcher.start('game.selectedNodes', @onSelectedNodesChange)
+				@watcher.start('game.touchedNodes', @onTouchedNodesChange)
+				@watcher.start('game.addedNodes', @onAddedNodesChange)
+				@watcher.start('game.removedNodes', @onRemovedNodesChange)
+				@watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
 
 			#	@isGrandPaNode
 			# 		Check if the given node is the SAME as the node two moves back
