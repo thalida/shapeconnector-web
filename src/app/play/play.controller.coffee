@@ -12,6 +12,8 @@ app.controller 'PlayCtrl', [
 	'$log'
 	'$scope'
 	($log, $scope) ->
+		$scope.difficulty = (if window.location.hostname is 'localhost' then 'dev' else 'medium')
+
 		$scope.rebuildGame = false
 
 		$scope.createNewGame = () ->
