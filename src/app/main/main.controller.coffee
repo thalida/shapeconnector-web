@@ -1,28 +1,15 @@
-app.controller "MainController", ($timeout, webDevTec, toastr) ->
-	vm = this
-	activate = ->
-		getWebDevTec()
-		$timeout (->
-			vm.classAnimation = 'rubberBand'
-			return
-		), 4000
-		return
+app.config ($stateProvider) ->
+	$stateProvider.state('main',
+		url: '/main'
+		templateUrl: 'app/main/main.html'
+		controller: 'MainCtrl'
+	)
 
-	showToastr = ->
-		toastr.info 'Fork <a href="https://github.com/Swiip/generator-gulp-angular" target="_blank"><b>generator-gulp-angular</b></a>'
-		vm.classAnimation = ''
-		return
 
-	getWebDevTec = ->
-		vm.awesomeThings = webDevTec.getTec()
-		angular.forEach vm.awesomeThings, (awesomeThing) ->
-			awesomeThing.rank = Math.random()
-			return
-		return
+app.controller 'MainCtrl', [
+	'$log'
+	'$scope'
+	($log, $scope) ->
+		$scope.date = moment().format('llll')
+]
 
-	vm.awesomeThings = []
-	vm.classAnimation = ''
-	vm.creationDate = 1441424403196
-	vm.showToastr = showToastr
-	activate()
-	return

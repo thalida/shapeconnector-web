@@ -30,4 +30,5 @@ app.service 'WatcherService', [
 					watchFunc?()
 				)
 				@watching = []
+
 ]
