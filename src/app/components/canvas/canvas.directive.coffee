@@ -106,10 +106,10 @@ app.directive 'appCanvas', [
 					trigger = (if isMouse then 'mouse' else 'touch')
 					$scope.events[evtType]?(e, {start: evtType == 'start', type: trigger })
 
-				start: ( e, isMouse ) -> @process('start', e, isMouse)
-				move: ( e, isMouse ) -> @process('move', e, isMouse)
-				end: ( e, isMouse ) -> @process('end', e, isMouse)
-				cancel: ( e, isMouse ) -> @process('cancel', e, isMouse)
+				start: ( e, isMouse ) -> events.process('start', e, isMouse)
+				move: ( e, isMouse ) -> events.process('move', e, isMouse)
+				end: ( e, isMouse ) -> events.process('end', e, isMouse)
+				cancel: ( e, isMouse ) -> events.process('cancel', e, isMouse)
 
 
 			# sizeWatch: Watch for the canvas size to be set before rendering
