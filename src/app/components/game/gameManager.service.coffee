@@ -254,12 +254,6 @@ app.service 'GameManagerService', [
 				@addedNodes.push( node )
 				return
 
-			#	playBadMoveSound
-			#-------------------------------------------------------------------
-			playBadMoveSound: () ->
-				assetsService.sounds.badMove.currentTime = 0
-				assetsService.sounds.badMove.play()
-
 			#	addTouchedNodes
 			#-------------------------------------------------------------------
 			addTouchedNodes: ( nodes ) ->
@@ -302,11 +296,9 @@ app.service 'GameManagerService', [
 					@render.allSolidLines( @selectedNodes )
 					@render.goal( @endNodes, hasWon )
 
-					assetsService.sounds.removedNode.pause()
-					assetsService.sounds.addedNode.pause()
-
-					assetsService.sounds.gameWon.currentTime = 0
-					assetsService.sounds.gameWon.play()
+					assetsService.pauseSound('removedNode')
+					assetsService.pauseSound('addedNode')
+					assetsService.playSound('gameWon')
 
 					@render.board(hasWon, {animation: true})
 
@@ -316,9 +308,7 @@ app.service 'GameManagerService', [
 			onGameLost: ( hasLost ) =>
 				if hasLost is true
 					@animationsDone = true
-
-					assetsService.sounds.gameLost.currentTime = 0
-					assetsService.sounds.gameLost.play()
+					assetsService.playSound('gameLost')
 
 			#	@movesLeft: Watcher Callback
 			# 		Are there any available moves left?
@@ -389,8 +379,7 @@ app.service 'GameManagerService', [
 				if not @won and nodes.length > 0
 					# $log.debug('ADDED', nodes)
 					$.each(nodes, (i, node) =>
-						assetsService.sounds.addedNode.currentTime = 0
-						assetsService.sounds.addedNode.play()
+						assetsService.playSound('addedNode')
 						@render.glowAnimation( node )
 					)
 
@@ -407,9 +396,7 @@ app.service 'GameManagerService', [
 					$.each(nodes, (i, node) =>
 						@render.stopAnimation(node, 'glow')
 						@render.removeConnectingLine( node )
-
-						assetsService.sounds.removedNode.currentTime = 0
-						assetsService.sounds.removedNode.play()
+						assetsService.playSound('removedNode')
 						@render.fillAnimation(node)
 					)
 
@@ -468,12 +455,10 @@ app.service 'GameManagerService', [
 				if (isValidTouch or isValidMouse)
 					if @isValidStart
 						@dragStart = currNode if params.start
-
 						@checkMove(currNode, nodePosition, {save: true})
 						@render.trackingLine(@dragStart, nodePosition)
 					else
-						console.log( e, params )
-						@playBadMoveSound()
+						assetsService.playSound('badMove')
 
 			#	onEndEvent
 			# 		Callback if the user has triggered a mouse/touch end events

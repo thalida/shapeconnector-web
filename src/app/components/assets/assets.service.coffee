@@ -82,6 +82,18 @@ app.service 'assetsService', [
 				)
 
 				return
-]
 
+			playSound: ( name ) =>
+				sound = @sounds[name]
+				return if !sound?
+
+				sound.currentTime = 0
+				sound.play?()
+
+			pauseSound: ( name ) =>
+				sound = @sounds[name]
+				return if !sound?
+
+				sound.pause?()
+]
 
