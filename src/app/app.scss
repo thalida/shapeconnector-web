@@ -6,71 +6,70 @@ html { box-sizing: border-box; }
 
 
 body {
-  background-color: #292B55;
-  font: normal normal 16px/1.5 'Lato', 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
+	background-color: #292B55;
+	font: normal normal 16px/1.5 'Lato', 'Arial', sans-serif;
+	margin: 0;
+	padding: 0;
 }
 
 .browsehappy {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
+	margin: 0.2em 0;
+	background: #ccc;
+	color: #000;
+	padding: 0.2em 0;
 }
 
 %disable-selection {
-  cursor: pointer;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
+	cursor: pointer;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		-webkit-tap-highlight-color: transparent;
 }
 
 %clickable {
-  cursor: pointer;
-  @extend %disable-selection;
+	cursor: pointer;
+	@extend %disable-selection;
 }
 
 
 .btn {
-  @extend %clickable;
+	@extend %clickable;
 
-  background: white;
-  box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
-  border-radius: 3px;
-  cursor: pointer;
-  display: block;
-  padding: 12px 10px;
-  text-align: center;
-  width: 150px;
+	background: white;
+	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
+	border-radius: 3px;
+	cursor: pointer;
+	display: block;
+	padding: 12px 10px;
+	text-align: center;
+	width: 150px;
 
-  &:hover,
-  &:active {
-    background: #fcfcfc;
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.40);
-  }
+	&:hover,
+	&:active {
+		background: #fcfcfc;
+		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.40);
+	}
 
-  &.type-secondary {
-    background: transparent;
-    border: 2px solid #FFFFFF;
-    color: white;
-    padding: 8px 10px;
-  }
+	&.type-secondary {
+		background: transparent;
+		border: 2px solid #FFFFFF;
+		color: white;
+		padding: 8px 10px;
+	}
 
-  &.type-text {
-    font-size: 14px;
-    background: transparent;
-    box-shadow: 0 0 0 0;
-  }
+	&.type-text {
+		font-size: 14px;
+		background: transparent;
+		box-shadow: 0 0 0 0;
+	}
 
-  &.addon-arrow {
-    text-align: left;
-  }
+	&.addon-arrow {
+		text-align: left;
+	}
 }
 
 

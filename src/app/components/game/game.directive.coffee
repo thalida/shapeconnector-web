@@ -7,7 +7,7 @@
 #
 #-------------------------------------------------------------------------------
 
-app.directive 'appGame', [
+app.directive 'scGame', [
 	'$rootScope'
 	'$log'
 	'LEVELS'
@@ -29,6 +29,7 @@ app.directive 'appGame', [
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
 			watcher = new Watcher( $scope )
+			$scope.showModal = false
 
 
 			# utils: simple functions used to render the board
@@ -45,9 +46,8 @@ app.directive 'appGame', [
 					windowMidHeight = $window.height() / 2
 					boardHalfHeight = BOARD.DIMENSIONS.h / 2
 					headerHeight = $gameHeader.outerHeight(true)
-					goalHeight = $scope.canvasCollection.goal.$el.outerHeight(true)
 
-					topMargin = windowMidHeight - boardHalfHeight - goalHeight - headerHeight
+					topMargin = windowMidHeight - headerHeight - boardHalfHeight
 					topMargin = 60 if topMargin < 0
 
 					return topMargin
@@ -103,6 +103,9 @@ app.directive 'appGame', [
 
 				$rootScope.windowEvents.onFocus( events.onFocus )
 				$rootScope.windowEvents.onBlur( events.onBlur )
+				$window.on('resize', events.onResize)
+
+				return
 
 
 			# saveGameBoard: Save the current game board to the controller
@@ -116,19 +119,16 @@ app.directive 'appGame', [
 			#-------------------------------------------------------------------
 			positionBoard = ->
 				$game = el.find('.game')
-				$gameBoardContainer = $game.find('.game-board-wrapper')
 				$gameBoard = $game.find('.game-board')
-				$gamePopup = $game.find('.game-popup')
 
 				$game.css(
 					width: utils.calcGameWidth()
 					marginTop: utils.calcGameTopMargin()
 				)
-				$gameBoardContainer.css(width: BOARD.DIMENSIONS.w)
-				$gameBoard.css(height: BOARD.DIMENSIONS.h)
-				$gamePopup.css(
-					width: BOARD.DIMENSIONS.w
+
+				$gameBoard.css(
 					height: BOARD.DIMENSIONS.h
+					width: BOARD.DIMENSIONS.w
 				)
 
 
@@ -143,6 +143,7 @@ app.directive 'appGame', [
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
 				onFocus: -> $scope.$apply( => Game.resumeGame() )
 				onBlur: -> $scope.$apply( => Game.pauseGame() )
+				onResize: -> positionBoard()
 
 
 			# actions: Additonal user triggered actions on game win/lose
@@ -168,35 +169,4 @@ app.directive 'appGame', [
 			$scope.$on('$destroy', () ->
 				Game.destroy()
 			)
-]
-
-
-
-app.animation '.game-popup', [
-	'$log'
-	($log) ->
-		return {
-			addClass: (element, className, done) ->
-				if className is 'ng-hide'
-					$el = $(element)
-					$el.show()
-					$el.css(top: '0%')
-					$el.animate({top: '100%'}, 500, () ->
-						$el.hide()
-						$el.css(top: '100%')
-					)
-
-				return
-
-			removeClass: (element, className, done) ->
-				if className is 'ng-hide'
-					$el = $(element)
-					$el.hide().css(top: '100%')
-					$el.show().animate({top: '0%'}, 500, () ->
-						$el.show()
-						$el.css(top: '0%')
-					)
-
-				return
-		}
 ]

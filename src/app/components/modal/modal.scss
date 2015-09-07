@@ -1,0 +1,56 @@
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 2;
+	overflow: auto;
+
+	&.minimized {
+		background-color: #2F79C1;
+		height: 50px;
+		position: fixed;
+		top: initial;
+		bottom: 0;
+		left: 0;
+	}
+
+	&-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: -1;
+
+		width: 100%;
+		height: 100%;
+
+		background-color: rgba(#444, .40);
+
+		.modal.minimized & {
+			display: none;
+		}
+	}
+
+	&-content {
+		position: relative;
+		margin: 0 auto;
+		background-color: #2F79C1;
+		border-radius: 3px;
+
+		.modal.minimized & {
+			display: none;
+		}
+	}
+
+	&-minimized {
+		display: none;
+		position: relative;
+		margin: 0 auto;
+		border-radius: 3px;
+
+		.modal.minimized & {
+			display: block;
+		}
+	}
+}

@@ -53,13 +53,8 @@ $color-red: #FF5252;
 	&-board {
 		@extend %clickable;
 		position: relative;
-
-		// &-wrapper => .game-board-wrapper :- Parent el around the game board
-		&-wrapper {
-			position: relative;
-			margin: 0 auto;
-			overflow: hidden;
-		}
+		margin: 0 auto;
+		// overflow: hidden;
 
 		// &-game_canvas => .game-board-game_canvas :- The canvas w/ the shapes
 		&-game_canvas {

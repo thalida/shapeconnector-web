@@ -13,7 +13,7 @@ gameLevels =
 	DEV: {
 		min: 3,
 		max: 3,
-		timer: 15
+		timer: 105
 	}
 	EASY: {
 		min: 5,
