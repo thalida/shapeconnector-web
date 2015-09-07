@@ -127,6 +127,12 @@ app.service 'GameManagerService', [
 				@watcher.start('game.removedNodes', @onRemovedNodesChange)
 				@watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
 
+			pauseGame: () ->
+				@timer?.pause()
+
+			resumeGame: () ->
+				@timer?.start()
+
 			#	@isGrandPaNode
 			# 		Check if the given node is the SAME as the node two moves back
 			#-------------------------------------------------------------------
@@ -248,6 +254,8 @@ app.service 'GameManagerService', [
 				@addedNodes.push( node )
 				return
 
+			#	playBadMoveSound
+			#-------------------------------------------------------------------
 			playBadMoveSound: () ->
 				assetsService.sounds.badMove.currentTime = 0
 				assetsService.sounds.badMove.play()
@@ -275,7 +283,9 @@ app.service 'GameManagerService', [
 				@timeRemaining = time
 				@render.timer()
 
-				if @timeRemaining.total is 0
+				console.log( @timeRemaining.total )
+
+				if @timeRemaining.total <= 0
 					@lost = true
 
 			#	@gameWon: Watcher callback

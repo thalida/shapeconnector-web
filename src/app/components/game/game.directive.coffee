@@ -8,13 +8,14 @@
 #-------------------------------------------------------------------------------
 
 app.directive 'appGame', [
+	'$rootScope'
 	'$log'
 	'LEVELS'
 	'BOARD'
 	'SHAPE'
 	'GameManagerService'
 	'WatcherService'
-	($log, LEVELS, BOARD, SHAPE, GameManager, Watcher) ->
+	($rootScope, $log, LEVELS, BOARD, SHAPE, GameManager, Watcher) ->
 		templateUrl: 'app/components/game/partials/game.html'
 		restrict: 'E'
 		scope:
@@ -100,6 +101,9 @@ app.directive 'appGame', [
 				# Create a scoped copy of the Game class
 				$scope.game = Game.start()
 
+				$rootScope.windowEvents.onFocus( events.onFocus )
+				$rootScope.windowEvents.onBlur( events.onBlur )
+
 
 			# saveGameBoard: Save the current game board to the controller
 			#-------------------------------------------------------------------
@@ -137,6 +141,8 @@ app.directive 'appGame', [
 				onMove: ( e, params ) -> $scope.$apply( => Game.onMoveEvent(e, params) )
 				onEnd: -> $scope.$apply( => Game.onEndEvent() )
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
+				onFocus: -> $scope.$apply( => Game.resumeGame() )
+				onBlur: -> $scope.$apply( => Game.pauseGame() )
 
 
 			# actions: Additonal user triggered actions on game win/lose

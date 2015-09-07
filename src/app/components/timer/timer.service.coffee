@@ -65,6 +65,8 @@ app.service 'TimerService', [
 			#-------------------------------------------------------------------
 			pause: () ->
 				$timeout.cancel(@timeout)
+				@timeout = null
+
 				@duration = @remaining.total
 				@running = false
 				return
