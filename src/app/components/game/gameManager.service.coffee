@@ -33,6 +33,7 @@ app.service 'GameManagerService', [
 				@touchedNodes = []
 				@startNode = null
 
+				@gameOver = false
 				@animationsDone = false
 				@disableNewConnections = null
 
@@ -287,6 +288,7 @@ app.service 'GameManagerService', [
 			#-------------------------------------------------------------------
 			onGameWon: ( hasWon ) =>
 				if hasWon is true
+					@gameOver = true
 					@endGameAnimation = 0
 					@movesLeft = 0
 
@@ -307,6 +309,7 @@ app.service 'GameManagerService', [
 			#-------------------------------------------------------------------
 			onGameLost: ( hasLost ) =>
 				if hasLost is true
+					@gameOver = true
 					@animationsDone = true
 					assetsService.playSound('gameLost')
 
@@ -418,6 +421,8 @@ app.service 'GameManagerService', [
 					touch = e.changedTouches[0]
 				else
 					touch = e
+
+				return if @gameOver is true
 
 				# Calculate the position of the touch on the canvas
 				canvasOffset = @canvas.game.$el.offset()
