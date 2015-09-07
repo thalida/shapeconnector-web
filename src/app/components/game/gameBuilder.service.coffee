@@ -61,8 +61,8 @@ app.service 'GameBuilderService', [
 				# Fill any empty spaces on the game board
 				@fillGrid()
 
-				$log.debug( 'BOARD', @board )
-				$log.debug( 'PATH', @path )
+				# $log.debug( 'BOARD', @board )
+				# $log.debug( 'PATH', @path )
 
 				return {
 					endNodes: @endNodes

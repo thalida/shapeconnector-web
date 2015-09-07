@@ -277,7 +277,7 @@ app.service 'GameManagerService', [
 				@timeRemaining = time
 				@render.timer()
 
-				console.log( @timeRemaining.total )
+				# console.log( @timeRemaining.total )
 
 				if @timeRemaining.total <= 0
 					@lost = true
