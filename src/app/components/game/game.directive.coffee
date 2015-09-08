@@ -144,10 +144,11 @@ app.directive 'scGame', [
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
 				onResize: -> positionBoard()
 				onBlur: ->
-					$scope.$apply( =>
-						Game.pauseGame()
-						$scope.showPauseModal = true
-					)
+					if $scope.game.gameOver is false
+						$scope.$apply( =>
+							Game.pauseGame()
+							$scope.showPauseModal = true
+						)
 
 
 			# actions: Additonal user triggered actions on game win/lose
