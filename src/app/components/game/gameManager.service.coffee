@@ -132,7 +132,7 @@ app.service 'GameManagerService', [
 				@timer?.pause()
 
 			resumeGame: () ->
-				@timer?.start()
+				@timer?.start() if not @gameOver
 
 			#	@isGrandPaNode
 			# 		Check if the given node is the SAME as the node two moves back
@@ -289,6 +289,7 @@ app.service 'GameManagerService', [
 			onGameWon: ( hasWon ) =>
 				if hasWon is true
 					@gameOver = true
+
 					@endGameAnimation = 0
 					@movesLeft = 0
 
@@ -310,6 +311,7 @@ app.service 'GameManagerService', [
 			onGameLost: ( hasLost ) =>
 				if hasLost is true
 					@gameOver = true
+
 					@animationsDone = true
 					assetsService.playSound('gameLost')
 
@@ -415,14 +417,14 @@ app.service 'GameManagerService', [
 
 				params = angular.extend({}, _defaults, params)
 
+				return if @gameOver is true
+
 				# Get the touch coords object
 				if params.type is 'touch'
 					e.preventDefault()
 					touch = e.changedTouches[0]
 				else
 					touch = e
-
-				return if @gameOver is true
 
 				# Calculate the position of the touch on the canvas
 				canvasOffset = @canvas.game.$el.offset()
@@ -470,6 +472,7 @@ app.service 'GameManagerService', [
 			#-------------------------------------------------------------------
 			onEndEvent: =>
 				@isDragging = false
+				return if @gameOver
 
 				# If the user has tried to leave only one node selected
 				# REMOVE it! A node only "counts" when it has a pair
@@ -486,6 +489,7 @@ app.service 'GameManagerService', [
 			# 		Callback if the user has triggered a touch cancel event
 			#-------------------------------------------------------------------
 			onCancelEvent: =>
+				return if @gameOver
 				@removedNodes = []
 				@removedNodes = [].concat( @selectedNodes )
 				@selectedNodes = []

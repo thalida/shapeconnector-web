@@ -1,13 +1,20 @@
 // bower:scss
 // endbower
+@import "sprites";
+@mixin clearfix {
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
 
 html { box-sizing: border-box; }
 *, *:before, *:after { box-sizing: inherit; }
 
-
 body {
 	background-color: #292B55;
-	font: normal normal 16px/1.5 'Lato', 'Arial', sans-serif;
+	font: normal normal 16px/1.5 'Kadwa', 'Times', serif;
 	margin: 0;
 	padding: 0;
 }
@@ -35,12 +42,20 @@ body {
 	@extend %disable-selection;
 }
 
+.float-left {
+	float: left;
+}
+
+.float-right {
+	float: right;
+}
+
 
 .btn {
 	@extend %clickable;
 
 	background: white;
-	box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
+	// box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
 	border-radius: 3px;
 	cursor: pointer;
 	display: block;
@@ -51,7 +66,8 @@ body {
 	&:hover,
 	&:active {
 		background: #fcfcfc;
-		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.40);
+		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
+		// box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.40);
 	}
 
 	&.type-secondary {
@@ -68,6 +84,13 @@ body {
 	}
 
 	&.addon-arrow {
+		&:after {
+			@include cssSprite( $arrow-right-black );
+			content: '';
+			display: block;
+			float: right;
+			margin-top: 5px;
+		}
 		text-align: left;
 	}
 }

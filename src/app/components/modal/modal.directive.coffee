@@ -1,5 +1,12 @@
 'use strict'
 
+#===============================================================================
+#
+#	ShapeConnector (SC) Modal Directive
+# 		Handles the game specific modals
+#
+#-------------------------------------------------------------------------------
+
 app.directive 'scModal', [
 	'$log'
 	'BOARD'
@@ -8,198 +15,162 @@ app.directive 'scModal', [
 		transclude: true
 		restrict: 'E'
 		scope:
+			name: '@?'
 			showModal: '=?show'
 			style: '@?'
+		controller: ['$scope', '$element', '$transclude', ($scope, $el, $transclude) ->
+			# Trigger the modal minimize action
+			@minimize = -> $scope.minimizeModal = true
+
+			# Trigger the modal show action
+			@close = -> $scope.showModal = false
+
+			# Trigger the modal hide action
+			@show = -> $scope.showModal = false
+
+			$transclude((clone) ->
+				mainContent = $el.find('.modal-content')
+				minimizeSection = $el.find('.modal-minimized')
+				transcludedContent = clone
+
+				angular.forEach(transcludedContent, ( content ) ->
+					if angular.element( content ).hasClass('scmodal-minimized-content')
+						minimizeSection.append( content )
+					else
+						mainContent.append( content )
+				)
+			)
+
+			return this
+		]
 		link: ($scope, el, attrs) ->
 			$window = $(window)
 			$gameBoard = $('.game-board')
 			$modal = el.find('.modal')
 			$content = $modal.find('.modal-content')
-			$closeBtns = $modal.find('.js-close-modal')
-			$minBtns = $modal.find('.js-minimize-modal')
 
 			modal = new class Modal
 				constructor: ->
 					$scope.minimizeModal = false
 
-				closeBtnOnClick: ( e ) =>
-					$scope.$apply(() =>
-						$scope.showModal = false
-					)
-					return
-
-				minimizeBtnOnClick: ( e ) =>
-					$scope.$apply(() =>
-						$scope.minimizeModal = true
-					)
-					return
-
+				#	@show
+				# 		Positions the modal correclty then inits the show animation
+				#---------------------------------------------------------------
 				show: ->
 					@positionModal()
+
+					# animateVisibility is set has a clase that ng animate watches
 					$scope.animateVisibility = 'js-modal-animate-visibility'
+
 					$('body').css(overflow: 'hidden')
 					window.scrollTo(0, 0)
 					return
 
+				#	@hide
+				# 		Removes the visibility class -> triggers animations
+				#---------------------------------------------------------------
 				hide: ->
+					# Remove the visiblity class - triggers animate on classRemove
 					$scope.animateVisibility = ''
+
 					$('body').css(overflow: 'auto')
 					return
 
+				#	@hide
+				# 		Adds the minimize class -> triggers ng animate addClass
+				#---------------------------------------------------------------
 				minimize: ->
 					$scope.animateMinimize = 'js-modal-animate-minimize'
-					$('body').css(overflow: 'auto')
 
+					$('body').css(overflow: 'auto')
+					return
+
+				#	@positionModal
+				# 		Position the contents of the modal to cover the game board
+				#---------------------------------------------------------------
 				positionModal: ->
-					offset = $gameBoard.offset()
 					$content.css(
 						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
 						height: BOARD.DIMENSIONS.h + 50
-						marginTop: offset.top
+						marginTop: $gameBoard.offset().top
 					)
 					return
 
+				#	@showModalWatch
+				# 		The callback for the $watch on 'showModal'
+				# 		Calls the approriate action if the modal visibility has changed
+				#---------------------------------------------------------------
 				showModalWatch: ( show, lastState ) ->
 					return if show is lastState
 
 					modal.show() if show is true
 					modal.hide() if show is false
+					return
 
-
+				#	@minimizeModalWatch
+				# 		The callback for the $watch on 'minimizeModal'
+				# 		Calls the approriate action if the modal has been minimized
+				#---------------------------------------------------------------
 				minimizeModalWatch: ( minimized, lastState ) ->
 					return if minimized is lastState
 
 					modal.minimize() if minimized is true
+					return
 
-
+			# Keep the contents covering the game board as the window changes
 			$window.on('resize', modal.positionModal)
-			$closeBtns.on('click', modal.closeBtnOnClick)
-			$minBtns.on('click', modal.minimizeBtnOnClick)
 
+			# Setup watches on the show + minimize variables
 			$scope.$watch('showModal', modal.showModalWatch)
 			$scope.$watch('minimizeModal', modal.minimizeModalWatch)
+			return
 ]
 
-app.animation '.modal', [
+#===============================================================================
+#
+#	ShapeConnector (SC) Modal Action Directive
+# 		Handles the game specific modals
+#
+#-------------------------------------------------------------------------------
+
+app.directive 'scModalAction', [
 	'$log'
-	($log) ->
-		visiblityClass = 'js-modal-animate-visibility'
-		minimizeClass = 'js-modal-animate-minimize'
+	'$parse'
+	'$timeout'
+	( $log, $parse, $timeout ) ->
+		require: '^scModal'
+		restrict: 'A'
+		link: ( $scope, el, attrs, modalCtrl ) ->
+			# What action are we trying to perform? [close, show, or minimize]
+			action = modalCtrl[attrs.scModalAction]
 
-		getSelectors = ( element ) ->
-			$el = $(element)
-			$overlay = $el.find('.modal-overlay')
-			$content = $el.find('.modal-content')
+			# Convert attr.onComplete back into a function if one has been passed
+			if attrs.onComplete?
+				hasCallback = true
+				eventCallback = $parse( attrs.onComplete )
+			else
+				hasCallback = false
 
-			return [$el, $content, $overlay]
+			# wait the duration of the modal animation before calling the eventCallback
+			callbackDelay = if attrs.noDelay? then 0 else 400
 
-		minimizeModal = ( element, done ) ->
-			console.log('minimizing')
-			[$el, $content, $overlay] = getSelectors( element )
+			runAction = ( e ) ->
+				# Check if a valid action was assigned
+				return if not action?
 
-			$el.show()
+				$scope.$apply(() ->
+					action()
 
-			$overlay.css(opacity: '1')
-			$content.css(top: '0%')
+					# If a callback has been passed, wait the duration of the
+					# modal animation before calling the eventCallback
+					if hasCallback
+						$timeout(() ->
+							eventCallback($scope, { e })
+						, callbackDelay)
+				)
 
-			marginTop = $(window).height() - 50
-
-			$content.animate({marginTop: marginTop, width: '100%'},
-				{
-					duration: 500
-					queue: false
-					complete: ->
-						$content.css(marginTop: marginTop, width: '100%')
-						$el.addClass('minimized')
-						done()
-				}
-			)
-
-			$overlay.animate({opacity: '0'},
-				{
-					duration: 350
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '0')
-				}
-			)
+			$(el).on('click', runAction)
 
 			return
-
-
-		showModal = ( element, done ) ->
-			[$el, $content, $overlay] = getSelectors( element )
-
-			$el.hide()
-
-			$overlay.css(opacity: '0')
-			$content.css(top: '100%')
-
-			$el.show()
-
-			$content.animate({top: '0%'},
-				{
-					duration: 500
-					queue: false
-					complete: ->
-						$el.show()
-						$content.css(top: '0%')
-						done()
-				}
-			)
-
-			$overlay.animate({opacity: '1'},
-				{
-					duration: 400
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '1')
-				}
-			)
-
-		hideModal = ( element, done ) ->
-			[$el, $content, $overlay] = getSelectors( element )
-
-			$el.show()
-
-			$overlay.css(opacity: '1')
-			$content.css(top: '0%')
-
-			$content.animate({top: '100%'},
-				{
-					duration: 400
-					queue: false
-					complete: ->
-						$el.hide()
-						$content.css(top: '100%')
-						done()
-				}
-			)
-
-			$overlay.animate({opacity: '0'},
-				{
-					duration: 350
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '0')
-				}
-			)
-
-		return {
-			addClass: (element, className, done) ->
-				if className.indexOf(visiblityClass) >= 0
-					showModal( element, done )
-				else if className.indexOf(minimizeClass) >= 0
-					minimizeModal( element, done )
-				else
-					done()
-				return
-
-			removeClass: (element, className, done) ->
-				if className.indexOf(visiblityClass) >= 0
-					hideModal( element, done )
-				else
-					done()
-				return
-		}
 ]
+

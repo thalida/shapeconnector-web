@@ -1,0 +1,58 @@
+<div class="game" ng-class="{'won': game.won == true, 'lost': game.lost == true}">
+	<div class="game-header">
+		<app:canvas
+			classes="game-goal"
+			name="goal"
+			size="{{canvasDimensions.goal}}"
+			canvas="canvasCollection.goal">
+		</app:canvas>
+
+		<app:canvas
+			ng-show="game.hasTimer == true"
+			classes="game-timer"
+			name="timer"
+			size="{{canvasDimensions.timer}}"
+			canvas="canvasCollection.timer">
+		</app:canvas>
+	</div>
+
+	<div class="game-board">
+		<app:canvas
+			classes="game-board-game_canvas"
+			name="game"
+			size="{{canvasDimensions.board}}"
+			canvas="canvasCollection.game"
+			events="gameCanvasEvents">
+		</app:canvas>
+
+		<app:canvas
+			classes="game-board-lines_canvas"
+			name="lines"
+			size="{{canvasDimensions.board}}"
+			canvas="canvasCollection.lines">
+		</app:canvas>
+	</div>
+</div>
+
+<sc:modal name="winModal" show="showWinModal" style="teal">
+	<span class="modal-content-header">Awesome!</span>
+	<a sc:modal:action="minimize" class="btn type-primary">See game board</div>
+	<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
+	<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+
+	<div class="scmodal-minimized-content">
+		<a sc:modal:action="close" on-complete="actions.goHome()" no-delay class="btn float-left type-text">
+			Exit game
+		</a>
+		<a sc:modal:action="close" on-complete="actions.newGame()" no-delay class="btn float-right type-primary addon-arrow">
+			Next Puzzle
+		</a>
+	</div>
+</sc:modal>
+
+<sc:modal name="loseModal" show="showLoseModal" style="red">
+	<span class="modal-content-header">Time&rsquo;s up!</span>
+	<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-primary">Try again?</a>
+	<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
+	<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Exit game</a>
+</sc:modal>

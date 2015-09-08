@@ -55,10 +55,14 @@ app.service 'GameDrawerService', [
 			# 		Render the moves left circle + counter
 			#---------------------------------------------------------------
 			movesLeft: ( isGameWon, color = 'white' ) =>
-				numMoves = @game.movesLeft
+				numMoves = if isGameWon then @game.maxMoves else @game.movesLeft
+
+				# Set text to green if we've won the game
+				if isGameWon
+					color = 'teal'
 
 				# Set text to red if we've used up all of our moves
-				if not isGameWon and parseInt(numMoves, 10) <= 0
+				else if parseInt(numMoves, 10) <= 0
 					color = 'red'
 
 				# Get the canvas x pos of the middle column of the board
@@ -108,7 +112,7 @@ app.service 'GameDrawerService', [
 				@canvas.goal.draw.clear(0, 0, BOARD.DIMENSIONS.w, BOARD.MARGIN)
 
 				# Render the moves left
-				movesCircle = @movesLeft()
+				movesCircle = @movesLeft( isGameWon )
 
 				# Get the middle column of the board
 				middleColumn = Math.floor(BOARD.SIZE / 2)
@@ -185,14 +189,14 @@ app.service 'GameDrawerService', [
 							)
 						else
 							if not node.selected
-								if opts? and opts.animation is true
+								if opts?.animation is true
 									@stopAnimation( node, 'glow' )
 									@fadeOutAnimation( node )
 								else
 									drawNode = @canvas.game.draw.createDrawParams( node, 'faded' )
 									@canvas.game.draw.create( drawNode )
 							else
-								if opts? and opts.animation is true
+								if opts?.animation is true
 									@stopAnimation( node, 'glow' )
 									@shadowAnimation( node )
 

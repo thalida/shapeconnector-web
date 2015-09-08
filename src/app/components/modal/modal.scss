@@ -1,3 +1,7 @@
+$color-teal: #8AE8B2;
+$color-red: #FF5252;
+$color-blue: #2F79C1;
+
 .modal {
 	position: fixed;
 	top: 0;
@@ -8,12 +12,24 @@
 	overflow: auto;
 
 	&.minimized {
-		background-color: #2F79C1;
-		height: 50px;
+		background-color: #ccc;
+		height: 70px;
 		position: fixed;
 		top: initial;
 		bottom: 0;
 		left: 0;
+
+		&.teal {
+			background-color: $color-teal;
+		}
+
+		&.red {
+			background-color: $color-red;
+		}
+
+		&.blue {
+			background-color: $color-blue;
+		}
 	}
 
 	&-overlay {
@@ -35,22 +51,75 @@
 	&-content {
 		position: relative;
 		margin: 0 auto;
-		background-color: #2F79C1;
+		padding: 40px 40px;
+
 		border-radius: 3px;
+		box-shadow: 0px 6px 3px 0px rgba(black, 0.1);
+		text-align: center;
+
+		color: black;
+		background-color: #ccc;
+
+		.modal.teal & {
+			background-color: $color-teal;
+		}
+
+		.modal.red & {
+			background-color: $color-red;
+		}
+
+		.modal.blue & {
+			background-color: $color-blue;
+		}
 
 		.modal.minimized & {
 			display: none;
 		}
+
+		// &-header => .game-popup-header :- The main title on the popup
+		&-header {
+			display: block;
+			font-weight: 300;
+			font-size: 36px;
+			line-height: 1.5;
+			margin-bottom: 40px;
+		}
+
+		// &-text => .game-popup-text :- The secondary text on the popup
+		&-text {
+			display: block;
+			font-size: 18px;
+			line-height: 1.3;
+			margin-bottom: 25px;
+		}
+
+		.btn {
+			width: 150px;
+			padding: 13px 10px;
+			margin: 0 auto 20px;
+		}
 	}
 
 	&-minimized {
+		@include clearfix;
 		display: none;
 		position: relative;
 		margin: 0 auto;
 		border-radius: 3px;
+		padding: 15px 20px;
 
 		.modal.minimized & {
 			display: block;
+		}
+
+		.btn {
+			height: 40px;
+			width: 120px;
+			font-size: 14px;
+
+			&.addon-arrow:after {
+				margin-top: 3px;
+			}
 		}
 	}
 }

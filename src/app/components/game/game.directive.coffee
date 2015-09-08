@@ -2,7 +2,7 @@
 
 #===============================================================================
 #
-#	Game Directive
+#	ShapeConnector (SC) Game Directive
 # 		Renders the game to the canvas and handles the events
 #
 #-------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ app.directive 'scGame', [
 	'GameManagerService'
 	'WatcherService'
 	($rootScope, $log, LEVELS, BOARD, SHAPE, GameManager, Watcher) ->
-		templateUrl: 'app/components/game/partials/game.html'
+		templateUrl: 'app/components/game/game.html'
 		restrict: 'E'
 		scope:
 			sourceGame: '=?'
@@ -149,6 +149,7 @@ app.directive 'scGame', [
 			# actions: Additonal user triggered actions on game win/lose
 			#-------------------------------------------------------------------
 			$scope.actions =
+				debug: ( e ) -> console.log('Made it to game.directive', e )
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
@@ -163,6 +164,13 @@ app.directive 'scGame', [
 				if collection?.game?
 					stopCanvasWatch()
 					start()
+			)
+
+			watcher.start('game.won', ( hasWon ) ->
+				$scope.showWinModal = (hasWon is true)
+			)
+			watcher.start('game.lost', ( hasLost ) ->
+				$scope.showLoseModal = (hasLost is true)
 			)
 
 			# Destroy the Game class on directive $destroy

@@ -13,7 +13,7 @@ gameLevels =
 	DEV: {
 		min: 3,
 		max: 3,
-		timer: 105
+		timer: 15
 	}
 	EASY: {
 		min: 5,
@@ -44,6 +44,7 @@ app.constant 'HEXCOLORS', {
 	blue: '#4B9CFF'
 	green: '#8BCA22'
 	yellow: '#E5D235'
+	teal: '#8AE8B2'
 }
 
 
