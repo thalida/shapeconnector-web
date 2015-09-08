@@ -25,7 +25,7 @@ The app was designed in sketch, and if you'd like to view the comp its available
 
 
 ## Future additions
-Checkout the [open issues](https://github.com/thalida/ShapeConnector/issues) for the enhancments, features, and bugs of the game.
+Checkout the [open issues](https://github.com/thalida/ShapeConnector/issues) for the enhancments, features, and bugs of the game. You can track the issues via github or the [waffle board](https://waffle.io/thalida/ShapeConnector).
 
 
 ## Contributing
