@@ -34,12 +34,30 @@
 	</div>
 </div>
 
-<sc:modal name="winModal" show="showWinModal" style="teal">
-	<span class="modal-content-header">Awesome!</span>
-	<a sc:modal:action="minimize" class="btn type-primary">See game board</div>
-	<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
-	<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+<sc:modal name="pauseModal" show="showPauseModal" style="blue">
+	<div class="game-pause_modal">
+		<div class="game-pause_modal-controls">
+			<div sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn small-circle restart-icon"></div>
+			<div sc:modal:action="close" on-complete="actions.resumeGame( e )" class="btn circle play-icon"></div>
+			<div sc:modal:action="close" on-complete="actions.newGame( e )" class="btn small-circle skip-icon"></div>
+		</div>
 
+		<div class="game-pause_modal-settings">
+			<div class="toggle"> Sound </div>
+			<div class="toggle"> Music </div>
+		</div>
+
+		<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+	</div>
+</sc:modal>
+
+<sc:modal name="winModal" show="showWinModal" style="teal">
+	<div class="game-win_modal">
+		<span class="modal-content-header">Awesome!</span>
+		<a sc:modal:action="minimize" class="btn type-primary">See game board</a>
+		<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
+		<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+	</div>
 	<div class="scmodal-minimized-content">
 		<a sc:modal:action="close" on-complete="actions.goHome()" no-delay class="btn float-left type-text">
 			Exit game
@@ -51,8 +69,10 @@
 </sc:modal>
 
 <sc:modal name="loseModal" show="showLoseModal" style="red">
-	<span class="modal-content-header">Time&rsquo;s up!</span>
-	<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-primary">Try again?</a>
-	<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
-	<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Exit game</a>
+	<div class="game-lose_modal">
+		<span class="modal-content-header">Time&rsquo;s up!</span>
+		<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-primary">Try again?</a>
+		<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Exit game</a>
+	</div>
 </sc:modal>

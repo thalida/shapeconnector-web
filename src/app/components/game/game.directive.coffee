@@ -29,7 +29,7 @@ app.directive 'scGame', [
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
 			watcher = new Watcher( $scope )
-			$scope.showModal = false
+			$scope.showPauseModal = false
 
 
 			# utils: simple functions used to render the board
@@ -101,7 +101,7 @@ app.directive 'scGame', [
 				# Create a scoped copy of the Game class
 				$scope.game = Game.start()
 
-				$rootScope.windowEvents.onFocus( events.onFocus )
+				# $rootScope.windowEvents.onFocus( events.onFocus )
 				$rootScope.windowEvents.onBlur( events.onBlur )
 				$window.on('resize', events.onResize)
 
@@ -138,12 +138,16 @@ app.directive 'scGame', [
 			#	Note: Keep $scope.$apply since events are bound outåside of angular
 			#-------------------------------------------------------------------
 			events =
-				onMove: ( e, params ) -> $scope.$apply( => Game.onMoveEvent(e, params) )
+				onMove: ( e, params ) ->
+					$scope.$apply( => Game.onMoveEvent(e, params) )
 				onEnd: -> $scope.$apply( => Game.onEndEvent() )
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
-				onFocus: -> $scope.$apply( => Game.resumeGame() )
-				onBlur: -> $scope.$apply( => Game.pauseGame() )
 				onResize: -> positionBoard()
+				onBlur: ->
+					$scope.$apply( =>
+						Game.pauseGame()
+						$scope.showPauseModal = true
+					)
 
 
 			# actions: Additonal user triggered actions on game win/lose
@@ -153,6 +157,12 @@ app.directive 'scGame', [
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
+				resumeGame: ->
+					$scope.$apply( =>
+						Game.resumeGame()
+						$scope.showPauseModal = false
+					)
+
 
 
 			# We're ready to set the scope variables

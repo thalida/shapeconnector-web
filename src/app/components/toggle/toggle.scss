@@ -1,0 +1,29 @@
+.toggle {
+	@include clearfix;
+
+	cursor: pointer;
+	display: block;
+	height: 40px;
+	width: 90px;
+	padding: 10px;
+	border-radius: 3px;
+	background-color: #E9E9E9;
+	color: black;
+
+	&:after {
+		content: "";
+		display: block;
+		float: right;
+
+		width: 10px;
+		height: 10px;
+		margin-top: 6px;
+
+		border-radius: 50%;
+		background-color: #BBBBBB;
+	}
+
+	&:hover {
+		background-color: #FBF8F8;
+	}
+}
