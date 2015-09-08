@@ -3,6 +3,9 @@ $color-red: #FF5252;
 $color-blue: #2F79C1;
 
 .modal {
+	@extend %disable-selection;
+	cursor: default;
+
 	position: fixed;
 	top: 0;
 	left: 0;
