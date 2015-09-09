@@ -26,6 +26,9 @@
 		margin-top: 60px;
 		.btn {
 			margin: 0 auto 20px;
+			&:hover {
+				opacity: 0.9;
+			}
 		}
 	}
 
