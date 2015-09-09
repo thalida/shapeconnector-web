@@ -1,8 +1,10 @@
 <div recompiler="rebuildGame">
 	<sc:game
+		type="{{gameType}}"
 		difficulty="{{difficulty}}"
 		source-game="gameCopy"
 		on-new-game="createNewGame(params)"
-		on-reset-game="resetGame(params)">
+		on-reset-game="resetGame(params)"
+		on-quit-game="goHome(params)">
 	</sc:game>
 </div>

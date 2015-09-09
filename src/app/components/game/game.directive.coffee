@@ -20,15 +20,20 @@ app.directive 'scGame', [
 		restrict: 'E'
 		scope:
 			sourceGame: '=?'
+			gameType: '@?type'
 			difficulty: '@?'
 			onNewGame: '&?'
 			onResetGame: '&?'
+			onQuitGame: '&?'
 		link: ($scope, el, attrs) ->
 			# globals
 			Game = null
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
 			watcher = new Watcher( $scope )
+
+			$scope.showWinModal = false
+			$scope.showLoseModal = false
 			$scope.showPauseModal = false
 
 
@@ -90,7 +95,7 @@ app.directive 'scGame', [
 			start = ->
 				# ALL of the game logic: Creates a game that uses the specified
 				# canvases, difficulty, and optional source game board
-				Game = new GameManager( $scope.canvasCollection, $scope.difficulty, $scope.sourceGame )
+				Game = new GameManager( $scope.gameType, $scope.difficulty, $scope.canvasCollection, $scope.sourceGame )
 
 				# Save the current game board to the parent (controller) scope
 				saveGameBoard()
@@ -138,8 +143,7 @@ app.directive 'scGame', [
 			#	Note: Keep $scope.$apply since events are bound outåside of angular
 			#-------------------------------------------------------------------
 			events =
-				onMove: ( e, params ) ->
-					$scope.$apply( => Game.onMoveEvent(e, params) )
+				onMove: ( e, params ) -> $scope.$apply( => Game.onMoveEvent(e, params) )
 				onEnd: -> $scope.$apply( => Game.onEndEvent() )
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
 				onResize: -> positionBoard()
@@ -154,7 +158,6 @@ app.directive 'scGame', [
 			# actions: Additonal user triggered actions on game win/lose
 			#-------------------------------------------------------------------
 			$scope.actions =
-				debug: ( e ) -> console.log('Made it to game.directive', e )
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
@@ -180,6 +183,7 @@ app.directive 'scGame', [
 			watcher.start('game.won', ( hasWon ) ->
 				$scope.showWinModal = (hasWon is true)
 			)
+
 			watcher.start('game.lost', ( hasLost ) ->
 				$scope.showLoseModal = (hasLost is true)
 			)

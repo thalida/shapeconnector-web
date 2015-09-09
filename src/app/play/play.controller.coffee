@@ -2,7 +2,7 @@
 
 app.config ($stateProvider) ->
 	$stateProvider.state('play',
-		url: '/'
+		url: '/play'
 		templateUrl: 'app/play/play.html'
 		controller: 'PlayCtrl'
 	)
@@ -10,10 +10,13 @@ app.config ($stateProvider) ->
 
 app.controller 'PlayCtrl', [
 	'$log'
+	'$rootScope'
 	'$scope'
-	($log, $scope) ->
-		isProdSite = (window.location.hostname.indexOf('shapeconnector') >= 0)
-		$scope.difficulty = (if not isProdSite then 'dev' else 'medium')
+	'$state'
+	'gameSettingsService'
+	($log, $rootScope, $scope, $state, gameSettings) ->
+		$scope.gameType = gameSettings.getGameType()
+		$scope.difficulty = (if not $rootScope.isProdSite then 'dev' else gameSettings.getDifficulty())
 
 		$scope.rebuildGame = false
 
@@ -24,6 +27,10 @@ app.controller 'PlayCtrl', [
 
 		$scope.resetGame = () ->
 			$scope.rebuildGame = true
+			return
+
+		$scope.goHome = ->
+			$state.go('home')
 			return
 ]
 

@@ -89,8 +89,6 @@ app.directive 'appCanvas', [
 						canvas.el.addEventListener('touchcancel', @cancel, false)
 
 				unbind: () ->
-					$log.debug('Canvas - unbinding')
-
 					canvas.$el
 						.off('mousedown')
 						.off('mousemove')

@@ -36,6 +36,12 @@ gameLevels.DEFAULT = {name: 'easy', info: gameLevels.EASY}
 app.constant 'LEVELS', gameLevels
 
 
+app.constant 'GAME_TYPES', {
+	options: ['freeplay', 'timed']
+	default: 'freeplay'
+}
+
+
 # Hex Colors: Hex versions of the colors used
 #-------------------------------------------------------------------------------
 app.constant 'HEXCOLORS', {

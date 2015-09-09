@@ -7,6 +7,7 @@ app.run [
 	'WindowEvents'
 	($rootScope, $location, $timeout, WindowEvents) ->
 		$rootScope.windowEvents = new WindowEvents()
+		$rootScope.isProdSite = (window.location.hostname.indexOf('shapeconnector') >= 0)
 
 		window.getRandomInt = (min, max) ->
 			return Math.floor(Math.random() * (max - min + 1)) + min

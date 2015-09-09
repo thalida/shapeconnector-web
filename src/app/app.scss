@@ -51,7 +51,7 @@ body {
 	}
 }
 
-.loading-screen {
+.loading-view {
 	position: absolute;
 	width: 100%;
 	height: 100%;
@@ -92,6 +92,10 @@ body {
 	&:active {
 		background: #fcfcfc;
 		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
+	}
+
+	&.teal {
+		background-color: #6EEFA5;
 	}
 
 	&.circle {
