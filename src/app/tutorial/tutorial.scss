@@ -1,0 +1,30 @@
+.tutorial-view {
+	width: 100%;
+	padding: 40px;
+	color: white;
+
+	&-content {
+		display: block;
+		width: 100%;
+	}
+
+	.header {
+		color: white;
+		font-size: 22px;
+		margin-bottom: 0px;
+		text-align: center;
+	}
+
+	.description {
+		font-size: 18px;
+		line-height: 1.8;
+
+		&.light {
+			font-weight: 300;
+		}
+
+		&.center {
+			text-align: center;
+		}
+	}
+}
