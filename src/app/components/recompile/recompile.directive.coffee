@@ -17,21 +17,26 @@ app.directive 'recompiler', [
 		link: ($scope, $el, attrs, ctrls, transclude) ->
 			previousElements = null
 
-			compile = ->
-				transclude($scope, (clone) ->
-					previousElements = clone
-					$el.append(clone)
-				)
+			recompile =
+				run: ->
+					@clean()
+					@compile()
 
-			clean = ->
-				return if !previousElements?
-				previousElements.remove()
-				previousElements = null
-				$el.empty()
+				compile: ->
+					transclude($scope, (clone) ->
+						previousElements = clone
+						if attrs.animate is 'fadeIn'
+							$el.hide().append(clone).fadeIn( 300 )
+						else
+							$el.append(clone)
+					)
 
-			recompile = ->
-				clean()
-				compile()
+				clean: ->
+					return if !previousElements?
+					previousElements.remove()
+					previousElements = null
+					$el.empty()
+
 
 			$scope.$watch(attrs.recompiler, (recompiler) ->
 				return if !recompiler? or recompiler is 'false'
@@ -40,6 +45,6 @@ app.directive 'recompiler', [
 				$parse(attrs.recompiler).assign($scope, false)
 
 				# Trigger the recompile
-				recompile()
+				recompile.run()
 			)
 ]

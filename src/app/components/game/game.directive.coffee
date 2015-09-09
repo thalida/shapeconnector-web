@@ -49,14 +49,12 @@ app.directive 'scGame', [
 					return gameWidth
 
 				calcGameTopMargin: ->
-					$appHeader = $('.app-header')
-					windowMidHeight = $window.height() / 2
+					windowMidHeight = window.innerHeight / 2
+					headerHeight = SHAPE.OUTERSIZE + 10
 					boardHalfHeight = BOARD.DIMENSIONS.h / 2
-					headerHeight = $gameHeader.outerHeight(true)
-					appHeaderHeight = $appHeader.outerHeight(true)
 
-					topMargin = windowMidHeight - headerHeight - appHeaderHeight - boardHalfHeight
-					topMargin = 0 if topMargin < 0
+					topMargin = windowMidHeight - headerHeight - boardHalfHeight
+					# topMargin = 20 if topMargin < 20
 
 					return topMargin
 

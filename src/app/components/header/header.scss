@@ -1,9 +1,10 @@
 .app-header {
-	margin-bottom: 20px;
+	margin: 30px 0 10px 30px;
+	position: absolute;
+	z-index: 1;
 
 	.logo {
 		@extend %clickable;
-		margin: 40px 0 0 40px;
 		&:hover {
 			opacity: 0.8;
 		}

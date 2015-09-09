@@ -4,7 +4,7 @@
 @import "mixins";
 
 $animationTiming: cubic-bezier(0.445, 0.050, 0.550, 0.950);
-$animationSpeed: 4s;
+$animationSpeed: 2s;
 
 @include keyframes(fadeInOut) {
 	0%,
@@ -35,6 +35,38 @@ body {
 	padding: 0.2em 0;
 }
 
+[ui-view].ng-enter,
+[ui-view].ng-leave {
+	position: absolute;
+	-webkit-transition: all .4s $animationTiming;
+	-moz-transition: all .4s $animationTiming;
+	-o-transition: all .4s $animationTiming;
+	transition: all .4s $animationTiming;
+}
+
+[ui-view].ng-enter {
+	opacity: 0;
+}
+
+[ui-view].ng-enter-active {
+	opacity: 1
+}
+
+[ui-view].ng-leave {
+	opacity: 1;
+}
+
+[ui-view].ng-leave-active {
+	opacity: 0;
+}
+
+.app-container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #292B55;
+}
+
 .logo {
 	&.large {
 		@include cssSprite( $logo-large );
@@ -61,6 +93,7 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
+	z-index: 1;
 
 	-webkit-animation: fadeInOut $animationTiming $animationSpeed infinite;
 	animation: fadeInOut $animationTiming $animationSpeed infinite;
