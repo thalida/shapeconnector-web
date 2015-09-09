@@ -4,10 +4,18 @@ app.run [
 	'$rootScope'
 	'$location'
 	'$timeout'
+	'$state'
 	'WindowEvents'
-	($rootScope, $location, $timeout, WindowEvents) ->
-		$rootScope.windowEvents = new WindowEvents()
+	($rootScope, $location, $timeout, $state, WindowEvents) ->
 		$rootScope.isProdSite = (window.location.hostname.indexOf('shapeconnector') >= 0)
+
+		$rootScope.windowEvents = new WindowEvents()
+
+		$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
+			if toState.name is 'play' and fromState.name.length is 0
+				e.preventDefault()
+				$state.go('home')
+		)
 
 		window.getRandomInt = (min, max) ->
 			return Math.floor(Math.random() * (max - min + 1)) + min
