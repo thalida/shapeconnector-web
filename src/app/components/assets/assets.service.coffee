@@ -10,7 +10,8 @@
 
 app.service 'assetsService', [
 	'$log'
-	($log) ->
+	'gameSettingsService'
+	($log, gameSettings) ->
 		return new class AssetLoader
 			# @constructor: Setup the file paths & initalise vars
 			#-------------------------------------------------------------------
@@ -84,6 +85,8 @@ app.service 'assetsService', [
 				return
 
 			playSound: ( name ) =>
+				return if gameSettings.getAllowSounds() is off
+
 				sound = @sounds[name]
 				return if !sound?
 

@@ -11,21 +11,25 @@
 #-------------------------------------------------------------------------------
 gameLevels =
 	DEV: {
+		label: 'Dev Mode'
 		min: 3,
 		max: 3,
 		timer: 15
 	}
 	EASY: {
+		label: 'Beginner'
 		min: 5,
 		max: 8,
 		timer: 90
 	}
 	MEDIUM: {
+		label: 'Intermediate'
 		min: 9,
 		max: 13,
 		timer: 60
 	}
 	HARD: {
+		label: 'Advanced'
 		min: 14,
 		max: 18,
 		timer: 60

@@ -1,8 +1,10 @@
+<app:header on-click="onHeaderClick()"></app:header>
 <div recompiler="rebuildGame">
 	<sc:game
 		type="{{gameType}}"
 		difficulty="{{difficulty}}"
 		source-game="gameCopy"
+		pause-game="pauseGame"
 		on-new-game="createNewGame(params)"
 		on-reset-game="resetGame(params)"
 		on-quit-game="goHome(params)">
