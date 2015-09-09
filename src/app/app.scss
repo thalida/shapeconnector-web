@@ -40,6 +40,11 @@ body {
 		content: '';
 		display: block;
 	}
+	&.small {
+		@include cssSprite( $logo-small );
+		content: '';
+		display: block;
+	}
 }
 
 .logomark {
