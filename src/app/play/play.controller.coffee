@@ -16,7 +16,7 @@ app.controller 'PlayCtrl', [
 	'gameSettingsService'
 	($log, $rootScope, $scope, $state, gameSettings) ->
 		$scope.gameType = gameSettings.getGameType()
-		$scope.difficulty = (if not $rootScope.isProdSite then 'dev' else gameSettings.getDifficulty())
+		$scope.difficulty = gameSettings.getDifficulty()
 
 		$scope.rebuildGame = false
 
@@ -28,6 +28,9 @@ app.controller 'PlayCtrl', [
 		$scope.resetGame = () ->
 			$scope.rebuildGame = true
 			return
+
+		$scope.onHeaderClick = () ->
+			$scope.pauseGame = true
 
 		$scope.goHome = ->
 			$state.go('home')

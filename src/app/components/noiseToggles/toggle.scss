@@ -23,7 +23,21 @@
 		background-color: #BBBBBB;
 	}
 
+	&.on:after {
+		background-color: #5CC968;
+	}
+
 	&:hover {
 		background-color: #FBF8F8;
+	}
+}
+
+.noise-toggles {
+	text-align: center;
+
+	.toggle {
+		display: inline-block;
+		text-align: left;
+		margin: 0 10px;
 	}
 }

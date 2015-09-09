@@ -2,15 +2,26 @@
 
 app.service 'gameSettingsService', [
 	'$log'
+	'$localStorage'
 	'GAME_TYPES'
 	'LEVELS'
-	( $log, GAME_TYPES, LEVELS ) ->
+	( $log, $localStorage, GAME_TYPES, LEVELS ) ->
 		new class GameSettings
 			constructor: ->
+				$localStorage.$default(
+					allowSounds: true
+					allowMusic: true
+					difficulty: LEVELS.DEFAULT.name
+				)
+
 				@gameType = GAME_TYPES.default
-				@allowSounds = true
-				@allowMusic = true
-				@difficulty = LEVELS.default
+				@allowSounds = $localStorage.allowSounds
+				@allowMusic = $localStorage.allowMusic
+				@difficulty = $localStorage.difficulty
+
+				# $localStorage.allowSounds = @allowSounds
+				# $localStorage.allowMusic = @allowMusic
+				# $localStorage.difficulty = @difficulty
 
 			setGameType: ( type ) ->
 				if GAME_TYPES.options.indexOf( type ) >= 0
@@ -22,19 +33,33 @@ app.service 'gameSettingsService', [
 				if LEVELS[ level.toUpperCase() ]?
 					@difficulty = level.toLowerCase()
 
+				$localStorage.difficulty = @difficulty
+
 				return @difficulty
 
 			setAllowSounds: (bool) ->
 				@allowSounds = bool
+				$localStorage.allowSounds = @allowSounds
+
+				return @allowSounds
 
 			setAllowMusic: (bool) ->
 				@allowMusic = bool
+				$localStorage.allowMusic = @allowMusic
+
+				return @allowMusic
+
+			toggle: ( type ) ->
+				if type is 'sounds'
+					return @toggleAllowSounds()
+				else if type is 'music'
+					return @toggleAllowMusic()
 
 			toggleAllowSounds: ->
-				@allowSounds = !@allowSounds
+				return @setAllowSounds( !@allowSounds )
 
 			toggleAllowMusic: ->
-				@allowMusic = !@allowMusic
+				return @setAllowMusic( !@allowMusic )
 
 			getGameType: -> return @gameType
 

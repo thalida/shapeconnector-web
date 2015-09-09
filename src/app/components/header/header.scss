@@ -1,0 +1,11 @@
+.app-header {
+	margin-bottom: 20px;
+
+	.logo {
+		@extend %clickable;
+		margin: 40px 0 0 40px;
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+}

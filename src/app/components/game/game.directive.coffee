@@ -22,6 +22,7 @@ app.directive 'scGame', [
 			sourceGame: '=?'
 			gameType: '@?type'
 			difficulty: '@?'
+			triggerGamePause: '=?pauseGame'
 			onNewGame: '&?'
 			onResetGame: '&?'
 			onQuitGame: '&?'
@@ -48,11 +49,13 @@ app.directive 'scGame', [
 					return gameWidth
 
 				calcGameTopMargin: ->
+					$appHeader = $('.app-header')
 					windowMidHeight = $window.height() / 2
 					boardHalfHeight = BOARD.DIMENSIONS.h / 2
 					headerHeight = $gameHeader.outerHeight(true)
+					appHeaderHeight = $appHeader.outerHeight(true)
 
-					topMargin = windowMidHeight - headerHeight - boardHalfHeight
+					topMargin = windowMidHeight - headerHeight - appHeaderHeight - boardHalfHeight
 					topMargin = 60 if topMargin < 0
 
 					return topMargin
@@ -147,12 +150,7 @@ app.directive 'scGame', [
 				onEnd: -> $scope.$apply( => Game.onEndEvent() )
 				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
 				onResize: -> positionBoard()
-				onBlur: ->
-					if $scope.game.gameOver is false
-						$scope.$apply( =>
-							Game.pauseGame()
-							$scope.showPauseModal = true
-						)
+				onBlur: ->$scope.$apply( => $scope.actions.pauseGame() )
 
 
 			# actions: Additonal user triggered actions on game win/lose
@@ -161,6 +159,10 @@ app.directive 'scGame', [
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
+				pauseGame: ->
+					if $scope.game.gameOver is false
+						Game.pauseGame()
+						$scope.showPauseModal = true
 				resumeGame: ->
 					$scope.$apply( =>
 						Game.resumeGame()
@@ -186,6 +188,16 @@ app.directive 'scGame', [
 
 			watcher.start('game.lost', ( hasLost ) ->
 				$scope.showLoseModal = (hasLost is true)
+			)
+
+			watcher.start('triggerGamePause', ( pauseGame ) ->
+				if pauseGame is true
+					if $scope.game.gameOver is true
+						$scope.actions.quitGame()
+					else
+						$scope.actions.pauseGame()
+						$scope.triggerGamePause = false
+
 			)
 
 			# Destroy the Game class on directive $destroy
