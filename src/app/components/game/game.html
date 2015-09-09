@@ -46,7 +46,7 @@
 			<sc:noise-toggles></sc:noise-toggles>
 		</div>
 
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Quit game</a>
 	</div>
 </sc:modal>
 
@@ -55,11 +55,11 @@
 		<span class="modal-content-header">Awesome!</span>
 		<a sc:modal:action="minimize" class="btn type-primary">See game board</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Quit game</a>
 	</div>
 	<div class="scmodal-minimized-content">
 		<a sc:modal:action="close" on-complete="actions.quitGame()" no-delay class="btn float-left type-text">
-			Exit game
+			Quit game
 		</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" no-delay class="btn float-right type-primary addon-arrow">
 			Next Puzzle
@@ -72,6 +72,6 @@
 		<span class="modal-content-header">Time&rsquo;s up!</span>
 		<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-primary">Try again?</a>
 		<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
-		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Exit game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Quit game</a>
 	</div>
 </sc:modal>

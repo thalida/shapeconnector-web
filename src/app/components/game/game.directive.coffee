@@ -54,7 +54,7 @@ app.directive 'scGame', [
 					boardHalfHeight = BOARD.DIMENSIONS.h / 2
 
 					topMargin = windowMidHeight - headerHeight - boardHalfHeight
-					# topMargin = 20 if topMargin < 20
+					topMargin = 60 if topMargin < 60
 
 					return topMargin
 
