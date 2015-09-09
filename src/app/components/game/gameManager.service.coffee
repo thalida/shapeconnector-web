@@ -23,7 +23,7 @@ app.service 'GameManagerService', [
 		class GameManager
 			#	@constructor: Sets up all of the variables to be used
 			#-------------------------------------------------------------------
-			constructor: ( @canvas, @difficulty, board ) ->
+			constructor: ( @mode, @difficulty, @canvas, board ) ->
 				# If no difficulty was passed default to easy
 				@difficulty ?= LEVELS.DEFAULT.name
 
@@ -41,10 +41,11 @@ app.service 'GameManagerService', [
 				@isDragging = false
 				@isValidStart = false
 
-				@hasTimer = true
-				@timer = null
-				@totalTime = LEVELS[ @difficulty.toUpperCase() ].timer
-				@timeRemaining = 0
+				@hasTimer = @mode is 'timed'
+				if @hasTimer
+					@timer = null
+					@totalTime = LEVELS[ @difficulty.toUpperCase() ].timer
+					@timeRemaining = 0
 
 				@selectedNodesHelper()
 
@@ -104,7 +105,7 @@ app.service 'GameManagerService', [
 				assetsService.onComplete(() =>
 					@render.run()
 
-					if @hasTimer == true
+					if @hasTimer
 						@timer = new Timer( @totalTime )
 						@timer.onTick = @onTimerChange
 						@timer.start()
@@ -130,9 +131,11 @@ app.service 'GameManagerService', [
 
 			pauseGame: () ->
 				@timer?.pause()
+				return
 
 			resumeGame: () ->
 				@timer?.start() if not @gameOver
+				return
 
 			#	@isGrandPaNode
 			# 		Check if the given node is the SAME as the node two moves back

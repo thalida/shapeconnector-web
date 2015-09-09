@@ -47,7 +47,7 @@
 			<div class="toggle"> Music </div>
 		</div>
 
-		<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit game</a>
 	</div>
 </sc:modal>
 
@@ -56,10 +56,10 @@
 		<span class="modal-content-header">Awesome!</span>
 		<a sc:modal:action="minimize" class="btn type-primary">See game board</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
-		<a sc:modal:action="close" on-complete="actions.goHome()" class="btn type-text">Exit game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit game</a>
 	</div>
 	<div class="scmodal-minimized-content">
-		<a sc:modal:action="close" on-complete="actions.goHome()" no-delay class="btn float-left type-text">
+		<a sc:modal:action="close" on-complete="actions.quitGame()" no-delay class="btn float-left type-text">
 			Exit game
 		</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" no-delay class="btn float-right type-primary addon-arrow">

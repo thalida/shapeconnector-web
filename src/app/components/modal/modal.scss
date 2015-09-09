@@ -6,6 +6,7 @@ $color-blue: #2F79C1;
 	@extend %disable-selection;
 	cursor: default;
 
+	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;

@@ -1,12 +1,20 @@
 // bower:scss
 // endbower
 @import "sprites";
-@mixin clearfix {
-  &:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
+@import "mixins";
+
+$animationTiming: cubic-bezier(0.445, 0.050, 0.550, 0.950);
+$animationSpeed: 4s;
+
+@include keyframes(fadeInOut) {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.1;
+	}
 }
 
 html { box-sizing: border-box; }
@@ -26,20 +34,39 @@ body {
 	padding: 0.2em 0;
 }
 
-%disable-selection {
-	cursor: pointer;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
-	-webkit-tap-highlight-color: transparent;
+.logo {
+	&.large {
+		@include cssSprite( $logo-large );
+		content: '';
+		display: block;
+	}
 }
 
-%clickable {
-	cursor: pointer;
-	@extend %disable-selection;
+.logomark {
+	color: white;
+	font: normal 700 16px/1.5 'Lato', 'Arial', sans-serif;
+	text-transform: uppercase;
+	.light {
+		font-weight: 300;
+	}
+}
+
+.loading-view {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+
+	-webkit-animation: fadeInOut $animationTiming $animationSpeed infinite;
+	animation: fadeInOut $animationTiming $animationSpeed infinite;
+
+	&-content {
+		@include vertical-align;
+		text-align: center;
+	}
+
+	.logo {
+		margin: 0 auto 20px;
+	}
 }
 
 .float-left {
@@ -50,12 +77,10 @@ body {
 	float: right;
 }
 
-
 .btn {
 	@extend %clickable;
 
 	background: white;
-	// box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
 	border-radius: 3px;
 	cursor: pointer;
 	display: block;
@@ -67,7 +92,10 @@ body {
 	&:active {
 		background: #fcfcfc;
 		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
-		// box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.40);
+	}
+
+	&.teal {
+		background-color: #6EEFA5;
 	}
 
 	&.circle {
@@ -140,7 +168,6 @@ body {
 		padding-left: 3px;
 	}
 }
-
 
 
 // injector
