@@ -56,7 +56,7 @@ app.directive 'scGame', [
 					appHeaderHeight = $appHeader.outerHeight(true)
 
 					topMargin = windowMidHeight - headerHeight - appHeaderHeight - boardHalfHeight
-					topMargin = 60 if topMargin < 0
+					topMargin = 0 if topMargin < 0
 
 					return topMargin
 

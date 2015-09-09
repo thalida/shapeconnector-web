@@ -91,7 +91,7 @@ app.directive 'scModal', [
 				positionModal: ->
 					$content.css(
 						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
-						height: BOARD.DIMENSIONS.h + 50
+						height: BOARD.DIMENSIONS.h
 						marginTop: $gameBoard.offset().top
 					)
 					return

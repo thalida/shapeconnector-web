@@ -17,7 +17,7 @@ $color-blue: #2F79C1;
 
 	&.minimized {
 		background-color: #ccc;
-		height: 70px;
+		height: 60px;
 		position: fixed;
 		top: initial;
 		bottom: 0;
@@ -83,7 +83,7 @@ $color-blue: #2F79C1;
 			font-weight: 300;
 			font-size: 36px;
 			line-height: 1.5;
-			margin-bottom: 40px;
+			margin-bottom: 20px;
 		}
 
 		&-text {
@@ -100,7 +100,7 @@ $color-blue: #2F79C1;
 		position: relative;
 		margin: 0 auto;
 		border-radius: 3px;
-		padding: 15px 20px;
+		padding: 10px 20px;
 
 		.modal.minimized & {
 			display: block;

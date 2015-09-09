@@ -78,7 +78,7 @@ $color-red: #FF5252;
 
 	&-win_modal,
 	&-lose_modal {
-		padding: 40px 40px;
+		padding: 30px;
 		text-align: center;
 
 		.btn {
@@ -86,14 +86,6 @@ $color-red: #FF5252;
 			padding: 13px 10px;
 			margin: 0 auto 20px;
 		}
-	}
-
-	&-win_modal {
-
-	}
-
-	&-lose_modal {
-
 	}
 
 	&-pause_modal {
