@@ -18,7 +18,8 @@ app.controller 'PlayCtrl', [
 		$scope.gameType = gameSettings.getGameType()
 		$scope.difficulty = gameSettings.getDifficulty()
 
-		$scope.rebuildGame = false
+		$scope.rebuildGame = true
+		$scope.pauseGame = false
 
 		$scope.createNewGame = () ->
 			$scope.gameCopy = null
@@ -31,6 +32,7 @@ app.controller 'PlayCtrl', [
 
 		$scope.onHeaderClick = () ->
 			$scope.pauseGame = true
+			return
 
 		$scope.goHome = ->
 			$state.go('home')

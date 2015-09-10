@@ -39,7 +39,7 @@ app.directive 'recompiler', [
 
 
 			$scope.$watch(attrs.recompiler, (recompiler) ->
-				return if !recompiler? or recompiler is 'false'
+				return if !recompiler? or recompiler is 'false' or recompiler is false
 
 				# Set the recompiler back to false
 				$parse(attrs.recompiler).assign($scope, false)

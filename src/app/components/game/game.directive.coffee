@@ -105,7 +105,7 @@ app.directive 'scGame', [
 				positionBoard()
 
 				# Create a scoped copy of the Game class
-				$scope.game = Game.start()
+				$scope.currGame = Game.start()
 
 				# $rootScope.windowEvents.onFocus( events.onFocus )
 				$rootScope.windowEvents.onBlur( events.onBlur )
@@ -158,7 +158,7 @@ app.directive 'scGame', [
 				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
 				pauseGame: ->
-					if $scope.game.gameOver is false
+					if $scope.currGame.gameOver is false
 						Game.pauseGame()
 						$scope.showPauseModal = true
 				resumeGame: ->
@@ -180,21 +180,21 @@ app.directive 'scGame', [
 					start()
 			)
 
-			watcher.start('game.won', ( hasWon ) ->
+			watcher.start('currGame.won', ( hasWon ) ->
 				$scope.showWinModal = (hasWon is true)
 			)
 
-			watcher.start('game.lost', ( hasLost ) ->
+			watcher.start('currGame.lost', ( hasLost ) ->
 				$scope.showLoseModal = (hasLost is true)
 			)
 
-			watcher.start('triggerGamePause', ( pauseGame ) ->
-				if pauseGame is true
-					if $scope.game.gameOver is true
+			stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame ) ->
+				if $scope.triggerGamePause is true
+					$scope.triggerGamePause = false
+					if $rootScope.game.gameOver is true
 						$scope.actions.quitGame()
 					else
 						$scope.actions.pauseGame()
-						$scope.triggerGamePause = false
 
 			)
 

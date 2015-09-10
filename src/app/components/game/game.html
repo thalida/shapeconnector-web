@@ -1,4 +1,4 @@
-<div class="game" ng-class="{'won': game.won == true, 'lost': game.lost == true}">
+<div class="game" ng-class="{'won': currGame.won == true, 'lost': currGame.lost == true}">
 	<div class="game-header">
 		<app:canvas
 			classes="game-goal"
@@ -8,7 +8,7 @@
 		</app:canvas>
 
 		<app:canvas
-			ng-show="game.hasTimer == true"
+			ng-show="currGame.hasTimer == true"
 			classes="game-timer"
 			name="timer"
 			size="{{canvasDimensions.timer}}"
