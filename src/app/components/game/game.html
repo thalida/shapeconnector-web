@@ -53,6 +53,9 @@
 <sc:modal name="winModal" show="showWinModal" style="teal">
 	<div class="game-win_modal">
 		<span class="modal-content-header">Awesome!</span>
+		<span class="modal-content-subtext" ng-if="game.mode == 'timed'">
+			Solved in <span class="weight-normal">{{game.solveTime}}s</span> on <span class="weight-normal">{{attempts | ordinal}}</span> attempt
+		</span>
 		<a sc:modal:action="minimize" class="btn type-primary">See game board</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
 		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Quit game</a>

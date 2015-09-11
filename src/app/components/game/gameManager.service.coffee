@@ -304,7 +304,10 @@ app.service 'GameManagerService', [
 					@endGameAnimation = 0
 					@movesLeft = 0
 
-					@timer?.stop?()
+					if @mode is 'timed'
+						@timer.stop?()
+						@solveTime = @totalTime - @timeRemaining.seconds
+						console.log( @mode, @solveTime, @totalTime, @timeRemaining )
 
 					@render.clearLinesBoard()
 					@render.allSolidLines( @selectedNodes )

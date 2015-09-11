@@ -84,6 +84,20 @@ $color-red: #FF5252;
 		.btn {
 			width: 150px;
 			padding: 13px 10px;
+		}
+	}
+
+	&-win_modal {
+		.btn {
+			margin: 20px auto 0;
+		}
+		.btn.type-text {
+			margin: 5px auto 0;
+		}
+	}
+
+	&-lose_modal {
+		.btn {
 			margin: 0 auto 20px;
 		}
 	}

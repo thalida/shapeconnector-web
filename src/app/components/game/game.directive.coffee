@@ -22,6 +22,7 @@ app.directive 'scGame', [
 			sourceGame: '=?'
 			gameType: '@?type'
 			difficulty: '@?'
+			attempts: '=?'
 			triggerGamePause: '=?pauseGame'
 			onNewGame: '&?'
 			onResetGame: '&?'
@@ -116,6 +117,7 @@ app.directive 'scGame', [
 
 				# Create a scoped copy of the Game class
 				game.start()
+				$scope.attempts += 1
 
 				$rootScope.windowEvents.onBlur( events.onBlur )
 				$window.on('resize', events.onResize)
