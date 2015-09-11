@@ -8,7 +8,6 @@
 #-------------------------------------------------------------------------------
 
 app.service 'GameManagerService', [
-	'$rootScope'
 	'$log'
 	'LEVELS'
 	'BOARD'
@@ -19,11 +18,20 @@ app.service 'GameManagerService', [
 	'WatcherService'
 	'assetsService'
 	'gameUtils'
-	( $rootScope, $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
-		class GameManager
+	( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
+		new class GameManager
+			constructor: () ->
+
 			#	@constructor: Sets up all of the variables to be used
 			#-------------------------------------------------------------------
-			constructor: ( @mode, @difficulty, @canvas, board ) ->
+			init: ( params ) ->
+				@scope = params.scope.$scope
+				@namespace = params.scope.namespace
+				@mode = params.settings.mode
+				@difficulty = params.settings.difficulty
+				@canvas = params.render.canvas
+				board = params.render.board
+
 				# If no difficulty was passed default to easy
 				@difficulty ?= LEVELS.DEFAULT.name
 
@@ -51,13 +59,14 @@ app.service 'GameManagerService', [
 
 				@setBoard( board )
 
-				$rootScope.game = this
+				@scope[@namespace] = this
 
 				return this
 
 			destroy: ->
 				@watcher.stopAll()
 				@timer?.stop()
+				return
 
 			#	@selectedNodesHelper: Namespaced quick actions for selectedNodes
 			#-------------------------------------------------------------------
@@ -75,7 +84,6 @@ app.service 'GameManagerService', [
 			setBoard: ( game ) ->
 				# Generate the game board arrays
 				gameBuilder = new GameBuilderService(difficulty: @difficulty)
-
 				if game?
 					gameBoard = angular.copy( game )
 				else
@@ -119,15 +127,15 @@ app.service 'GameManagerService', [
 			#	@watch: Assign watchers to various aspects of the ggame
 			#-------------------------------------------------------------------
 			watch: () ->
-				@watcher = new Watcher( $rootScope )
-				@watcher.start('game.won', @onGameWon)
-				@watcher.start('game.lost', @onGameLost)
-				@watcher.start('game.movesLeft', @onMovesLeftChange)
-				@watcher.start('game.selectedNodes', @onSelectedNodesChange)
-				@watcher.start('game.touchedNodes', @onTouchedNodesChange)
-				@watcher.start('game.addedNodes', @onAddedNodesChange)
-				@watcher.start('game.removedNodes', @onRemovedNodesChange)
-				@watcher.start('game.endGameAnimation', @onEndGameAnimationChange)
+				@watcher = new Watcher( @scope )
+				@watcher.start(@namespace + '.won', @onGameWon)
+				@watcher.start(@namespace + '.lost', @onGameLost)
+				@watcher.start(@namespace + '.movesLeft', @onMovesLeftChange)
+				@watcher.start(@namespace + '.selectedNodes', @onSelectedNodesChange)
+				@watcher.start(@namespace + '.touchedNodes', @onTouchedNodesChange)
+				@watcher.start(@namespace + '.addedNodes', @onAddedNodesChange)
+				@watcher.start(@namespace + '.removedNodes', @onRemovedNodesChange)
+				@watcher.start(@namespace + '.endGameAnimation', @onEndGameAnimationChange)
 
 			pauseGame: () ->
 				@timer?.pause()

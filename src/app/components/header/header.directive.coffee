@@ -1,10 +1,9 @@
 'use strict'
 
 app.directive 'appHeader', [
-	'$rootScope'
 	'$log'
 	'$state'
-	($rootScope, $log, $state) ->
+	($log, $state) ->
 		templateUrl: 'app/components/header/header.html'
 		restrict: 'E'
 		scope:

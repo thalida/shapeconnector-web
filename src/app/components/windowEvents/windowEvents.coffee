@@ -9,8 +9,7 @@
 
 app.service 'WindowEvents', [
 	'$log'
-	'$rootScope'
-	( $log, $rootScope ) ->
+	( $log ) ->
 		class WindowEvents
 			constructor: () ->
 				@eventCallbacks = {

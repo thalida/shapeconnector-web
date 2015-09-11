@@ -10,11 +10,10 @@ app.config ($stateProvider) ->
 
 app.controller 'PlayCtrl', [
 	'$log'
-	'$rootScope'
 	'$scope'
 	'$state'
 	'gameSettingsService'
-	($log, $rootScope, $scope, $state, gameSettings) ->
+	($log, $scope, $state, gameSettings) ->
 		$scope.gameType = gameSettings.getGameType()
 		$scope.difficulty = gameSettings.getDifficulty()
 

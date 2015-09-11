@@ -10,8 +10,7 @@ app.config ($stateProvider) ->
 
 app.controller 'TutorialCtrl', [
 	'$log'
-	'$rootScope'
 	'$scope'
-	($log, $rootScope, $scope) ->
+	($log, $scope) ->
 ]
 

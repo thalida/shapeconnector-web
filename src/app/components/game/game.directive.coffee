@@ -28,7 +28,7 @@ app.directive 'scGame', [
 			onQuitGame: '&?'
 		link: ($scope, el, attrs) ->
 			# globals
-			Game = null
+			game = null
 			$window = $(window)
 			$gameHeader = el.find('.game-header')
 			watcher = new Watcher( $scope )
@@ -96,7 +96,17 @@ app.directive 'scGame', [
 			start = ->
 				# ALL of the game logic: Creates a game that uses the specified
 				# canvases, difficulty, and optional source game board
-				Game = new GameManager( $scope.gameType, $scope.difficulty, $scope.canvasCollection, $scope.sourceGame )
+				game = GameManager.init(
+					scope:
+						$scope: $scope
+						namespace: 'game'
+					settings:
+						mode: $scope.gameType
+						difficulty: $scope.difficulty
+					render:
+						canvas: $scope.canvasCollection
+						board: $scope.sourceGame
+				)
 
 				# Save the current game board to the parent (controller) scope
 				saveGameBoard()
@@ -105,9 +115,8 @@ app.directive 'scGame', [
 				positionBoard()
 
 				# Create a scoped copy of the Game class
-				$scope.currGame = Game.start()
+				game.start()
 
-				# $rootScope.windowEvents.onFocus( events.onFocus )
 				$rootScope.windowEvents.onBlur( events.onBlur )
 				$window.on('resize', events.onResize)
 
@@ -118,7 +127,7 @@ app.directive 'scGame', [
 			#-------------------------------------------------------------------
 			saveGameBoard = ->
 				if not $scope.sourceGame?
-					$scope.sourceGame = angular.copy(Game.cacheGameBoard)
+					$scope.sourceGame = angular.copy(game.cacheGameBoard)
 
 
 			# positionBoard: Update the position of the board on the screen
@@ -144,9 +153,9 @@ app.directive 'scGame', [
 			#	Note: Keep $scope.$apply since events are bound outåside of angular
 			#-------------------------------------------------------------------
 			events =
-				onMove: ( e, params ) -> $scope.$apply( => Game.onMoveEvent(e, params) )
-				onEnd: -> $scope.$apply( => Game.onEndEvent() )
-				onCancel: -> $scope.$apply( => Game.onCancelEvent() )
+				onMove: ( e, params ) -> $scope.$apply( => game.onMoveEvent(e, params) )
+				onEnd: -> $scope.$apply( => game.onEndEvent() )
+				onCancel: -> $scope.$apply( => game.onCancelEvent() )
 				onResize: -> positionBoard()
 				onBlur: ->$scope.$apply( => $scope.actions.pauseGame() )
 
@@ -155,15 +164,15 @@ app.directive 'scGame', [
 			#-------------------------------------------------------------------
 			$scope.actions =
 				newGame: -> $scope.onNewGame?(params: true)
-				resetGame: -> $scope.onResetGame?(params: Game.cacheGameBoard)
+				resetGame: -> $scope.onResetGame?(params: game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
 				pauseGame: ->
-					if $scope.currGame.gameOver is false
-						Game.pauseGame()
+					if game.gameOver is false
+						game.pauseGame()
 						$scope.showPauseModal = true
 				resumeGame: ->
 					$scope.$apply( =>
-						Game.resumeGame()
+						game.resumeGame()
 						$scope.showPauseModal = false
 					)
 
@@ -178,20 +187,26 @@ app.directive 'scGame', [
 				if collection?.game?
 					stopCanvasWatch()
 					start()
+					startWatching()
 			)
 
-			watcher.start('currGame.won', ( hasWon ) ->
-				$scope.showWinModal = (hasWon is true)
-			)
+			startWatching = ->
+					watcher.start(
+						() -> return game.won
+						( hasWon ) ->
+							$scope.showWinModal = (hasWon is true)
+					)
 
-			watcher.start('currGame.lost', ( hasLost ) ->
-				$scope.showLoseModal = (hasLost is true)
-			)
+					watcher.start(
+						() -> return game.lost
+						( hasLost ) ->
+							$scope.showLoseModal = (hasLost is true)
+					)
 
 			stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame ) ->
 				if $scope.triggerGamePause is true
 					$scope.triggerGamePause = false
-					if $rootScope.game.gameOver is true
+					if game?.gameOver is true
 						$scope.actions.quitGame()
 					else
 						$scope.actions.pauseGame()
@@ -200,6 +215,6 @@ app.directive 'scGame', [
 
 			# Destroy the Game class on directive $destroy
 			$scope.$on('$destroy', () ->
-				Game.destroy()
+				game.destroy()
 			)
 ]
