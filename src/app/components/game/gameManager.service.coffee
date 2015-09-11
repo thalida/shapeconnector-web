@@ -108,9 +108,9 @@ app.service 'GameManagerService', [
 				# Start the game watchers
 				@watch()
 
-				# Finish rendering the board & optionally start the timer after
-				# all of the assets have finished downloading
-				assetsService.onComplete(() =>
+				assetsService.downloadAll().then(() =>
+					# Finish rendering the board & optionally start the timer
+					# after all of the assets have finished downloading
 					@render.run()
 
 					if @hasTimer
@@ -118,9 +118,6 @@ app.service 'GameManagerService', [
 						@timer.onTick = @onTimerChange
 						@timer.start()
 				)
-
-				# Start downloading the assets
-				assetsService.downloadAll()
 
 				return this
 

@@ -6,10 +6,18 @@ app.run [
 	'$timeout'
 	'$state'
 	'WindowEvents'
-	($rootScope, $location, $timeout, $state, WindowEvents) ->
+	'assetsService'
+	($rootScope, $location, $timeout, $state, WindowEvents, assetsService) ->
 		$rootScope.isProdSite = (window.location.hostname.indexOf('shapeconnector') >= 0)
 
 		$rootScope.windowEvents = new WindowEvents()
+
+		assetsService.downloadAll().then(() =>
+			assetsService.playSound('background')
+		)
+
+		$rootScope.windowEvents.onFocus( -> assetsService.playSound('background') )
+		$rootScope.windowEvents.onBlur( -> assetsService.pauseSound('background') )
 
 		$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
 			if toState.name is 'play' and fromState.name.length is 0

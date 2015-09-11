@@ -12,11 +12,11 @@ app.controller 'HomeCtrl', [
 	'$scope'
 	'$state'
 	'gameSettingsService'
-	($log, $scope, $state, gameSettings) ->
+	'assetsService'
+	($log, $scope, $state, gameSettings, assetsService) ->
 
 		$scope.onSelectGame = ( type ) ->
 			gameSettings.setGameType( type )
 			$state.go('play')
-
 ]
 

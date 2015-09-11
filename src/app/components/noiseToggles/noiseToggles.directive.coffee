@@ -3,7 +3,8 @@
 app.directive 'scNoiseToggles', [
 	'$log'
 	'gameSettingsService'
-	( $log, gameSettings) ->
+	'assetsService'
+	( $log, gameSettings, assetsService) ->
 		templateUrl: 'app/components/noiseToggles/noiseToggles.html'
 		restrict: 'E'
 		scope: true
@@ -20,6 +21,10 @@ app.directive 'scNoiseToggles', [
 
 			$scope.toggleNoise = ( type ) ->
 				$scope.noises[type].allowed = gameSettings.toggle( type )
+				if type is 'music' and $scope.noises[type].allowed is false
+					assetsService.pauseSound('background')
+				if type is 'music' and $scope.noises[type].allowed is true
+					assetsService.playSound('background')
 				return
 
 ]

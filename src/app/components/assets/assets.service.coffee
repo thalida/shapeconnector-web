@@ -10,8 +10,9 @@
 
 app.service 'assetsService', [
 	'$log'
+	'$q'
 	'gameSettingsService'
-	($log, gameSettings) ->
+	($log, $q, gameSettings) ->
 		return new class AssetLoader
 			# @constructor: Setup the file paths & initalise vars
 			#-------------------------------------------------------------------
@@ -22,76 +23,71 @@ app.service 'assetsService', [
 					gameWon: '/assets/sound/win1.wav'
 					gameLost: '/assets/sound/lose1.wav'
 					badMove: '/assets/sound/bad2.wav'
+					background: '/assets/sound/carefree.mp3'
 
 				@assetsLoaded = 0
 				@totalSounds = Object.keys(@sounds).length
 				@totalAssests = parseInt(@totalSounds, 10)
 
-			# @onComplete: Callback for when ALL assets have finished loaded
-			#-------------------------------------------------------------------
-			onComplete: ( cb ) ->
-				cb?()
-				return
-
-			# @assetLoaded
-			# 	Check if an asset has finished loaded. After all assets are
-			# 	loaded call @onComplete
-			#-------------------------------------------------------------------
-			assetLoaded: (dict, name) ->
-				asset = @[dict][name]
-
-				# don't count assets that have already loaded
-				return if asset.status != 'loading'
-
-				asset.status = 'loaded'
-				@assetsLoaded += 1
-
-				# finished callback
-				@onComplete?() if @assetsLoaded == @totalAssests
-
 			# @checkAudioState: Check if an audio asset has been downloaded
 			#-------------------------------------------------------------------
 			checkAudioState: ( sound ) =>
 				thisSound = @sounds[sound]
+				return if !thisSound?
 				if thisSound.status is 'loading' and thisSound.readyState == 4
-					@assetLoaded('sounds', sound)
+					thisSound.status = 'loaded'
+
+				return thisSound
 
 			# @downloadAll: Download the sound assets (only if we haven't already)
 			#-------------------------------------------------------------------
 			downloadAll: ->
-				if @assetsLoaded == @totalAssests
-					@onComplete?()
-				else
-					@downloadSounds()
+				return @downloadSounds()
 
 			# @downlonadSounds: For each of the sound files convert to an
 			# Audio element and donwload
 			#-------------------------------------------------------------------
 			downloadSounds: =>
-				$.each(@sounds, (sound, src) =>
-					@sounds[sound] = new Audio()
-					@sounds[sound].status = 'loading'
-					@sounds[sound].name = sound
+				deferred = $q.defer()
 
-					@sounds[sound].addEventListener('canplay', =>
-						@checkAudioState( sound )
+				if @assetsLoaded == @totalAssests
+					deferred.resolve()
+				else
+					$.each(@sounds, (sound, src) =>
+						@sounds[sound] = new Audio()
+						@sounds[sound].status = 'loading'
+						@sounds[sound].name = sound
+
+						@sounds[sound].addEventListener('canplay', =>
+							sound = @checkAudioState( sound )
+							if sound?.status is 'loaded'
+								@assetsLoaded += 1
+
+							if @assetsLoaded == @totalAssests
+								deferred.resolve()
+						)
+
+						@sounds[sound].src = src
+						@sounds[sound].preload = 'auto'
+						@sounds[sound].load()
 					)
 
-					@sounds[sound].src = src
-					@sounds[sound].preload = 'auto'
-					@sounds[sound].load()
-				)
-
-				return
+				return deferred.promise
 
 			playSound: ( name ) =>
-				return if gameSettings.getAllowSounds() is off
-
 				sound = @sounds[name]
 				return if !sound?
 
-				sound.currentTime = 0
-				sound.play?()
+				if name is 'background'
+					return if gameSettings.getAllowMusic() is off
+					sound.currentTime = 0
+					sound.volume = 0.2
+					sound.play()
+				else
+					return if gameSettings.getAllowSounds() is off
+					sound.currentTime = 0
+					sound.play?()
+				return
 
 			pauseSound: ( name ) =>
 				sound = @sounds[name]
