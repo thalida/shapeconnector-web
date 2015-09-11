@@ -303,7 +303,7 @@ app.service 'GameManagerService', [
 
 					if @mode is 'timed'
 						@timer.stop?()
-						@solveTime = @totalTime - @timeRemaining.seconds
+						@solveTime = @totalTime - @timeRemaining.total
 
 					@render.clearLinesBoard()
 					@render.allSolidLines( @selectedNodes )

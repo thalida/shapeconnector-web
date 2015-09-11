@@ -78,12 +78,12 @@ app.service 'TimerService', [
 				@running = false
 				return
 
-			#	@parse: Convert the seconds into additional usable formats
+			#	@parse: Convert the time into additional usable formats
 			#-------------------------------------------------------------------
-			parse: ( seconds ) ->
+			parse: ( time ) ->
 				return {
-					minutes: (seconds / 60) | 0
-					seconds: (seconds % 60) | 0
-					total: seconds
+					minutes: (time / 60) | 0
+					seconds: (time % 60) | 0
+					total: time
 				}
 ]
