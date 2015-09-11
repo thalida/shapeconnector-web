@@ -21,10 +21,11 @@ app.directive 'scNoiseToggles', [
 
 			$scope.toggleNoise = ( type ) ->
 				$scope.noises[type].allowed = gameSettings.toggle( type )
-				if type is 'music' and $scope.noises[type].allowed is false
-					assetsService.pauseSound('background')
-				if type is 'music' and $scope.noises[type].allowed is true
-					assetsService.playSound('background')
+				if type is 'music'
+					if $scope.noises[type].allowed is yes
+						assetsService.playSound('background')
+					else
+						assetsService.pauseSound('background')
 				return
 
 ]

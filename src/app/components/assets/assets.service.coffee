@@ -82,6 +82,14 @@ app.service 'assetsService', [
 					return if gameSettings.getAllowMusic() is off
 					sound.currentTime = 0
 					sound.volume = 0.2
+					if typeof sound.loop is 'boolean'
+						sound.loop = true
+					else
+						sound.addEventListener('ended', () ->
+							sound.currentTime = 0
+							sound.play()
+						, false)
+
 					sound.play()
 				else
 					return if gameSettings.getAllowSounds() is off
