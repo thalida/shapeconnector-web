@@ -5,3 +5,4 @@ bower_components/
 .tmp/
 dist/
 .DS_Store
+bundle.js
