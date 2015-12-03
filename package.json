@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "main": "app/app.module.coffee",
   "scripts": {
-    "start": "webpack-dev-server --progress --colors --hot --content-base app"
+    "start": "webpack-dev-server --progress --colors --hot --content-base app --port 8000"
   },
   "devDependencies": {
     "coffee-loader": "^0.7.2",
