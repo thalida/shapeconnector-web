@@ -5,23 +5,20 @@
 
 ## The rules
 
-It's simple get from Point A to Point B in exactly N moves. 
+It's simple: get from Point A to Point B in exactly X number of moves. 
 
-But, the caveat is that you can only move up, down, left, or right. 
-Also, you can only move to a shape that is the same color (red, green, blue, yellow) and/or type (square, diamond, triangle, circle).
+The caveat: you can only move up, down, left, or right, and only to a shape that is the same color (red, green, blue, yellow) or type (square, diamond, triangle, circle).
 
-![game play](https://raw.githubusercontent.com/thalida/ShapeConnector/master/src/assets/images/gameplay.gif?token=ADPn89czZXRjhQXjuVXqDmxQbmtafThsks5V-HO2wA%3D%3D)
+![game play](https://raw.githubusercontent.com/thalida/ShapeConnector/master/app/assets/images/gameplay.gif)
 
 ## The implementation
 ### Status: In Progess
 
-The game is built using Angular, and all of the game elements are rendered on canvases.
-
-I used the yo [gulp anuglar generator](https://github.com/Swiip/generator-gulp-angular) to setup the general strucutre for the app, and made minor modifications to support the folder & naming structure that I prefer.
+The game is developed using Angular and Webpack, and all of the game elements are rendered on HTML5 canvases.
 
 The app is written in coffeescript and the styles use scss.
 
-The app was designed in sketch, and if you'd like to view the comp its available here: [ShapeConnector sketch file](https://github.com/thalida/ShapeConnector/blob/master/shapeconnector.sketch). The comp lays out my end goal plans for the core app.
+It was designed using Sketch, and if you'd like to view the comp its available here: [ShapeConnector sketch file](https://github.com/thalida/ShapeConnector/blob/master/shapeconnector.sketch).
 
 
 ## Future additions
