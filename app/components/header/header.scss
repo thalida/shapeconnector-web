@@ -1,0 +1,14 @@
+@import "../../assets/styles/mixins";
+
+.app-header {
+	margin: 30px 0 10px 30px;
+	position: absolute;
+	z-index: 1;
+
+	.logo {
+		@extend %clickable;
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+}

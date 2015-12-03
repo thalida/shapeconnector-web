@@ -1,0 +1,211 @@
+@import "./assets/styles/sprites";
+@import "./assets/styles/mixins";
+
+$animationTiming: cubic-bezier(0.445, 0.050, 0.550, 0.950);
+$animationSpeed: 2s;
+
+@include keyframes(fadeInOut) {
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.1;
+	}
+}
+
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
+
+body {
+	background-color: #292B55;
+	font: normal normal 16px/1.2 'Lato', 'Arial', sans-serif;
+	// font: normal normal 16px/1.5 'Kadwa', 'Times', serif;
+	margin: 0;
+	padding: 0;
+}
+
+.browsehappy {
+	margin: 0.2em 0;
+	background: #ccc;
+	color: #000;
+	padding: 0.2em 0;
+}
+
+[ui-view].ng-enter,
+[ui-view].ng-leave {
+	position: absolute;
+	-webkit-transition: all .4s $animationTiming;
+	-moz-transition: all .4s $animationTiming;
+	-o-transition: all .4s $animationTiming;
+	transition: all .4s $animationTiming;
+}
+
+[ui-view].ng-enter {
+	opacity: 0;
+}
+
+[ui-view].ng-enter-active {
+	opacity: 1
+}
+
+[ui-view].ng-leave {
+	opacity: 1;
+}
+
+[ui-view].ng-leave-active {
+	opacity: 0;
+}
+
+.app-container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #292B55;
+}
+
+.logo {
+	&.large {
+		@include cssSprite( $logo-large );
+		content: '';
+		display: block;
+	}
+	&.small {
+		@include cssSprite( $logo-small );
+		content: '';
+		display: block;
+	}
+}
+
+.logomark {
+	color: white;
+	font: normal 700 16px/1.5 'Lato', 'Arial', sans-serif;
+	text-transform: uppercase;
+	.light {
+		font-weight: 300;
+	}
+}
+
+.loading-view {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+
+	-webkit-animation: fadeInOut $animationTiming $animationSpeed infinite;
+	animation: fadeInOut $animationTiming $animationSpeed infinite;
+
+	&-content {
+		@include vertical-align;
+		text-align: center;
+	}
+
+	.logo {
+		margin: 0 auto 20px;
+	}
+}
+
+.weight-normal {
+	font-weight: 400;
+}
+
+.float-left {
+	float: left;
+}
+
+.float-right {
+	float: right;
+}
+
+.btn {
+	@extend %clickable;
+
+	background: white;
+	border-radius: 3px;
+	cursor: pointer;
+	display: block;
+	padding: 12px 10px;
+	text-align: center;
+	width: 150px;
+
+	&:hover,
+	&:active {
+		background: #fcfcfc;
+		box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.20);
+	}
+
+	&.teal {
+		background-color: #6EEFA5;
+	}
+
+	&.circle {
+		height: 85px;
+		width: 85px;
+		border-radius: 50%;
+		padding: 0;
+	}
+
+	&.small-circle {
+		height: 45px;
+		width: 45px;
+		border-radius: 50%;
+		padding: 0;
+	}
+
+	&.type-secondary {
+		background: transparent;
+		border: 2px solid #FFFFFF;
+		color: white;
+		padding: 8px 10px;
+	}
+
+	&.type-text {
+		font-size: 14px;
+		background: transparent;
+		box-shadow: 0 0 0 0;
+	}
+
+	&.addon-arrow {
+		&:after {
+			@include cssSprite( $arrow-right-black );
+			content: '';
+			display: block;
+			float: right;
+			margin-top: 5px;
+		}
+		text-align: left;
+	}
+
+	&.restart-icon {
+		&:after {
+			@include cssSprite( $restart-white );
+			content: '';
+			display: inline-block;
+			margin: 12px auto;
+		}
+		background: rgba(white, .15);
+	}
+
+	&.play-icon {
+		&:after {
+			@include cssSprite( $play-white );
+			content: '';
+			display: inline-block;
+			margin: 22px auto;
+		}
+		background: rgba(white, .15);
+		padding-left: 5px;
+	}
+
+	&.skip-icon {
+		&:after {
+			@include cssSprite( $skip-white );
+			content: '';
+			display: inline-block;
+			margin: 12px auto;
+		}
+		background: rgba(white, .15);
+		padding-left: 3px;
+	}
+}
