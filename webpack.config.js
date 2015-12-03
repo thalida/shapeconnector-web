@@ -8,7 +8,7 @@ var APP = __dirname + '/app';
 module.exports = {
 	context: APP,
 	entry: {
-		app: ['webpack/hot/dev-server', './app.module.coffee']
+		app: ['./app.module.coffee']
 	},
 	output: {
 		path: APP,
