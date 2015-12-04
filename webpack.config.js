@@ -2,6 +2,7 @@
 
 var webpack = require('webpack');
 var path = require('path');
+var CordovaPlugin = require('webpack-cordova-plugin');
 
 var APP = __dirname + '/app';
 
@@ -61,6 +62,12 @@ module.exports = {
 			MODE: {
 				production: process.env.NODE_ENV === 'production'
 			}
+		}),
+		new CordovaPlugin({
+			config: 'config.xml',  // Location of Cordova' config.xml (will be created if not found)
+			src: 'app/index.html',     // Set entry-point of cordova in config.xml
+			platform: 'android', // Set `webpack-dev-server` to correct `contentBase` to use Cordova plugins.
+			version: true,         // Set config.xml' version. (true = use version from package.json)
 		})
 	]
 };

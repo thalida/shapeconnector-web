@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "main": "app/app.module.coffee",
   "scripts": {
-    "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base app --host 0.0.0.0 --port 8000",
+    "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base app --host 0.0.0.0 --port 8000 --cordova --android",
     "build": "NODE_ENV=production webpack -p --progress --colors"
   },
   "devDependencies": {
@@ -17,8 +17,10 @@
     "node-sass": "^3.4.1",
     "raw-loader": "^0.5.1",
     "sass-loader": "^3.1.1",
+    "script-loader": "^0.6.1",
     "style-loader": "^0.13.0",
     "webpack": "^1.12.4",
+    "webpack-cordova-plugin": "^0.1.5",
     "webpack-dev-server": "^1.12.1"
   },
   "dependencies": {
