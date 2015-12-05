@@ -59,11 +59,8 @@ angular.module('app').directive 'scModal', [
 				show: ->
 					@positionModal()
 
-					# animateVisibility is set has a clase that ng animate watches
+					# animateVisibility is set as a class ng animate watches
 					$scope.animateVisibility = 'js-modal-animate-visibility'
-
-					$('body').css(overflow: 'hidden')
-					window.scrollTo(0, 0)
 					return
 
 				#	@hide
@@ -72,8 +69,6 @@ angular.module('app').directive 'scModal', [
 				hide: ->
 					# Remove the visiblity class - triggers animate on classRemove
 					$scope.animateVisibility = ''
-
-					$('body').css(overflow: 'auto')
 					return
 
 				#	@hide
@@ -81,19 +76,29 @@ angular.module('app').directive 'scModal', [
 				#---------------------------------------------------------------
 				minimize: ->
 					$scope.animateMinimize = 'js-modal-animate-minimize'
-
-					$('body').css(overflow: 'auto')
 					return
 
 				#	@positionModal
 				# 		Position the contents of the modal to cover the game board
 				#---------------------------------------------------------------
 				positionModal: ->
+					currWindowHeight = $window.height()
+					modalHeight = '345px'
+
+					if currWindowHeight < 475
+						modalHeight = BOARD.DIMENSIONS.h
+						$content.removeClass('size-large')
+						$content.addClass('size-normal')
+					else
+						$content.removeClass('size-normal')
+						$content.addClass('size-large')
+
 					$content.css(
 						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
-						height: BOARD.DIMENSIONS.h
+						height: modalHeight
 						marginTop: $gameBoard.offset().top
 					)
+
 					return
 
 				#	@showModalWatch

@@ -13,9 +13,7 @@ require './'
 angular.module('app').directive 'scCanvas', [
 	'$log',
 	'SHAPE'
-
 	require '../../services/canvasDraw/'
-
 	($log, SHAPE, CanvasDrawService) ->
 		templateUrl: 'components/canvas/canvas.html'
 		restrict: 'E'

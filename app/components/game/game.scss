@@ -54,9 +54,7 @@
 		@extend %clickable;
 		position: relative;
 		margin: 0 auto;
-		// overflow: hidden;
 
-		// &-game_canvas => .game-board-game_canvas :- The canvas w/ the shapes
 		&-game_canvas {
 			position: absolute;
 			top: 0;
@@ -68,12 +66,16 @@
 			}
 		}
 
-		// &-lines_canvas => .game-board-lines_canvas :- The canvas w/ the lines
 		&-lines_canvas {
 			position: absolute;
 			top: 0;
 			left: 0;
 		}
+	}
+
+	&-modal {
+		position: relative;
+		height: 100%;
 	}
 
 	&-win_modal,
@@ -82,23 +84,47 @@
 		text-align: center;
 
 		.btn {
-			width: 150px;
-			padding: 13px 10px;
+			width: 136px;
+			padding-left: 15px;
+			padding-right: 15px;
+
+			margin: 15px auto 0;
 		}
 	}
 
 	&-win_modal {
-		.btn {
-			margin: 20px auto 0;
-		}
 		.btn.type-text {
-			margin: 5px auto 0;
+			margin: 3px auto 0;
+
+			.modal-content.size-large & {
+				margin-top: 20px;
+			}
+		}
+
+		.game-modal-main_btns {
+			margin-top: 20px;
+
+			.modal-content.size-large & {
+				margin-top: 30px;
+			}
 		}
 	}
 
 	&-lose_modal {
-		.btn {
-			margin: 0 auto 20px;
+		.btn.type-text {
+			margin: 15px auto 0;
+
+			.modal-content.size-large & {
+				margin-top: 40px;
+			}
+		}
+
+		.game-modal-main_btns {
+			margin-top: 25px;
+
+			.modal-content.size-large & {
+				margin-top: 40px;
+			}
 		}
 	}
 
@@ -108,25 +134,33 @@
 		&-controls {
 			padding: 30px 0;
 			margin: 0 auto;
-			border-bottom: 1px solid rgba(white, 0.1);
+			border-bottom: 1px solid rgba(black, 0.1);
 			text-align: center;
+
+			.modal-content.size-large & {
+				padding: 40px 0;
+			}
 
 			.btn {
 				display: inline-block;
 				vertical-align: middle;
 			}
+
 			.btn.play-icon {
 				margin: 0 15px;
 			}
 		}
 
 		&-settings {
-			padding: 30px 0;
+			padding: 30px 0 20px;
+
+			.modal-content.size-large & {
+				padding: 30px 0;
+			}
 		}
 
 		.btn.type-text {
 			margin: 0 auto;
-			color: white;
 		}
 	}
 }

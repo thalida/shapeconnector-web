@@ -11,6 +11,7 @@ $requires = [
 ]
 
 onAppRun = ($rootScope, $location, $timeout, $state, WindowEvents, assetsService) ->
+	console.log( MODE.production )
 	$rootScope.isProdSite = MODE.production is true
 
 	$rootScope.windowEvents = new WindowEvents()

@@ -2,6 +2,7 @@
 
 require '../../components/header'
 require '../../components/game'
+require '../../components/recompiler'
 
 require './play.scss'
 require './play.html'

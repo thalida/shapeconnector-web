@@ -1,5 +1,6 @@
 @import "../../assets/styles/mixins";
 @import "../../assets/styles/colors";
+@import "../../assets/styles/generics";
 
 .toggle {
 	@include clearfix;
@@ -9,9 +10,12 @@
 	height: 40px;
 	width: 90px;
 	padding: 10px;
-	border-radius: 3px;
-	background-color: #E9E9E9;
+	border-radius: $border-radius;
+	background-color: white;
 	color: black;
+	text-transform: uppercase;
+	font-size: 14px;
+	line-height: 20px;
 
 	&:after {
 		content: "";
@@ -23,15 +27,17 @@
 		margin-top: 6px;
 
 		border-radius: 50%;
-		background-color: #BBBBBB;
+		background-color: transparent;
+		border: 1px solid rgba(black, 0.2);
 	}
 
 	&.on:after {
-		background-color: #5CC968;
+		background-color: $color-teal-1;
+		border: 0;
 	}
 
 	&:hover {
-		background-color: #FBF8F8;
+		background-color: rgba(white, 0.95);
 	}
 }
 

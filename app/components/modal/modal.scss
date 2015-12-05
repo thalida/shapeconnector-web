@@ -1,5 +1,6 @@
 @import "../../assets/styles/mixins";
 @import "../../assets/styles/colors";
+@import "../../assets/styles/generics.scss";
 
 .modal {
 	@extend %disable-selection;
@@ -16,22 +17,22 @@
 
 	&.minimized {
 		background-color: #ccc;
-		height: 60px;
+		height: 70px;
 		position: fixed;
 		top: initial;
 		bottom: 0;
 		left: 0;
 
 		&.teal {
-			background-color: $color-teal;
+			background-image: $gradient-blue-6-blue-7;
 		}
 
 		&.red {
-			background-color: $color-red;
+			background-image: $gradient-red-2-red-3;
 		}
 
 		&.blue {
-			background-color: $color-blue;
+			background-image: $gradient-blue-4-blue-5;
 		}
 	}
 
@@ -44,7 +45,7 @@
 		width: 100%;
 		height: 100%;
 
-		background-color: rgba(#444, .40);
+		background-color: rgba($color-background, .80);
 
 		.modal.minimized & {
 			display: none;
@@ -55,22 +56,22 @@
 		position: relative;
 		margin: 0 auto;
 
-		border-radius: 3px;
+		border-radius: $border-radius;
 		box-shadow: 0px 6px 3px 0px rgba(black, 0.1);
 
 		color: black;
 		background-color: #ccc;
 
 		.modal.teal & {
-			background-color: $color-teal;
+			background-image: $gradient-blue-6-blue-7;
 		}
 
 		.modal.red & {
-			background-color: $color-red;
+			background-image: $gradient-red-2-red-3;
 		}
 
 		.modal.blue & {
-			background-color: $color-blue;
+			background-image: $gradient-blue-4-blue-5;
 		}
 
 		.modal.minimized & {
@@ -82,13 +83,16 @@
 			font-weight: 300;
 			font-size: 36px;
 			line-height: 1.5;
-			margin-bottom: 10px;
+			text-transform: uppercase;
+			margin-bottom: 5px;
+			color: white;
 		}
 
 		&-text {
 			display: block;
 			font-size: 18px;
 			line-height: 1.3;
+			color: white;
 		}
 
 		&-subtext {
@@ -96,6 +100,7 @@
 			font-size: 16px;
 			font-weight: 300;
 			line-height: 1.3;
+			color: white;
 		}
 	}
 
@@ -104,8 +109,8 @@
 		display: none;
 		position: relative;
 		margin: 0 auto;
-		border-radius: 3px;
-		padding: 10px 20px;
+		border-radius: $border-radius;
+		padding: 15px 20px;
 
 		.modal.minimized & {
 			display: block;
@@ -115,6 +120,8 @@
 			height: 40px;
 			width: 120px;
 			font-size: 14px;
+			padding-top: 12px;
+			padding-bottom: 12px;
 
 			&.addon-arrow:after {
 				margin-top: 3px;
