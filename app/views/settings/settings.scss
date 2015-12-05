@@ -19,16 +19,26 @@
 	.header {
 		color: white;
 		font-size: 22px;
-		margin-bottom: 60px;
+		margin-bottom: 50px;
 	}
 
 	.btn {
+		width: 200px;
 		margin: 0 auto 20px;
-		border: 2px solid white;
+		padding: 17px 15px;
 
-		&:not(.selected) {
-			color: white;
-			background-color: transparent;
+		background-color: rgba(white, 0.2);
+		color: white;
+		font-size: 14px;
+		text-transform: uppercase;
+
+		&:hover {
+			background-color: rgba(white, 0.4);
+		}
+
+		&.selected {
+			background-color: rgba(white, 1);
+			color: black;
 		}
 	}
 

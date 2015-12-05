@@ -1,3 +1,20 @@
-$color-teal: #8AE8B2;
-$color-red: #FF5252;
-$color-blue: #2F79C1;
+$color-teal-1: #8AE8B2;
+
+$color-red-1: #FF5252;
+$color-red-2: #FF4949;
+$color-red-3: #501067;
+
+$color-blue-1: #2F79C1;
+$color-blue-2: #252658;
+$color-blue-3: #52DFDE;
+$color-blue-4: #2588FF;
+$color-blue-5: #2E54D7;
+$color-blue-6: #41EEAB;
+$color-blue-7: #629FBD;
+
+$color-background: $color-blue-2;
+
+$gradient-blue-2-blue-3: linear-gradient(225deg, $color-background 0%, $color-blue-3 100%);
+$gradient-blue-4-blue-5: linear-gradient(225deg, $color-blue-4 0%, $color-blue-5 100%);
+$gradient-blue-6-blue-7: linear-gradient(225deg, $color-blue-6 0%, $color-blue-7 100%);
+$gradient-red-2-red-3: linear-gradient(225deg, $color-red-2 0%, $color-red-3 100%);

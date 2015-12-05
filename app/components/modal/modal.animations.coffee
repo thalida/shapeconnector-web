@@ -13,6 +13,11 @@ angular.module('app').animation '.modal', [
 
 			return [$el, $content, $overlay]
 
+		setOverflow = ( state ) ->
+			$('body').css({'overflow': state})
+			$('.app-container').css({'overflow': state})
+			$('.modal').css({'overflow': state})
+
 		minimizeModal = ( element, done ) ->
 			[$el, $content, $overlay] = getSelectors( element )
 
@@ -30,6 +35,7 @@ angular.module('app').animation '.modal', [
 					complete: ->
 						$content.css(marginTop: marginTop, width: '100%')
 						$el.addClass('minimized')
+						setOverflow('auto')
 						done()
 				}
 			)
@@ -49,6 +55,8 @@ angular.module('app').animation '.modal', [
 		showModal = ( element, done ) ->
 			[$el, $content, $overlay] = getSelectors( element )
 
+			setOverflow('hidden')
+
 			$el.hide()
 
 			$overlay.css(opacity: '0')
@@ -63,6 +71,7 @@ angular.module('app').animation '.modal', [
 					complete: ->
 						$el.show()
 						$content.css(top: '0%')
+						window.scrollTo(0, 0)
 						done()
 				}
 			)
@@ -91,6 +100,7 @@ angular.module('app').animation '.modal', [
 					complete: ->
 						$el.hide()
 						$content.css(top: '100%')
+						setOverflow('auto')
 						done()
 				}
 			)

@@ -14,7 +14,7 @@ gameLevels =
 		label: 'Dev Mode'
 		min: 3,
 		max: 3,
-		timer: 15
+		timer: 4
 	}
 	EASY: {
 		label: 'Beginner'

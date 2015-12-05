@@ -502,7 +502,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 			@ctx.save()
 
 			fontSize = 16
-			@ctx.font = fontSize + 'px Lato, sans-serif'
+			@ctx.font = fontSize + 'px PT Sans, sans-serif'
 			@ctx.textAlign = 'center'
 			@ctx.textBaseline = 'top'
 			@ctx.fillStyle = '#FFFFFF'

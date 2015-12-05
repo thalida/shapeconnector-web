@@ -19,20 +19,20 @@ class PlayController
 		@goHome = ->
 			$state.go('home')
 
-		return
+		@createNewGame = =>
+			@attempts = 0
+			@gameCopy = null
+			@rebuildGame = true
+			return
 
-	createNewGame: =>
-		@attempts = 0
-		@gameCopy = null
-		@rebuildGame = true
-		return
+		@resetGame = =>
+			@rebuildGame = true
+			return
 
-	resetGame: =>
-		@rebuildGame = true
-		return
+		@onHeaderClick = =>
+			@pauseGame = true
+			return
 
-	onHeaderClick: =>
-		@pauseGame = true
 		return
 
 PlayController.$inject = $requires
