@@ -3,6 +3,8 @@
 # Styles
 require './app.scss'
 
+require './index.html'
+
 # JS
 window.jQuery = $ = require 'jquery'
 window.angular = require 'angular'
@@ -36,3 +38,7 @@ require './app.constants.coffee'
 require './app.filters.coffee'
 require './app.routes.coffee'
 require './app.run.coffee'
+
+document.addEventListener('deviceready', () ->
+	console.log('Cordova loaded succesfully - Device Ready!')
+, false)

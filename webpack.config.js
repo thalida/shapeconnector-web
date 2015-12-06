@@ -4,6 +4,8 @@ var webpack = require('webpack');
 var path = require('path');
 var CordovaPlugin = require('webpack-cordova-plugin');
 
+var isDevServer = process.argv.join('').indexOf('webpack-dev-server') > -1;
+
 var APP = __dirname + '/app';
 
 module.exports = {
@@ -13,7 +15,11 @@ module.exports = {
 	},
 	output: {
 		path: APP,
-		filename: 'bundle.js'
+		filename: 'bundle.js',
+		publicPath: isDevServer ? '../': ''
+	},
+	devServer: {
+		publicPath: '/'
 	},
 	module: {
 		loaders: [
@@ -65,7 +71,7 @@ module.exports = {
 		}),
 		new CordovaPlugin({
 			config: 'config.xml',  // Location of Cordova' config.xml (will be created if not found)
-			src: 'app/index.html',     // Set entry-point of cordova in config.xml
+			src: 'index.html',     // Set entry-point of cordova in config.xml
 			platform: 'android', // Set `webpack-dev-server` to correct `contentBase` to use Cordova plugins.
 			version: true,         // Set config.xml' version. (true = use version from package.json)
 		})

@@ -1,0 +1,11 @@
+<div class="modal" ng-class="[
+	style,
+	animateVisibility,
+	animateMinimize,
+	{shown: showModal == true},
+	{hidden: showModal == false}
+]" ng-show="showModal">
+	<div class="modal-overlay"></div>
+	<div class="modal-content"></div>
+	<div class="modal-minimized"></div>
+</div>

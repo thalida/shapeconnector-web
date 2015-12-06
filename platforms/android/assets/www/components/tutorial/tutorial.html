@@ -1,0 +1,27 @@
+<div class="game">
+	<div class="game-header" ng-show="step.showGoal === true">
+		<sc:canvas
+			classes="game-goal"
+			name="goal"
+			size="{{canvasDimensions.goal}}"
+			canvas="canvasCollection.goal">
+		</sc:canvas>
+	</div>
+
+	<div class="game-board">
+		<sc:canvas
+			classes="game-board-game_canvas"
+			name="game"
+			size="{{canvasDimensions.board}}"
+			canvas="canvasCollection.game"
+			events="gameCanvasEvents">
+		</sc:canvas>
+
+		<sc:canvas
+			classes="game-board-lines_canvas"
+			name="lines"
+			size="{{canvasDimensions.board}}"
+			canvas="canvasCollection.lines">
+		</sc:canvas>
+	</div>
+</div>

@@ -1,0 +1,8 @@
+<div class="noise-toggles">
+	<div ng-repeat="(key, noise) in ::noises"
+		 ng-click="toggleNoise( key )"
+		 class="toggle"
+		 ng-class="{'on': noise.allowed}">
+		{{noise.label}}
+	</div>
+</div>
