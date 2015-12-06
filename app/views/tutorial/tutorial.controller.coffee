@@ -1,20 +1,30 @@
 'use strict'
 
-$requires = [ '$scope', '$log', '$state', 'TUTORIAL_STEPS']
+$requires = [
+	'$scope'
+	'$log'
+	'$state'
+	'$localStorage'
+	'TUTORIAL_STEPS'
+]
 
 class TutorialController
-	constructor: ( $scope, $log, $state, TUTORIAL_STEPS ) ->
+	constructor: ( $scope, $log, $state, $localStorage, TUTORIAL_STEPS ) ->
 		step = parseInt($state.params.step, 10)
+		@playMode = $state.params.mode
 
 		if not (1 <= step <= 5)
 			$state.go('tutorial', {step: 1})
 
-		this.showSuccess = step == 5
+		@showSuccess = step == 5
 
-		this.mode = 'tutorial'
-		this.stepNum = step
-		this.step = TUTORIAL_STEPS[this.stepNum]
-		this.endNodes = []
+		if @showSuccess
+			$localStorage.hasCompletedTutorial = true
+
+		@mode = 'tutorial'
+		@stepNum = step
+		@step = TUTORIAL_STEPS[@stepNum]
+		@endNodes = []
 
 		replaceNodeText = ( str, find, node ) ->
 			return str if !str?
@@ -24,16 +34,16 @@ class TutorialController
 
 		$scope.$watch(
 			() =>
-				return this.endNodes
+				return @endNodes
 			( nodes ) =>
 				return if !nodes? || nodes.length == 0
 
 				[startNode, endNode] = nodes
-				this.step.header1 = replaceNodeText(this.step.header1, '#{startNode}', startNode)
-				this.step.header1 = replaceNodeText(this.step.header1, '#{endNode}', endNode)
+				@step.header1 = replaceNodeText(@step.header1, '#{startNode}', startNode)
+				@step.header1 = replaceNodeText(@step.header1, '#{endNode}', endNode)
 
-				this.step.header2 = replaceNodeText(this.step.header2, '#{startNode}', startNode)
-				this.step.header2 = replaceNodeText(this.step.header2, '#{endNode}', endNode)
+				@step.header2 = replaceNodeText(@step.header2, '#{startNode}', startNode)
+				@step.header2 = replaceNodeText(@step.header2, '#{endNode}', endNode)
 		)
 
 		return

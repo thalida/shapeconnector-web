@@ -5,8 +5,8 @@
 		<span class="step-header2">{{tutorial.step.header2}}</span>
 		<sc:tutorial step="{{tutorial.stepNum}}" end-nodes="tutorial.endNodes"></sc:tutorial>
 	</div>
-	<div ng-if="tutorial.showSuccess == true">
-		You've successfully completed the tutorial
-		<span ui-sref="play" class="btn type-primary">Start Playing</span>
+	<div class="success" ng-if="tutorial.showSuccess == true">
+		<span class="step-header">You've successfully completed the tutorial!</span>
+		<span class="success-button btn type-primary" ui-sref="play({mode:tutorial.playMode})">Start Playing</span>
 	</div>
 </div>

@@ -10,8 +10,7 @@ $requires = [
 class HomeController
 	constructor: ( $log, $scope, $state, gameSettings ) ->
 		@onSelectGame = ( type ) ->
-			gameSettings.setGameType( type )
-			$state.go('play')
+			$state.go('play', {mode: type})
 
 		return
 
