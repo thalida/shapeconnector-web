@@ -94,7 +94,9 @@ gameUtils = ( $log, BOARD, SHAPE ) ->
 
 				return if not isValidBoardX or not isValidBoardY
 
-				return board[boardX][boardY]
+				# console.log( board[boardX], board[boardX][boardY])
+
+				return board[boardX]?[boardY]
 
 			#	@getNeighborNodes
 			# 		Get all the nodes surrounding this one
@@ -126,13 +128,14 @@ gameUtils = ( $log, BOARD, SHAPE ) ->
 					isValidY = @isValidBoardAxis( potY )
 
 					if isValidX and isValidY
-						neighborNode = board[potX][potY]
+						neighborNode = board[potX]?[potY]
 
-						if checks?
-							if checks.selected? and neighborNode.selected is checks.selected
+						if neighborNode?
+							if checks?
+								if checks.selected? and neighborNode.selected is checks.selected
+									neighbors.push( neighborNode )
+							else
 								neighbors.push( neighborNode )
-						else
-							neighbors.push( neighborNode )
 
 					potentialIdx += 1
 

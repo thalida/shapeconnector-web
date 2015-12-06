@@ -33,12 +33,17 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 			@board()
 
 			# Render the game goal
-			@goal()
+			if @game.mode is 'tutorial' and @game.step.showGoal and not @game.step.showMovesLeft
+				@goalWithoutMoves()
+			else
+				@goal()
 
 		#	@getNodeStyle
 		# 		Get the style of the node based on it's current state
 		#-------------------------------------------------------------------
 		getNodeStyle: ( node, lastNode ) ->
+			return if !node?
+
 			if node.selected is true
 				lastNode = @game.getSelectedNodes.last()
 
@@ -57,7 +62,9 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 		# 		Render the moves left circle + counter
 		#---------------------------------------------------------------
 		movesLeft: ( isGameWon, color = 'white' ) =>
-			numMoves = if isGameWon then @game.maxMoves else @game.movesLeft
+			return if @game.mode is 'tutorial' and @game.step.showGoal and not @game.step.showMovesLeft
+
+			numMoves = if isGameWon then @game.maxMoves - 1 else @game.movesLeft
 
 			# Set text to green if we've won the game
 			if isGameWon
@@ -68,7 +75,11 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 				color = 'red'
 
 			# Get the canvas x pos of the middle column of the board
-			middleColumn = Math.floor(BOARD.SIZE / 2)
+			boardSize = BOARD.SIZE
+			if @game.mode is 'tutorial'
+				boardSize = if @game.step.random then @game.step.boardSize else @game.step.shapes.length
+
+			middleColumn = Math.floor(boardSize / 2)
 			gameMiddle = gameUtils.calcCanvasX( middleColumn )
 
 			# Setup the position and dimensions of the moves circle
@@ -108,6 +119,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 		# 		Render the nodes that must start and end the connections
 		#---------------------------------------------------------------
 		goal: (endNodes, isGameWon) ->
+			return if @game.mode is 'tutorial' and @game.step.showGoal and not @game.step.showMovesLeft
+
 			endNodes ?= @game.endNodes
 			isGameWon ?= @game.won
 
@@ -117,7 +130,11 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 			movesCircle = @movesLeft( isGameWon )
 
 			# Get the middle column of the board
-			middleColumn = Math.floor(BOARD.SIZE / 2)
+			boardSize = BOARD.SIZE
+			if @game.mode is 'tutorial'
+				boardSize = if @game.step.random then @game.step.boardSize else @game.step.shapes.length
+
+			middleColumn = Math.floor(boardSize / 2)
 
 			# For each of the game nodes
 			# Render them to the board and draw the dashed connecting line
@@ -163,6 +180,47 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 				return
 			)
 
+		goalWithoutMoves: () ->
+			endNodes = @game.endNodes
+			isGameWon = @game.won
+
+			if @game.mode is 'tutorial'
+				boardSize = if @game.step.random then @game.step.boardSize else @game.step.shapes.length
+			else
+				boardSize = BOARD.SIZE
+
+			middle = boardSize / 2
+
+			x1 = gameUtils.calcCanvasX( 0 ) + (SHAPE.SIZE / 2)
+			x2 = gameUtils.calcCanvasX( 1 ) + (SHAPE.SIZE / 2)
+			y1 = y2 = SHAPE.SIZE + (SHAPE.SIZE / 2)
+
+			# Set the line to start and end
+			line = {x1, y1, x2, y2}
+
+			if isGameWon
+				nodeStyle = 'start'
+				@canvas.goal.draw.solidLine(line.x1, line.y1, line.x2, line.y2)
+			else
+				nodeStyle = 'untouched'
+				@canvas.goal.draw.dashedLine(line.x1, line.y1, line.x2, line.y2)
+
+			$.each(endNodes, (i, node) =>
+				if i == 0
+					x = gameUtils.calcCanvasX( 0 )
+				else
+					x = gameUtils.calcCanvasX( 1 )
+
+				y = SHAPE.SIZE
+
+				@canvas.goal.draw.create(
+					type: node.type
+					color: node.color
+					coords: {x, y}
+					style: nodeStyle
+				)
+			)
+
 		#	@board
 		# 		Render the nodes of the game board
 		#---------------------------------------------------------------
@@ -172,6 +230,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 
 			$.each( board, ( boardX, col ) =>
 				$.each( col, ( boardY, node ) =>
+					return if !node?
+
 					if not isGameWon
 						# Get the canvas x and y coords of the node
 						x = gameUtils.calcCanvasX(node.coords.x)

@@ -4,13 +4,18 @@ $requires = [
 	'$log'
 	'$scope'
 	'$state'
+	'$localStorage'
 	require '../../services/gameSettings'
 ]
 
 class PlayController
-	constructor: ( $log, $scope, $state, gameSettings ) ->
-		@gameType = gameSettings.getGameType()
+	constructor: ( $log, $scope, $state, $localStorage, gameSettings ) ->
+		mode = $state.params.mode
+		@gameType = gameSettings.setGameType( mode )
 		@difficulty = gameSettings.getDifficulty()
+
+		if $localStorage.hasCompletedTutorial != true
+			$state.go('tutorial', {step: 1, mode: @gameType})
 
 		@rebuildGame = true
 		@pauseGame = false

@@ -4,16 +4,13 @@ $requires = [
 	'$log'
 	'$scope'
 	'$state'
-
 	require '../../services/gameSettings'
-	require '../../services/assets'
 ]
 
 class HomeController
-	constructor: ( $log, $scope, $state, gameSettings, assets ) ->
+	constructor: ( $log, $scope, $state, gameSettings ) ->
 		@onSelectGame = ( type ) ->
-			gameSettings.setGameType( type )
-			$state.go('play')
+			$state.go('play', {mode: type})
 
 		return
 

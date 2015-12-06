@@ -10,21 +10,20 @@ $requires = [
 	require './services/assets'
 ]
 
-onAppRun = ($rootScope, $location, $timeout, $state, WindowEvents, assetsService) ->
-	console.log( MODE.production )
+onAppRun = ($rootScope, $location, $timeout, $state, WindowEvents, assets) ->
 	$rootScope.isProdSite = MODE.production is true
 
 	$rootScope.windowEvents = new WindowEvents()
 
-	assetsService.downloadAll().then(() =>
-		assetsService.playSound('background')
+	assets.downloadAll().then(() =>
+		assets.playSound('background')
 	)
 
-	$rootScope.windowEvents.onFocus( -> assetsService.playSound('background') )
-	$rootScope.windowEvents.onBlur( -> assetsService.pauseSound('background') )
+	$rootScope.windowEvents.onFocus( -> assets.playSound('background') )
+	$rootScope.windowEvents.onBlur( -> assets.pauseSound('background') )
 
 	$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
-		if toState.name is 'play' and fromState.name.length is 0
+		if (toState.name is 'play' || toState.name is 'tutorial') and fromState.name.length is 0
 			e.preventDefault()
 			$state.go('home')
 	)
