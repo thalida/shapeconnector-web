@@ -23,7 +23,7 @@ class TutorialController
 
 		@mode = 'tutorial'
 		@stepNum = step
-		@step = TUTORIAL_STEPS[@stepNum]
+		@step = angular.copy(TUTORIAL_STEPS[@stepNum])
 		@endNodes = []
 
 		replaceNodeText = ( str, find, node ) ->
@@ -39,6 +39,7 @@ class TutorialController
 				return if !nodes? || nodes.length == 0
 
 				[startNode, endNode] = nodes
+
 				@step.header1 = replaceNodeText(@step.header1, '#{startNode}', startNode)
 				@step.header1 = replaceNodeText(@step.header1, '#{endNode}', endNode)
 
