@@ -63,7 +63,10 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				@generatePath()
 
 				# Fill any empty spaces on the game board
-				@fillGrid()
+				if @opts.mode is 'tutorial' and @opts.step.makeUnique
+					@fillGridAsUnique()
+				else
+					@fillGrid()
 
 			# Save the start + end nodes for the final path
 			@saveEndNodes()
@@ -269,7 +272,7 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 
 		#	@fillGrid
 		# 		Fill in any empty spots on the grid with a random shape
-		#-------------------------------------------------------------------
+		#-----------------------------------------------------------------------
 		fillGrid: () ->
 			$.each(@board, (x, yArr) =>
 				$.each(yArr, (y, node) =>
@@ -287,6 +290,55 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 
 			return @board
 
+		#	@makeUnique
+		# 		Loop over the gameboard and make all the nodes unique
+		#-----------------------------------------------------------------------
+		fillGridAsUnique: () ->
+			takenCombos = []
+			emptyNodes = []
+
+			generateAttrs = ( takenCombos ) =>
+				colorIndex = getRandomInt(0, @shapes.colors.length - 1)
+				typeIndex = getRandomInt(0, @shapes.types.length - 1)
+
+				type = @shapes.types[ typeIndex ]
+				color = @shapes.colors[ colorIndex ]
+
+				newCombo = type + ':' + color
+
+				if takenCombos.indexOf( newCombo ) == -1
+					return [color, type]
+				else
+					return generateAttrs( takenCombos )
+
+			$.each(@board, (x, yArr) =>
+				$.each(yArr, (y, node) =>
+					if node?
+						combo = node.type + ':' + node.color
+						takenCombos.push( combo )
+					else
+						emptyNodes.push(coords: {x, y})
+				)
+			)
+
+			$.each(emptyNodes, (i, node) =>
+				[color, type] = generateAttrs(takenCombos)
+				node.color = color
+				node.type = type
+
+				x = node.coords.x
+				y = node.coords.y
+				@board[x][y] = node
+
+				combo = node.type + ':' + node.color
+				takenCombos.push( combo )
+			)
+
+			return @board
+
+		#	@findNodeByAttrs
+		# 		In a given array find the node that matches the passed attrs
+		#-----------------------------------------------------------------------
 		findNodeByAttrs: ( nodes, attrs ) ->
 			result = found: false, node: null
 

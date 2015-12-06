@@ -69,10 +69,12 @@ tutorialSteps =
 		]
 	},
 	3: {
-		header1: 'Connect the #{startNode} to a #{endNode}'
+		header1: 'Next connect the #{startNode} to a #{endNode}'
+		header2: 'You cannot move at a diagonal.'
 		headerPosition: 'top'
 		showGoal: true
 		showMovesLeft: false
+		makeUnique: true
 		random: true
 		boardSize: 2
 		pathSize: 3
@@ -82,6 +84,7 @@ tutorialSteps =
 		headerPosition: 'bottom'
 		showGoal: true
 		showMovesLeft: true
+		makeUnique: true
 		random: true
 		boardSize: 4
 		pathSize: 4
