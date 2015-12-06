@@ -21,7 +21,6 @@
   <preference name="DisallowOverscroll" value="true"/>
   <gap:plugin name="org.apache.cordova.console"/>
   <gap:plugin name="org.apache.cordova.device"/>
-  <gap:plugin name="org.apache.cordova.globalization"/>
   <gap:plugin name="org.apache.cordova.media"/>
   <gap:plugin name="org.apache.cordova.splashscreen"/>
   <icon src="icon.png"/>
@@ -53,6 +52,8 @@
   <allow-intent href="geo:*"/>
   <platform name="android">
     <allow-intent href="market:*"/>
+  </platform>
+  <platform name="browser">
   </platform>
   <platform name="ios">
     <allow-intent href="itms:*"/>
