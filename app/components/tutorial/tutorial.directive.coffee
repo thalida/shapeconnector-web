@@ -100,8 +100,7 @@ angular.module('app').directive 'scTutorial', [
 				$game = el.find('.game')
 				$gameBoard = $game.find('.game-board')
 
-				# headerHeight = if step.showGoal then SHAPE.OUTERSIZE + 10 else 0
-				headerHeight = 0
+				headerHeight = if window.innerHeight > 650 and step.showGoal then SHAPE.OUTERSIZE + 10 else 0
 
 				windowMidHeight = window.innerHeight / 2
 				windowMidWidth = window.innerWidth / 2

@@ -51,12 +51,11 @@ angular.module('app').directive 'scGame', [
 
 				calcGameTopMargin: ->
 					windowMidHeight = window.innerHeight / 2
-					# headerHeight = SHAPE.OUTERSIZE + 10
-					headerHeight = 0
 					boardHalfHeight = BOARD.DIMENSIONS.h / 2
+					headerHeight = if window.innerHeight > 650 then SHAPE.OUTERSIZE + 10 else 0
 
 					topMargin = windowMidHeight - headerHeight - boardHalfHeight
-					topMargin = 60 if topMargin < 60
+					topMargin = 80 if topMargin < 80
 
 					return topMargin
 
