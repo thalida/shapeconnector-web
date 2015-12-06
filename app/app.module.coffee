@@ -1,14 +1,5 @@
 'use strict'
 
-# Styles
-require './app.scss'
-
-# JS
-window.jQuery = $ = require 'jquery'
-window.angular = require 'angular'
-window.moment = require 'moment'
-ngstorage = require 'ngstorage'
-
 # Module
 window.app = angular.module('app', [
 	require 'angular-animate'

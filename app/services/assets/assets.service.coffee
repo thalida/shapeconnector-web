@@ -1,5 +1,12 @@
 'use strict'
 
+require '../../assets/sound/add2.wav'
+require '../../assets/sound/undo3.wav'
+require '../../assets/sound/win1.wav'
+require '../../assets/sound/lose1.wav'
+require '../../assets/sound/bad2.wav'
+require '../../assets/sound/carefree.mp3'
+
 #===============================================================================
 #
 #	Assets Service
@@ -21,12 +28,12 @@ assets = ($log, $q, gameSettings) ->
 		#-------------------------------------------------------------------
 		constructor: ->
 			@sounds =
-				addedNode: '/assets/sound/add2.wav'
-				removedNode: '/assets/sound/undo3.wav'
-				gameWon: '/assets/sound/win1.wav'
-				gameLost: '/assets/sound/lose1.wav'
-				badMove: '/assets/sound/bad2.wav'
-				background: '/assets/sound/carefree.mp3'
+				addedNode: 'assets/sound/add2.wav'
+				removedNode: 'assets/sound/undo3.wav'
+				gameWon: 'assets/sound/win1.wav'
+				gameLost: 'assets/sound/lose1.wav'
+				badMove: 'assets/sound/bad2.wav'
+				background: 'assets/sound/carefree.mp3'
 
 			@assetsLoaded = 0
 			@totalSounds = Object.keys(@sounds).length
