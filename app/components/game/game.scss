@@ -62,7 +62,7 @@
 			z-index: 2; // Lift above the lines canvas
 
 			.game.won & {
-				z-index: 0; // Hide below the win popup
+				z-index: 1; // Hide below the win popup
 			}
 		}
 

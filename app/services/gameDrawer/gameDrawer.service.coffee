@@ -334,12 +334,12 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 				else
 					@canvas.lines.draw.dashedLine(x1, y1, x2, y2)
 
-
-			clearNode = @canvas.lines.draw.createDrawParams(node, 'invisible', 'small').clear
-			clearParentNode = @canvas.lines.draw.createDrawParams(parentNode, 'invisible', 'small').clear
-
-			@canvas.lines.draw.clear( clearNode )
-			@canvas.lines.draw.clear( clearParentNode )
+			if not @game.won
+				# Clear & redraw the nodes sitting on top of the line
+				clearNode = @canvas.lines.draw.createDrawParams(node, 'invisible', 'small').clear
+				clearParentNode = @canvas.lines.draw.createDrawParams(parentNode, 'invisible', 'small').clear
+				@canvas.lines.draw.clear( clearNode )
+				@canvas.lines.draw.clear( clearParentNode )
 
 			return true
 
