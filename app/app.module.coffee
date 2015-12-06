@@ -16,14 +16,3 @@ window.app = angular.module('app', [
 	'app.settings'
 	'app.tutorial'
 ])
-
-require './views/about'
-require './views/home'
-require './views/play'
-require './views/settings'
-require './views/tutorial'
-
-require './app.constants.coffee'
-require './app.filters.coffee'
-require './app.routes.coffee'
-require './app.run.coffee'
