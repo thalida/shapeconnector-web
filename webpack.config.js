@@ -58,7 +58,7 @@ module.exports = {
 			template: APP + '/index.html', // Load a custom template
 			inject: 'body'
 		}),
-		new webpack.HotModuleReplacementPlugin(),
+		// new webpack.HotModuleReplacementPlugin(),
 		new webpack.ProvidePlugin({
 			jQuery: "jquery",
 			$: "jquery"
