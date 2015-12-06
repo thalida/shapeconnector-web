@@ -1,0 +1,30 @@
+$icon-spritePath: 'assets/images/icon-sprite';
+$icon-spriteURL: $icon-spritePath + '.png';
+$icon-spritex2URL: $icon-spritePath + '@2x.png';
+$bgiSizeW: 287px;
+$bgiSizeH: 153px;
+$logo-large: 137px 68px $icon-spriteURL -22px -21px $icon-spritex2URL;
+$logo-small: 46px 24px $icon-spriteURL -22px -107px $icon-spritex2URL;
+$arrow-right-black: 8px 11.993000000000002px $icon-spriteURL -249.50448549730794px -112.19922859705821px $icon-spritex2URL;
+$arrow-right-white: 8px 11.993000000000002px $icon-spriteURL -219.50448549730794px -112.19922859705821px $icon-spritex2URL;
+$play-black: 36.720001220703125px 36px $icon-spriteURL -231.77999877929688px -38px $icon-spritex2URL;
+$play-white: 36.720001220703125px 36px $icon-spriteURL -182.64999961853027px -38px $icon-spritex2URL;
+$restart-black: 18px 18px $icon-spriteURL -151px -110px $icon-spritex2URL;
+$skip-black: 18.010000228881836px 16.62168683318977px $icon-spriteURL -183px -110px $icon-spritex2URL;
+$restart-white: 18px 18px $icon-spriteURL -81px -110px $icon-spritex2URL;
+$skip-white: 18.010000228881836px 16.62168683318977px $icon-spriteURL -113px -110px $icon-spritex2URL;
+
+@mixin cssSprite( $spriteVals ) {
+	$spriteUrl1x: nth( $spriteVals, 3 );
+	$spriteUrl2x: nth( $spriteVals, 6 );
+
+	width: ceil(nth( $spriteVals, 1 ));
+	height: ceil(nth( $spriteVals, 2 ));
+	background-repeat: no-repeat;
+	background-image: url( $spriteUrl1x );
+	background-position: nth( $spriteVals, 4 ) nth( $spriteVals, 5 );
+	@media only screen and ( -webkit-min-device-pixel-ratio: 2 ), only screen and ( min-device-pixel-ratio: 2 ) {
+		background-image: url( $spriteUrl2x );
+		background-size: $bgiSizeW $bgiSizeH;
+	}
+}

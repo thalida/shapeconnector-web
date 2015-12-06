@@ -2,24 +2,24 @@
 
 var webpack = require('webpack');
 var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
-var APP = __dirname + '/www';
+var APP = __dirname + '/app';
+var DIST = __dirname + '/www';
 
 module.exports = {
 	context: APP,
-	entry: {
-		// app: ['./app.module.coffee']
-		app: ['./js/index.js']
-	},
+	entry: 'index.coffee',
 	output: {
-		path: APP,
-		filename: 'bundle.js'
+		path: DIST,
+		filename: 'bundle.js',
+		publicPath: ''
 	},
 	module: {
 		loaders: [
 			{
 				test: /\.scss$/,
-				loaders: ['style', 'css', 'sass']
+				loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
 			},
 			{
 				test: /\.coffee$/,
@@ -36,11 +36,11 @@ module.exports = {
 			},
 			{
 				test: /\.(woff|woff2|ttf|eot|svg|png|gif|jpg|jpeg)(\?]?.*)?$/,
-				loader: 'file-loader?name=res/[name].[ext]?[hash]'
+				loader: 'file-loader?name=[path][name].[ext]'
 			},
 			{
 				test: /\.(wav|mp3)(\?]?.*)?$/,
-				loader: 'file-loader'
+				loader: 'file-loader?name=[path][name].[ext]'
 			},
 			{
 				test: /\.json/,
@@ -53,6 +53,11 @@ module.exports = {
 		extensions: ["", ".webpack.js", ".web.js", ".js", ".coffee"]
 	},
 	plugins: [
+		new HtmlWebpackPlugin({
+			title: 'Custom template',
+			template: APP + '/index.html', // Load a custom template
+			inject: 'body'
+		}),
 		new webpack.HotModuleReplacementPlugin(),
 		new webpack.ProvidePlugin({
 			jQuery: "jquery",
