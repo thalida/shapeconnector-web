@@ -18,21 +18,27 @@ gameLevels =
 	}
 	EASY: {
 		label: 'Beginner'
-		min: 5,
-		max: 8,
-		timer: 90
+		min: 4,
+		max: 7,
+		timer: 60
 	}
 	MEDIUM: {
 		label: 'Intermediate'
-		min: 9,
-		max: 13,
-		timer: 60
+		min: 8,
+		max: 11,
+		timer: 45
 	}
 	HARD: {
 		label: 'Advanced'
-		min: 14,
-		max: 18,
-		timer: 60
+		min: 12,
+		max: 14,
+		timer: 30
+	}
+	INSANE: {
+		label: 'Master'
+		min: 15,
+		max: 17,
+		timer: 15
 	}
 
 gameLevels.DEFAULT = {name: 'easy', info: gameLevels.EASY}
@@ -72,7 +78,7 @@ tutorialSteps =
 		pathSize: 3
 	}
 	4: {
-		header1: 'Now connect a #{startNode} to a #{endNode} in only 3 moves'
+		header1: 'Now connect a #{startNode} to a #{endNode} in exactly 3 moves'
 		headerPosition: 'bottom'
 		showGoal: true
 		showMovesLeft: true
