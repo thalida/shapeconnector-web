@@ -75,7 +75,7 @@
 
 	&.addon-arrow {
 		&:after {
-			@include cssSprite( $arrow-right-black );
+			@include cssSprite( $arrow-right-white );
 			content: '';
 			display: block;
 			float: right;

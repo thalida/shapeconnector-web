@@ -70,7 +70,6 @@ tutorialSteps =
 	},
 	3: {
 		header1: 'Next connect the #{startNode} to a #{endNode}'
-		header2: 'You cannot move at a diagonal.'
 		headerPosition: 'top'
 		showGoal: true
 		showMovesLeft: false
