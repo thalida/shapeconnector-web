@@ -34,6 +34,9 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 
 			@opts = angular.extend({}, @defaults, opts)
 
+			if @opts.mode is 'tutorial' and @opts.step.random
+				@opts.dimensions = @opts.step.boardSize
+
 			# Get the total # of connections needed to solve the game
 			@pathSize = @setPathSize()
 
@@ -53,14 +56,17 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			# Create an empty board
 			@generateGrid()
 
-			# Set the board coordinates for the path
-			@generatePath()
+			if @opts.mode is 'tutorial' and not @opts.step.random
+				@generatePredefinedPath()
+			else
+				# Set the board coordinates for the path
+				@generatePath()
+
+				# Fill any empty spaces on the game board
+				@fillGrid()
 
 			# Save the start + end nodes for the final path
 			@saveEndNodes()
-
-			# Fill any empty spaces on the game board
-			@fillGrid()
 
 			# $log.debug( 'BOARD', @board )
 			# $log.debug( 'PATH', @path )
@@ -75,8 +81,12 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 		# 		Based on the difficulty randomly get the path size
 		#-------------------------------------------------------------------
 		setPathSize: ->
-			range = LEVELS[ @opts.difficulty.toUpperCase() ]
-			@pathSize = getRandomInt( range.min, range.max )
+			if @opts.mode is 'tutorial'
+				@pathSize = if @opts.step.random then @opts.step.pathSize else @opts.step.shapes.length - 1
+			else
+				range = LEVELS[ @opts.difficulty.toUpperCase() ]
+				@pathSize = getRandomInt( range.min, range.max )
+
 
 			return @pathSize
 
@@ -96,14 +106,33 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 		# 		Setup an empty 2D array for the game board
 		#-------------------------------------------------------------------
 		generateGrid: ->
-			@board = new Array( @opts.dimensions )
+			gridSize = if @opts.mode is 'tutorial' and not @opts.step.random then 2 else @opts.dimensions
+			@board = new Array( gridSize )
 
 			i = 0
-			while i < @opts.dimensions
-				@board[i] = new Array(@opts.dimensions)
+			while i < gridSize
+				@board[i] = new Array(gridSize)
 				i += 1
 
 			return @board
+
+		generatePredefinedPath: ->
+			totalShapes = @opts.step.shapes.length
+			i = 0
+			while i < totalShapes
+				shape = @opts.step.shapes[i]
+				node =
+					color: shape.color
+					type: shape.type
+					coords: {x: i, y: 0}
+
+				@path.push( node )
+				@board[ node.coords.x ][ node.coords.y ] = node
+
+				i += 1
+
+			return
+
 
 		#	@generatePath
 		# 		Figure out the path for the nodes in the game board
@@ -208,6 +237,12 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			parentAttrIdx = missingAttr.opts.indexOf(parentNode[missingAttr.name])
 			missingAttr.opts.splice(parentAttrIdx, 1)
 
+			if @path.length + 1 >= @pathSize
+				# Make sure we don't get the same shape attrs as the first node
+				firstNodeAttrIdx = missingAttr.opts.indexOf(@path[0][missingAttr.name])
+				missingAttr.opts.splice(firstNodeAttrIdx, 1)
+
+
 			# Randomly pick an option from the available list
 			missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
 			newNode[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
@@ -245,11 +280,24 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 							color: @shapes.colors[ colorIndex ]
 							type: @shapes.types[ typeIndex ]
 							coords: {x, y}
+
 						@board[x][y] = node
 				)
 			)
 
 			return @board
+
+		findNodeByAttrs: ( nodes, attrs ) ->
+			result = found: false, node: null
+
+			$.each(nodes, (node) =>
+				if node.color == attrs.color and node.type == attrs.type
+					result.found = true
+					result.node = node
+					return result;
+			)
+
+			return result
 
 
 gameBuilderService.$inject = $requires

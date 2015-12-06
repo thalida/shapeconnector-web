@@ -2,11 +2,9 @@
 
 angular.module('app').directive 'scNoiseToggles', [
 	'$log'
-
+	'assets'
 	require '../../services/gameSettings'
-	require '../../services/assets'
-
-	( $log, gameSettings, assetsService) ->
+	( $log, assets, gameSettings) ->
 		templateUrl: 'components/noiseToggles/noiseToggles.html'
 		restrict: 'E'
 		scope: true
@@ -25,9 +23,9 @@ angular.module('app').directive 'scNoiseToggles', [
 				$scope.noises[type].allowed = gameSettings.toggle( type )
 				if type is 'music'
 					if $scope.noises[type].allowed is yes
-						assetsService.playSound('background')
+						assets.playSound('background')
 					else
-						assetsService.pauseSound('background')
+						assets.pauseSound('background')
 				return
 
 ]

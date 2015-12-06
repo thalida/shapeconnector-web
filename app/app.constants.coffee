@@ -39,6 +39,49 @@ gameLevels.DEFAULT = {name: 'easy', info: gameLevels.EASY}
 
 app.constant 'LEVELS', gameLevels
 
+tutorialSteps =
+	total: 4
+	1: {
+		header1: 'Connect two similar shapes'
+		header2: 'Try it yourself'
+		headerPosition: 'top'
+		showGoal: false
+		random: false
+		shapes: [
+			{color: 'yellow', type: 'triangle'}
+			{color: 'green', type: 'triangle'}
+		]
+	},
+	2: {
+		header1: 'You can also connect the same colors'
+		headerPosition: 'top'
+		showGoal: false
+		random: false
+		shapes: [
+			{color: 'red', type: 'diamond'}
+			{color: 'red', type: 'circle'}
+		]
+	},
+	3: {
+		header1: 'Connect the #{startNode} to a #{endNode}'
+		headerPosition: 'top'
+		showGoal: true
+		showMovesLeft: false
+		random: true
+		boardSize: 2
+		pathSize: 3
+	}
+	4: {
+		header1: 'Now connect a #{startNode} to a #{endNode} in only 3 moves'
+		headerPosition: 'bottom'
+		showGoal: true
+		showMovesLeft: true
+		random: true
+		boardSize: 4
+		pathSize: 4
+	}
+
+app.constant 'TUTORIAL_STEPS', tutorialSteps
 
 app.constant 'GAME_TYPES', {
 	options: ['freeplay', 'timed']

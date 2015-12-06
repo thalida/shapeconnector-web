@@ -1,36 +1,33 @@
 .tutorial-view {
 	width: 100%;
-	margin-top: 70px;
-	padding: 30px;
 	color: white;
 
-	&-content {
-		display: block;
-		width: 100%;
+	.step {
+		width: 80%;
+		margin: 120px auto;
 		text-align: center;
-	}
 
-	.header {
-		color: white;
-		font-size: 22px;
-		margin-bottom: 0px;
-		text-align: center;
-	}
-
-	.description {
-		font-size: 18px;
-		line-height: 1.8;
-
-		&.light {
-			font-weight: 300;
+		&-header {
+			display: block;
+			color: white;
+			font-size: 22px;
+			line-height: 28px;
+			padding-bottom: 10px;
 		}
 
-		&.center {
-			text-align: center;
+		&-header2 {
+			display: block;
+			color: rgba(white, 0.65);
+			font-size: 16px;
+			line-height: 20px;
 		}
-	}
 
-	.game-gif {
-		max-width: 100%;
+		&.step4 {
+			margin: 80px auto;
+
+			.game-header {
+				margin-left: -50px;
+			}
+		}
 	}
 }

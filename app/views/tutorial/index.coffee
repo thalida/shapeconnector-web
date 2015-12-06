@@ -1,6 +1,7 @@
 'use strict'
 
 require '../../components/header'
+require '../../components/tutorial'
 
 require './tutorial.scss'
 require './tutorial.html'

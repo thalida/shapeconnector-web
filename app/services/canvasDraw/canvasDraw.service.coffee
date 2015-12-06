@@ -89,6 +89,8 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 		# 		utility for converting a node to the correct params
 		#---------------------------------------------------------------
 		createDrawParams: ( node, nodeStyle, clearStyle ) ->
+			return if !node?
+
 			if clearStyle? and clearStyle == 'small'
 				clear =
 					x: node.position.x

@@ -15,7 +15,7 @@ $requires = [
 	require '../gameSettings'
 ]
 
-assetsService = ($log, $q, gameSettings) ->
+assets = ($log, $q, gameSettings) ->
 	new class AssetLoader
 		# @constructor: Setup the file paths & initalise vars
 		#-------------------------------------------------------------------
@@ -107,5 +107,5 @@ assetsService = ($log, $q, gameSettings) ->
 			sound.pause?()
 
 
-assetsService.$inject = $requires
-module.exports = assetsService
+assets.$inject = $requires
+module.exports = assets

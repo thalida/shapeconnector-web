@@ -17,11 +17,11 @@ $requires = [
 	require '../gameBuilder'
 	require '../gameDrawer'
 	require '../watcher'
-	require '../assets'
 	require '../gameUtils'
+	'assets'
 ]
 
-gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, assetsService, gameUtils ) ->
+gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, gameUtils, assetsService ) ->
 	new class GameManager
 		constructor: () ->
 
@@ -31,12 +31,15 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 			@scope = params.scope.$scope
 			@namespace = params.scope.namespace
 			@mode = params.settings.mode
-			@difficulty = params.settings.difficulty
 			@canvas = params.render.canvas
-			board = params.render.board
 
-			# If no difficulty was passed default to easy
-			@difficulty ?= LEVELS.DEFAULT.name
+			if @mode is 'tutorial'
+				@step = params.settings.step
+			else
+				@difficulty = params.settings.difficulty
+				board = params.render.board
+				# If no difficulty was passed default to easy
+				@difficulty ?= LEVELS.DEFAULT.name
 
 			@selectedNodes = []
 			@addedNodes = []
@@ -86,7 +89,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 		#-------------------------------------------------------------------
 		setBoard: ( game ) ->
 			# Generate the game board arrays
-			gameBuilder = new GameBuilderService(difficulty: @difficulty)
+			gameBuilder = new GameBuilderService(mode: @mode, step: @step, difficulty: @difficulty)
 			if game?
 				gameBoard = angular.copy( game )
 			else
@@ -97,7 +100,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 			@board = gameBoard.board
 			@endNodes = gameBoard.endNodes
 			@maxMoves = gameBoard.maxMoves
-			@movesLeft = @maxMoves
+			@movesLeft = @maxMoves - 1
 
 		#	@start: Namespaced quick actions for selectedNodes
 		#-------------------------------------------------------------------
@@ -311,6 +314,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 				@render.clearLinesBoard()
 				@render.allSolidLines( @selectedNodes )
 				@render.goal( @endNodes, hasWon )
+				@render.movesLeft( @won )
 
 				assetsService.pauseSound('removedNode')
 				assetsService.pauseSound('addedNode')
@@ -332,9 +336,18 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 		# 		Are there any available moves left?
 		#-------------------------------------------------------------------
 		onMovesLeftChange: ( numMoves ) =>
-			if numMoves <= 0 and not @won and not @lost
+			if numMoves < 0 and not @won and not @lost
 				@disableNewConnections = true
 				@render.movesLeft(@won, 'red')
+
+			# if @mode is 'tutorial'
+			# 	if numMoves < 0 and not @won and not @lost
+			# 		@disableNewConnections = true
+			# 		@render.movesLeft(@won, 'red')
+			# else
+			# 	if numMoves <= 0 and not @won and not @lost
+			# 		@disableNewConnections = true
+			# 		@render.movesLeft(@won, 'red')
 
 		#	@endGameAnimation
 		#		Wait for the end game animations to finish
@@ -358,19 +371,27 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 
 			@dragStart = nodes[nodes.length - 1]
 
-			# Only update the counter when we have two or more selections
-			if totalNodes == 0
-				@movesLeft = @maxMoves - 1
-			else
+			if @mode is 'tutorial' and not @step.random
 				@movesLeft = @maxMoves - totalNodes
-
-			@render.movesLeft( @won )
-
-			if @movesLeft <= 0
-				@won = @isGameOver()
-				@disableNewConnections = true
+				if @movesLeft < 0
+					@won = @isGameOver()
+					@disableNewConnections = true
+				else
+					@disableNewConnections = false
 			else
-				@disableNewConnections = false
+				# Only update the counter when we have two or more selections
+				if totalNodes == 0
+					@movesLeft = @maxMoves - 1
+				else
+					@movesLeft = @maxMoves - totalNodes
+
+				@render.movesLeft( @won )
+
+				if @movesLeft <= 0
+					@won = @isGameOver()
+					@disableNewConnections = true
+				else
+					@disableNewConnections = false
 
 		#	@touchedNodes
 		# 		If a node has been "touched" by an animation re-render it
