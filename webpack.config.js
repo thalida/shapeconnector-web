@@ -3,12 +3,13 @@
 var webpack = require('webpack');
 var path = require('path');
 
-var APP = __dirname + '/app';
+var APP = __dirname + '/www';
 
 module.exports = {
 	context: APP,
 	entry: {
-		app: ['./app.module.coffee']
+		// app: ['./app.module.coffee']
+		app: ['./js/index.js']
 	},
 	output: {
 		path: APP,
