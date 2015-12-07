@@ -1,3 +1,5 @@
+@import "../../assets/styles/sprites.scss";
+
 .tutorial-view {
 	width: 100%;
 	color: white;
@@ -20,6 +22,29 @@
 			color: rgba(white, 0.65);
 			font-size: 16px;
 			line-height: 20px;
+		}
+
+		&-skip {
+			position: absolute;
+			bottom: 50px;
+			right: 50px;
+
+			color: white;
+			cursor: pointer;
+			text-decoration: none;
+
+			&:hover {
+				opacity: 0.9;
+			}
+
+			&:after {
+				@include cssSprite( $arrow-right-white );
+				content: '';
+				display: block;
+				float: right;
+				margin-left: 10px;
+    			margin-top: 4px;
+			}
 		}
 
 		&.step3 {

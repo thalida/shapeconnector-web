@@ -4,6 +4,10 @@
 		<span class="step-header">{{tutorial.step.header1}}</span>
 		<span class="step-header2">{{tutorial.step.header2}}</span>
 		<sc:tutorial step="{{tutorial.stepNum}}" end-nodes="tutorial.endNodes"></sc:tutorial>
+
+		<a class="step-skip" ng-if="tutorial.stepNum === 1" ng-click="tutorial.skip()">
+			Skip Tutorial
+		</a>
 	</div>
 	<div class="success" ng-if="tutorial.showSuccess == true">
 		<span class="step-header">You've successfully completed the tutorial!</span>

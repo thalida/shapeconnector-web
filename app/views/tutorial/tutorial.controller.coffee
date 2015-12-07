@@ -26,6 +26,11 @@ class TutorialController
 		@step = angular.copy(TUTORIAL_STEPS[@stepNum])
 		@endNodes = []
 
+		@skip = =>
+			$localStorage.hasCompletedTutorial = true
+			$state.go('play', {mode: @playMode})
+			return
+
 		replaceNodeText = ( str, find, node ) ->
 			return str if !str?
 			replace = node.color + ' ' + node.type
