@@ -12,21 +12,19 @@ $requires = [
 
 onAppRun = ($rootScope, $location, $timeout, $state, WindowEvents, assets) ->
 	$rootScope.isProdSite = MODE.production is true
-
 	$rootScope.windowEvents = new WindowEvents()
-
-	assets.downloadAll().then(() =>
-		assets.playSound('background')
-	)
-
-	$rootScope.windowEvents.onFocus( -> assets.playSound('background') )
-	$rootScope.windowEvents.onBlur( -> assets.pauseSound('background') )
 
 	$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
 		if (toState.name is 'play' || toState.name is 'tutorial') and fromState.name.length is 0
 			e.preventDefault()
 			$state.go('home')
 	)
+
+	assets.downloadAll().then(() =>
+		assets.playSound('background')
+	)
+	$rootScope.windowEvents.onFocus( -> assets.playSound('background') )
+	$rootScope.windowEvents.onBlur( -> assets.pauseSound('background') )
 
 	window.getRandomInt = (min, max) ->
 		return Math.floor(Math.random() * (max - min + 1)) + min

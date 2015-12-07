@@ -46,7 +46,7 @@
 			<sc:noise-toggles></sc:noise-toggles>
 		</div>
 
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit Game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Go Home</a>
 	</div>
 </sc:modal>
 
@@ -60,11 +60,11 @@
 			<a sc:modal:action="minimize" class="btn type-secondary">See gameboard</a>
 			<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
 		</div>
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Exit Game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Go Home</a>
 	</div>
 	<div class="scmodal-minimized-content">
 		<a sc:modal:action="close" on-complete="actions.quitGame()" no-delay class="btn float-left type-text">
-			Exit Game
+			Go Home
 		</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" no-delay class="btn float-right type-primary addon-arrow">
 			Next Puzzle
@@ -79,6 +79,6 @@
 			<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-secondary">Try again?</a>
 			<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
 		</div>
-		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Exit Game</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Go Home</a>
 	</div>
 </sc:modal>

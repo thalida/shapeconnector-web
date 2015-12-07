@@ -35,14 +35,15 @@ windowEventsSerice = ( $log ) ->
 				document.addEventListener('webkitvisibilitychange', onchange)
 			else if (hidden = 'msHidden') of document
 				document.addEventListener('msvisibilitychange', onchange)
-
 			# IE 9 and lower:
 			else if 'onfocusin' of document
 				document.onfocusin = document.onfocusout = onchange
-
 			# All others:
 			else
 				window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onchange
+
+			document.addEventListener('resume', onchange, false)
+			document.addEventListener('pause', onchange, false)
 
 			# set the initial state (but only if browser supports the Page Visibility API)
 			if typeof document[hidden] isnt 'undefined'
@@ -54,9 +55,11 @@ windowEventsSerice = ( $log ) ->
 			h = 'hidden'
 
 			evtMap =
+				resume: v
 				focus: v
 				focusin: v
 				pageshow: v
+				pause: h
 				blur: h
 				focusout: h
 				pagehide: h

@@ -1,3 +1,6 @@
+# if not navigator.userAgent.toLowerCase().match('chrome')
+# 	document.write('<script src="cordova.js"><\/script>')
+
 # JS
 window.jQuery = $ = require 'jquery'
 window.angular = require 'angular'
@@ -24,3 +27,6 @@ require './views/play'
 require './views/settings'
 require './views/tutorial'
 
+document.addEventListener('deviceready', () ->
+	angular.bootstrap(document, ['app'])
+, false)

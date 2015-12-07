@@ -4,8 +4,11 @@
   "main": "app/app.module.coffee",
   "scripts": {
     "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base www --host 0.0.0.0 --port 8000",
-    "start-app": "webpack --progress --colors && cordova run android --device",
-    "build": "NODE_ENV=production webpack -p --progress --colors"
+    "build": "NODE_ENV=production webpack -p --progress --colors",
+
+    "start-app": "webpack --progress --colors --watch",
+    "build-debug": "phonegap build android --debug",
+    "deploy-app": "NODE_ENV=production phonegap build android --release"
   },
   "devDependencies": {
     "coffee-loader": "^0.7.2",
