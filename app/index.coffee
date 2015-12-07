@@ -1,5 +1,10 @@
-# if not navigator.userAgent.toLowerCase().match('chrome')
-# 	document.write('<script src="cordova.js"><\/script>')
+'use strict'
+
+window.isAndroid = navigator.userAgent.toLowerCase().match('android') != null
+
+if window.isAndroid
+	document.write('<script src="cordova.js"><\/script>')
+
 
 # JS
 window.jQuery = $ = require 'jquery'
@@ -27,6 +32,9 @@ require './views/play'
 require './views/settings'
 require './views/tutorial'
 
-document.addEventListener('deviceready', () ->
+if isAndroid
+	document.addEventListener('deviceready', () ->
+		angular.bootstrap(document, ['app'])
+	, false)
+else
 	angular.bootstrap(document, ['app'])
-, false)
