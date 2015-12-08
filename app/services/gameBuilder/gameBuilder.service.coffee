@@ -211,7 +211,8 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			# If we haven't found any allowed moves
 			if allowables.length is 0
 				# Remove the last move we made (since it was bad)
-				@path.pop()
+				removedNode = @path.pop()
+				@board[ removedNode.coords.x ][ removedNode.coords.y ] = undefined
 
 				# Go back to the previous node and try again
 				@generatePath( @path[@path.length - 1] )
