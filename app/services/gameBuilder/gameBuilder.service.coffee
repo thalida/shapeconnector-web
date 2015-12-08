@@ -37,6 +37,9 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			if @opts.mode is 'tutorial' and @opts.step.random
 				@opts.dimensions = @opts.step.boardSize
 
+			@totalColorChain = 0
+			@totalShapeChain = 0
+
 			# Get the total # of connections needed to solve the game
 			@pathSize = @setPathSize()
 
@@ -212,6 +215,12 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			if allowables.length is 0
 				# Remove the last move we made (since it was bad)
 				removedNode = @path.pop()
+
+				if removedNode.isKeepColor
+					@totalColorChain -= 1
+				else
+					@totalShapeChain -= 1
+
 				@board[ removedNode.coords.x ][ removedNode.coords.y ] = undefined
 
 				# Go back to the previous node and try again
@@ -231,6 +240,20 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 
 			# Decide if to keep the color or the shape type
 			isKeepColor = coinFlip()
+			hasColorChain = @checkHasColorChain()
+			hasShapeChain = @checkHasShapeChain()
+
+			if hasColorChain
+				isKeepColor = false
+				@totalColorChain = 0
+			else if hasShapeChain
+				isKeepColor = true
+				@totalShapeChain = 0
+
+			@updateChainTally( isKeepColor )
+
+			newNode.isKeepColor = isKeepColor
+
 			missingAttr =
 				name: (if isKeepColor then 'type' else 'color')
 
@@ -241,11 +264,11 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			parentAttrIdx = missingAttr.opts.indexOf(parentNode[missingAttr.name])
 			missingAttr.opts.splice(parentAttrIdx, 1)
 
+			# On the last node
 			if @path.length + 1 >= @pathSize
 				# Make sure we don't get the same shape attrs as the first node
 				firstNodeAttrIdx = missingAttr.opts.indexOf(@path[0][missingAttr.name])
 				missingAttr.opts.splice(firstNodeAttrIdx, 1)
-
 
 			# Randomly pick an option from the available list
 			missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
@@ -270,6 +293,18 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			)
 
 			return isVisited
+
+		updateChainTally: ( isKeepColor ) ->
+			if isKeepColor
+				@totalColorChain += 1
+			else
+				@totalShapeChain += 1
+
+		checkHasColorChain: ->
+			return @totalColorChain > 2
+
+		checkHasShapeChain: ->
+			return @totalShapeChain > 2
 
 		#	@fillGrid
 		# 		Fill in any empty spots on the grid with a random shape
