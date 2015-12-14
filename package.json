@@ -3,9 +3,8 @@
   "version": "1.2.0",
   "main": "app/app.module.coffee",
   "scripts": {
-    "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base www --host 0.0.0.0 --port 8000",
+    "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base www --host 0.0.0.0 --port 8001",
     "build": "NODE_ENV=production webpack -p --progress --colors",
-
     "start-app": "webpack --progress --colors --watch",
     "deploy-debug": "phonegap build android --debug && adb install platforms/android/build/outputs/apk/android-debug.apk",
     "deploy-app": "NODE_ENV=production phonegap build android --release"
@@ -14,6 +13,7 @@
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.10.0",
     "css-loader": "^0.22.0",
+    "extract-text-webpack-plugin": "^0.9.1",
     "file-loader": "^0.8.5",
     "html-loader": "^0.3.0",
     "html-webpack-plugin": "^1.7.0",

@@ -3,23 +3,29 @@
 var webpack = require('webpack');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var APP = __dirname + '/app';
 var DIST = __dirname + '/www';
 
 module.exports = {
 	context: APP,
-	entry: 'index.coffee',
+	entry: {
+		app: './'
+	},
 	output: {
 		path: DIST,
-		filename: 'bundle.js',
-		publicPath: ''
+        filename: "[name].js",
+        chunkFilename: "[id].js",
+		publicPath: '',
+		hash: true
 	},
 	module: {
 		loaders: [
 			{
 				test: /\.scss$/,
-				loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
+				loader: ExtractTextPlugin.extract("style-loader", "css-loader!resolve-url-loader!sass-loader?sourceMap")
+				// loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
 			},
 			{
 				test: /\.coffee$/,
@@ -53,10 +59,12 @@ module.exports = {
 		extensions: ["", ".webpack.js", ".web.js", ".js", ".coffee"]
 	},
 	plugins: [
+		new ExtractTextPlugin("[name].css", {
+            allChunks: true
+        }),
 		new HtmlWebpackPlugin({
-			title: 'Custom template',
 			template: APP + '/index.html', // Load a custom template
-			inject: 'body'
+			inject: true
 		}),
 		new webpack.HotModuleReplacementPlugin(),
 		new webpack.ProvidePlugin({
