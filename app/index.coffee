@@ -1,5 +1,7 @@
 'use strict'
 
+require('offline-plugin/runtime').install( null )
+
 # Vendors
 require 'jquery'
 require 'angular'
