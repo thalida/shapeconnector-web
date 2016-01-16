@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Users/thalidanoel/Repos/ShapeConnector/platforms/android/CordovaLib/res"/><source path="/Users/thalidanoel/Repos/ShapeConnector/platforms/android/CordovaLib/build/generated/res/rs/release"/><source path="/Users/thalidanoel/Repos/ShapeConnector/platforms/android/CordovaLib/build/generated/res/generated/release"/></dataSet><dataSet config="release"><source path="/Users/thalidanoel/Repos/ShapeConnector/platforms/android/CordovaLib/src/release/res"/></dataSet><mergedItems/></merger>
