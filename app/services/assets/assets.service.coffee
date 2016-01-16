@@ -1,11 +1,12 @@
 'use strict'
 
-require '../../assets/sound/add2.wav'
-require '../../assets/sound/undo3.wav'
-require '../../assets/sound/win1.wav'
-require '../../assets/sound/lose1.wav'
-require '../../assets/sound/bad2.wav'
-require '../../assets/sound/carefree.mp3'
+assetsSrc = {}
+assetsSrc.addedNode = require '../../assets/sound/add2.wav'
+assetsSrc.removedNode = require '../../assets/sound/undo3.wav'
+assetsSrc.gameWon = require '../../assets/sound/win1.wav'
+assetsSrc.gameLost = require '../../assets/sound/lose1.wav'
+assetsSrc.badMove = require '../../assets/sound/bad2.wav'
+assetsSrc.background = require '../../assets/sound/carefree.mp3'
 
 #===============================================================================
 #
@@ -27,14 +28,7 @@ assets = ($log, $q, gameSettings) ->
 		# @constructor: Setup the file paths & initalise vars
 		#-------------------------------------------------------------------
 		constructor: ->
-			@sounds =
-				addedNode: 'assets/sound/add2.wav'
-				removedNode: 'assets/sound/undo3.wav'
-				gameWon: 'assets/sound/win1.wav'
-				gameLost: 'assets/sound/lose1.wav'
-				badMove: 'assets/sound/bad2.wav'
-				background: 'assets/sound/carefree.mp3'
-
+			@sounds = assetsSrc
 			@assetsLoaded = 0
 			@totalSounds = Object.keys(@sounds).length
 			@totalAssests = parseInt(@totalSounds, 10)
@@ -63,7 +57,7 @@ assets = ($log, $q, gameSettings) ->
 			if @assetsLoaded == @totalAssests
 				deferred.resolve()
 			else
-				$.each(@sounds, (sound, src) =>
+				angular.forEach(@sounds, (src, sound) =>
 					@sounds[sound] = new Audio()
 					@sounds[sound].status = 'loading'
 					@sounds[sound].name = sound

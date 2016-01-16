@@ -43,6 +43,13 @@ utils = ( $log, BOARD, SHAPE ) ->
 			else
 				return null
 
+		offset: (element ) ->
+			de = document.documentElement;
+			box = element.getBoundingClientRect();
+			top = box.top + window.pageYOffset - de.clientTop;
+			left = box.left + window.pageXOffset - de.clientLeft;
+			return { top: top, left: left };
+
 	return utils
 
 

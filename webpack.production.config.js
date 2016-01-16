@@ -2,20 +2,33 @@
 
 var webpack = require('webpack');
 var path = require('path');
+var node_modules_dir = path.resolve(__dirname, 'node_modules');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var APP = __dirname + '/app';
 var DIST = __dirname + '/dist';
 
-module.exports = {
+var config = {
 	context: APP,
 	entry: {
-		app: './'
+		app: './',
+		vendors: [
+			'jquery',
+			'angular',
+			'angular-animate',
+			'angular-cookies',
+			'angular-resource',
+			'angular-sanitize',
+			'angular-touch',
+			'angular-ui-router',
+			'ngstorage'
+		]
 	},
 	output: {
 		path: DIST,
-        filename: "[name].js",
+        filename: "[name].[hash].js",
+        chunkFilename: "[id].js",
 		publicPath: ''
 	},
 	module: {
@@ -33,12 +46,8 @@ module.exports = {
 				loader: 'ngtemplate?relativeTo=' + APP + '/!html'
 			},
 			{
-				test: /\.(woff|woff2|ttf|eot|svg|png|gif|jpg|jpeg)(\?]?.*)?$/,
-				loader: 'file-loader?name=[path][name].[ext]'
-			},
-			{
-				test: /\.(wav|mp3)(\?]?.*)?$/,
-				loader: 'file-loader?name=[path][name].[ext]'
+				test: /\.(woff|woff2|ttf|eot|svg|png|gif|jpg|jpeg|wav|mp3)(\?]?.*)?$/,
+				loader: 'file-loader?name=[path][name].[hash].[ext]'
 			},
 			{
 				test: /\.json/,
@@ -51,12 +60,13 @@ module.exports = {
 		extensions: ["", ".webpack.js", ".web.js", ".js", ".coffee"]
 	},
 	plugins: [
-		new webpack.HotModuleReplacementPlugin(),
 		new HtmlWebpackPlugin({
 			template: APP + '/index.html',
 			inject: true
 		}),
-		new ExtractTextPlugin("[name].css", {
+		new webpack.optimize.DedupePlugin(),
+		new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.[hash].js'),
+		new ExtractTextPlugin("[name].[hash].css", {
             allChunks: true
         }),
 		new webpack.DefinePlugin({
@@ -66,3 +76,5 @@ module.exports = {
 		})
 	]
 };
+
+module.exports = config;

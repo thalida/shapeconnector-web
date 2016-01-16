@@ -4,7 +4,7 @@
   "main": "app/app.module.coffee",
   "scripts": {
     "start": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base dist --host 0.0.0.0 --port 8001",
-    "build": "NODE_ENV=production webpack -p --progress --colors"
+    "build": "NODE_ENV=production webpack -p --progress --colors --config webpack.production.config.js"
   },
   "devDependencies": {
     "coffee-loader": "^0.7.2",

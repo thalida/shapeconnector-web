@@ -13,6 +13,7 @@ $requires = [
 	'BOARD'
 	'SHAPE'
 
+	require '../utils'
 	require '../timer'
 	require '../gameBuilder'
 	require '../gameDrawer'
@@ -21,7 +22,7 @@ $requires = [
 	'assets'
 ]
 
-gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, GameDrawer, Watcher, gameUtils, assetsService ) ->
+gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderService, GameDrawer, Watcher, gameUtils, assetsService ) ->
 	new class GameManager
 		constructor: () ->
 
@@ -461,7 +462,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, Timer, GameBuilderService, Ga
 				touch = e
 
 			# Calculate the position of the touch on the canvas
-			canvasOffset = @canvas.game.$el.offset()
+			canvasOffset = utils.offset( @canvas.game.$el[0] )
 			nodePosition =
 				x: touch.pageX - canvasOffset.left
 				y: touch.pageY - canvasOffset.top

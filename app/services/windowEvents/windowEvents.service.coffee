@@ -78,7 +78,7 @@ windowEventsSerice = ( $log ) ->
 			return
 
 		runCallbacks: ( type, e ) ->
-			$.each(@eventCallbacks[type], (i, cb) ->
+			@eventCallbacks[type].forEach((cb) ->
 				cb?( e )
 			)
 			return

@@ -10,7 +10,8 @@
 angular.module('app').directive 'scModal', [
 	'$log'
 	'BOARD'
-	( $log, BOARD ) ->
+	require '../../services/utils'
+	( $log, BOARD, utils ) ->
 		templateUrl: 'components/modal/modal.html'
 		transclude: true
 		restrict: 'E'
@@ -96,7 +97,7 @@ angular.module('app').directive 'scModal', [
 					$content.css(
 						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
 						height: modalHeight
-						marginTop: $gameBoard.offset().top
+						marginTop: utils.offset( $gameBoard[0] ).top
 					)
 
 					return
