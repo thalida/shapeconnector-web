@@ -1,7 +1,7 @@
 'use strict'
 
-window.jQuery = window.$ = require 'jquery'
-window.angular = require 'angular'
+require 'jquery'
+require 'angular'
 
 # Styles
 require './app.scss'

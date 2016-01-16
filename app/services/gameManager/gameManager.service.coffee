@@ -462,7 +462,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				touch = e
 
 			# Calculate the position of the touch on the canvas
-			canvasOffset = utils.offset( @canvas.game.$el[0] )
+			canvasOffset = @canvas.game.$el.offset( )
 			nodePosition =
 				x: touch.pageX - canvasOffset.left
 				y: touch.pageY - canvasOffset.top

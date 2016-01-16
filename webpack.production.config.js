@@ -34,6 +34,14 @@ var config = {
 	module: {
 		loaders: [
 			{
+				test: require.resolve("jquery"),
+				loader: "expose?$!expose?jQuery"
+			},
+			{
+				test: require.resolve('angular'),
+				loader: "expose?angular"
+			},
+			{
 				test: /\.scss$/,
 				loader: ExtractTextPlugin.extract("style-loader", "css-loader!resolve-url-loader!sass-loader?sourceMap")
 			},

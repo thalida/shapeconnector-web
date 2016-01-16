@@ -97,7 +97,7 @@ angular.module('app').directive 'scModal', [
 					$content.css(
 						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
 						height: modalHeight
-						marginTop: utils.offset( $gameBoard[0] ).top
+						marginTop: $gameBoard.offset().top
 					)
 
 					return
