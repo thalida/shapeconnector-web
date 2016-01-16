@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 var APP = __dirname + '/app';
-var DIST = __dirname + '/www';
+var DIST = __dirname + '/dist';
 
 module.exports = {
 	context: APP,
@@ -25,20 +25,14 @@ module.exports = {
 			{
 				test: /\.scss$/,
 				loader: ExtractTextPlugin.extract("style-loader", "css-loader!resolve-url-loader!sass-loader?sourceMap")
-				// loaders: ['style', 'css', 'resolve-url', 'sass?sourceMap']
 			},
 			{
 				test: /\.coffee$/,
 				loader: "coffee-loader"
 			},
 			{
-				test: /\.(coffee\.md|litcoffee)$/,
-				loaders: ["coffee-loader?literate"]
-			},
-			{
 				test: /\.html$/,
 				loader: 'ngtemplate?relativeTo=' + APP + '/!html'
-				// loader: 'raw'
 			},
 			{
 				test: /\.(woff|woff2|ttf|eot|svg|png|gif|jpg|jpeg)(\?]?.*)?$/,
@@ -59,18 +53,14 @@ module.exports = {
 		extensions: ["", ".webpack.js", ".web.js", ".js", ".coffee"]
 	},
 	plugins: [
+		new webpack.HotModuleReplacementPlugin(),
+		new HtmlWebpackPlugin({
+			template: APP + '/index.html',
+			inject: true
+		}),
 		new ExtractTextPlugin("[name].css", {
             allChunks: true
         }),
-		new HtmlWebpackPlugin({
-			template: APP + '/index.html', // Load a custom template
-			inject: true
-		}),
-		new webpack.HotModuleReplacementPlugin(),
-		new webpack.ProvidePlugin({
-			jQuery: "jquery",
-			$: "jquery"
-		}),
 		new webpack.DefinePlugin({
 			MODE: {
 				production: process.env.NODE_ENV === 'production'

@@ -9,11 +9,13 @@
 $requires = [
 	'$log'
 	'LEVELS'
-	'SHAPES'
+	'SHAPE'
 	'BOARD'
+
+	require '../../services/utils'
 ]
 
-gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
+gameBuilderService = ( $log, LEVELS, SHAPE, BOARD, utils) ->
 	class GameBuilder
 		#	@constructor
 		# 		Sets up the options to be used for generating the game
@@ -24,8 +26,8 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 
 			# Join shape colors + types to one object
 			@shapes =
-				colors: SHAPES.COLORS
-				types: SHAPES.TYPES
+				colors: SHAPE.COLORS
+				types: SHAPE.TYPES
 
 			# Default to an easy 5 x 5 game board
 			@defaults =
@@ -91,7 +93,7 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				@pathSize = if @opts.step.random then @opts.step.pathSize else @opts.step.shapes.length - 1
 			else
 				range = LEVELS[ @opts.difficulty.toUpperCase() ]
-				@pathSize = getRandomInt( range.min, range.max )
+				@pathSize = utils.getRandomInt( range.min, range.max )
 
 
 			return @pathSize
@@ -158,10 +160,10 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				# Setup an array of nodes we have already checked
 				@visited = []
 
-				x = getRandomInt(0, @opts.dimensions - 1)
-				y = getRandomInt(0, @opts.dimensions - 1)
-				colorIndex = getRandomInt(0, colorOpts.length - 1)
-				typeIndex = getRandomInt(0, colorOpts.length - 1)
+				x = utils.getRandomInt(0, @opts.dimensions - 1)
+				y = utils.getRandomInt(0, @opts.dimensions - 1)
+				colorIndex = utils.getRandomInt(0, colorOpts.length - 1)
+				typeIndex = utils.getRandomInt(0, colorOpts.length - 1)
 
 				# Create the first node of the path and mark it as visited
 				node =
@@ -228,7 +230,7 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				return
 
 			# Randomly pick an allowed moves
-			randomIdx = getRandomInt(0, allowables.length - 1)
+			randomIdx = utils.getRandomInt(0, allowables.length - 1)
 			newCoords = allowables[ randomIdx ]
 
 			newNode = angular.copy(parentNode)
@@ -239,7 +241,7 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				y: newCoords[1]
 
 			# Decide if to keep the color or the shape type
-			isKeepColor = coinFlip()
+			isKeepColor = utils.coinFlip()
 			hasColorChain = @checkHasColorChain()
 			hasShapeChain = @checkHasShapeChain()
 
@@ -271,7 +273,7 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 				missingAttr.opts.splice(firstNodeAttrIdx, 1)
 
 			# Randomly pick an option from the available list
-			missingAttr.index = getRandomInt(0, missingAttr.opts.length - 1)
+			missingAttr.index = utils.getRandomInt(0, missingAttr.opts.length - 1)
 			newNode[missingAttr.name] = missingAttr.opts[ missingAttr.index ]
 
 			@visited.push( newNode )
@@ -313,8 +315,8 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			$.each(@board, (x, yArr) =>
 				$.each(yArr, (y, node) =>
 					if not node?
-						colorIndex = getRandomInt(0, @shapes.colors.length - 1)
-						typeIndex = getRandomInt(0, @shapes.types.length - 1)
+						colorIndex = utils.getRandomInt(0, @shapes.colors.length - 1)
+						typeIndex = utils.getRandomInt(0, @shapes.types.length - 1)
 						node =
 							color: @shapes.colors[ colorIndex ]
 							type: @shapes.types[ typeIndex ]
@@ -334,8 +336,8 @@ gameBuilderService = ( $log, LEVELS, SHAPES, BOARD) ->
 			emptyNodes = []
 
 			generateAttrs = ( takenCombos ) =>
-				colorIndex = getRandomInt(0, @shapes.colors.length - 1)
-				typeIndex = getRandomInt(0, @shapes.types.length - 1)
+				colorIndex = utils.getRandomInt(0, @shapes.colors.length - 1)
+				typeIndex = utils.getRandomInt(0, @shapes.types.length - 1)
 
 				type = @shapes.types[ typeIndex ]
 				color = @shapes.colors[ colorIndex ]

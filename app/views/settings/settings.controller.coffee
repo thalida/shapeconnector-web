@@ -11,13 +11,13 @@ $requires = [
 
 class SettingsController
 	constructor: ($log, $rootScope, $scope, $state, LEVELS, gameSettings) ->
-		@isProd = $rootScope.isProdSite
+		@isProd = MODE.production is true
 		@levels = angular.copy( LEVELS )
 		@levels.DEFAULT = null
 
 		@selectedLevel = gameSettings.getDifficulty()
 
-		if $rootScope.isProdSite
+		if MODE.production is true
 			@levels.DEV = null
 
 		@setDifficulity = ( level ) ->

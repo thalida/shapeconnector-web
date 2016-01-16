@@ -6,3 +6,4 @@ bower_components/
 dist/
 .DS_Store
 www/
+*.log

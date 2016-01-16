@@ -1,5 +1,8 @@
 'use strict'
 
+ngstorage = require 'ngstorage'
+config = require './app.constants.coffee'
+
 # Module
 window.app = angular.module('app', [
 	require 'angular-animate'
@@ -15,4 +18,22 @@ window.app = angular.module('app', [
 	'app.play'
 	'app.settings'
 	'app.tutorial'
+
 ])
+.constant( 'LEVELS', config.LEVELS )
+.constant( 'TUTORIAL_STEPS', config.TUTORIAL_STEPS )
+.constant( 'GAME_TYPES', config.GAME_TYPES )
+.constant( 'HEXCOLORS', config.HEXCOLORS )
+.constant( 'BOARD', config.BOARD )
+.constant( 'SHAPE', config.SHAPE )
+.config( require './app.route.coffee' )
+.run( require './app.run.coffee' )
+
+require './app.filters.coffee'
+
+# Views
+require './views/about'
+require './views/home'
+require './views/play'
+require './views/settings'
+require './views/tutorial'

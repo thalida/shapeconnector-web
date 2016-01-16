@@ -11,9 +11,11 @@ $requires = [
 	'$log'
 	'SHAPE'
 	'HEXCOLORS'
+
+	require '../../services/utils'
 ]
 
-canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
+canvasDrawService = ( $log, SHAPE, HEXCOLORS, utils ) ->
 	class CanvasDrawService
 		#	@constructor
 		#-------------------------------------------------------------------
@@ -219,7 +221,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 			@ctx.save()
 			@ctx.lineWidth = SHAPE.BORDER
 
-			rgb = hexToRgb(params.color)
+			rgb = utils.hexToRgb(params.color)
 
 			# Untouched: solid filled shape
 			if params.style is 'untouched'
@@ -289,7 +291,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 			)
 
 			# Get the rgba version of color and make opaque
-			rgb = hexToRgb(params.color)
+			rgb = utils.hexToRgb(params.color)
 
 			# Fill the glow
 			@ctx.save()
@@ -345,7 +347,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 			)
 
 			# Get the rgba version of color and make opaque
-			rgb = hexToRgb(params.color)
+			rgb = utils.hexToRgb(params.color)
 
 			# Fill the glow
 			@ctx.save()
@@ -401,7 +403,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 
 
 			makeShape = @[params.type]
-			rgb = hexToRgb(params.color)
+			rgb = utils.hexToRgb(params.color)
 
 			@ctx.save()
 
@@ -440,7 +442,7 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS ) ->
 		fadeOutAnimation: (params, progress) =>
 			@clear( params.clear )
 
-			rgb = hexToRgb(params.color)
+			rgb = utils.hexToRgb(params.color)
 			fade = (1 - progress) + 0.2
 
 			makeShape = @[params.type]
