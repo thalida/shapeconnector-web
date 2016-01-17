@@ -144,13 +144,15 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		#	@pauseGame
 		#-------------------------------------------------------------------
 		pauseGame: () ->
-			@timer?.pause()
+			if @hasTimer
+				@timer?.pause()
 			return
 
 		#	@resumeGame
 		#-------------------------------------------------------------------
 		resumeGame: () ->
-			@timer?.start() if not @gameOver
+			if @hasTimer
+				@timer?.start() if not @gameOver
 			return
 
 		#	@isGrandPaNode
