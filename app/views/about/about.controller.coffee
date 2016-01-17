@@ -3,7 +3,8 @@
 $requires = [ '$log' ]
 
 class AboutController
-	constructor: ( $log ) -> return
+	constructor: ( $log ) ->
+		@year = new Date().getFullYear()
 
 AboutController.$inject = $requires
 module.exports = AboutController
