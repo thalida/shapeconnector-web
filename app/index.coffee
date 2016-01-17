@@ -1,7 +1,11 @@
 'use strict'
 
+# Import manifest.json for use in index.html file
 manifestJSON = require('./manifest.json')
-require('offline-plugin/runtime').install( null )
+
+# ServiceWorker for Offline Support
+if MODE.production is true
+	require('offline-plugin/runtime').install( null )
 
 # Vendors
 require 'jquery'
