@@ -180,6 +180,9 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 				return
 			)
 
+		#	@goalWithoutMoves
+		# 		Render the nodes that must start and end the connections
+		#---------------------------------------------------------------
 		goalWithoutMoves: () ->
 			endNodes = @game.endNodes
 			isGameWon = @game.won
@@ -367,8 +370,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 
 			@canvas.lines.draw.clear( clearBoard )
 
-		#	@clearLinesBoard
-		# 		Clear the canvas used to draw the lines
+		#	@clearGoalBoard
+		# 		Clear the canvas used to draw the goal
 		#---------------------------------------------------------------
 		clearGoalBoard: ->
 			clearBoard =
@@ -379,8 +382,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 
 			@canvas.goal.draw.clear( clearBoard )
 
-		#	@clearLinesBoard
-		# 		Clear the canvas used to draw the lines
+		#	@clearGameBoard
+		# 		Clear the canvas used to draw the game
 		#---------------------------------------------------------------
 		clearGameBoard: ->
 			clearBoard =

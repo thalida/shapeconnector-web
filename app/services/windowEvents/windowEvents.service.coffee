@@ -5,6 +5,9 @@
 #	Window Events
 # 		Handles the callbacks for the window/tab foucs + blur events
 #
+# 		Based on:
+# 		http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
+#
 #-------------------------------------------------------------------------------
 
 $requires = [
@@ -13,6 +16,8 @@ $requires = [
 
 windowEventsSerice = ( $log ) ->
 	class WindowEvents
+		#	@constructor: Setup the default vars for the service
+		#-------------------------------------------------------------------
 		constructor: () ->
 			@eventCallbacks = {
 				focus: []
@@ -21,9 +26,12 @@ windowEventsSerice = ( $log ) ->
 
 			@setupEvent()
 
+		#	@setupEvent: Setup the event listeners on the window
+		#-------------------------------------------------------------------
 		setupEvent: () ->
 			hidden = 'hidden'
 
+			# Wrapper function for @onChange
 			onchange = ( e ) => @onChange(e, hidden)
 
 			# Standards
@@ -50,6 +58,8 @@ windowEventsSerice = ( $log ) ->
 				type = if document[hidden] then 'blur' else 'focus'
 				onchange({ type })
 
+		#	@onChange: After a window evetn detect the type and trigger the cb
+		#-------------------------------------------------------------------
 		onChange: ( e, hidden ) ->
 			v = 'visible'
 			h = 'hidden'
@@ -77,19 +87,26 @@ windowEventsSerice = ( $log ) ->
 			@runCallbacks( eventType, e )
 			return
 
+		#	@runCallbacks: Trigger all of the callbacks tied to the given event
+		#-------------------------------------------------------------------
 		runCallbacks: ( type, e ) ->
 			@eventCallbacks[type].forEach((cb) ->
 				cb?( e )
 			)
 			return
 
+		#	@onFocus: Setup an on focus callback
+		#-------------------------------------------------------------------
 		onFocus: ( callback ) =>
 			@eventCallbacks.focus.push( callback )
 			return
 
+		#	@onBlur: Setup an on blur callback
+		#-------------------------------------------------------------------
 		onBlur: ( callback ) =>
 			@eventCallbacks.blur.push( callback )
 			return
+
 
 windowEventsSerice.$inject = $requires
 module.exports = windowEventsSerice

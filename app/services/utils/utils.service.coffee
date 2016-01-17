@@ -15,16 +15,24 @@ $requires = [
 
 utils = ( $log, BOARD, SHAPE ) ->
 	utils =
+		#	@getRandomInt
+		# 		Get a random int between the given min + max
+		#-------------------------------------------------------------------
 		getRandomInt: (min, max) ->
 			return Math.floor(Math.random() * (max - min + 1)) + min
 
+		#	@coinFlip
+		# 		Randomly generate a true/false
+		#-------------------------------------------------------------------
 		coinFlip: () ->
 			isEven = utils.getRandomInt(1, 10) % 2 == 0
 
 			return true if isEven
 			return false if !isEven
 
-		# http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+		#	@hexToRgb
+		# 		http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+		#-------------------------------------------------------------------
 		hexToRgb: (hex) ->
 			# Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
 			shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i
@@ -42,13 +50,6 @@ utils = ( $log, BOARD, SHAPE ) ->
 				}
 			else
 				return null
-
-		offset: (element ) ->
-			de = document.documentElement;
-			box = element.getBoundingClientRect();
-			top = box.top + window.pageYOffset - de.clientTop;
-			left = box.left + window.pageXOffset - de.clientLeft;
-			return { top: top, left: left };
 
 	return utils
 

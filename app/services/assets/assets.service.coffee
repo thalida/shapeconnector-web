@@ -1,5 +1,15 @@
 'use strict'
 
+#===============================================================================
+#
+#	Assets Service
+# 		Loads the sound assets needed for the game
+#		http://blog.sklambert.com/html5-game-tutorial-game-ui-canvas-vs-dom/
+#
+#-------------------------------------------------------------------------------
+
+
+# Get a collection of the assets for the game
 assetsSrc = {}
 assetsSrc.addedNode = require '../../assets/sound/add2.wav'
 assetsSrc.removedNode = require '../../assets/sound/undo3.wav'
@@ -8,13 +18,6 @@ assetsSrc.gameLost = require '../../assets/sound/lose1.wav'
 assetsSrc.badMove = require '../../assets/sound/bad2.wav'
 assetsSrc.background = require '../../assets/sound/carefree.mp3'
 
-#===============================================================================
-#
-#	Assets Service
-# 		Loads the sound assets needed for the game
-#		http://blog.sklambert.com/html5-game-tutorial-game-ui-canvas-vs-dom/
-#
-#-------------------------------------------------------------------------------
 
 $requires = [
 	'$log'
@@ -26,7 +29,7 @@ $requires = [
 assets = ($log, $q, gameSettings) ->
 	new class AssetLoader
 		# @constructor: Setup the file paths & initalise vars
-		#-------------------------------------------------------------------
+		#-----------------------------------------------------------------------
 		constructor: ->
 			@sounds = assetsSrc
 			@assetsLoaded = 0
@@ -34,7 +37,7 @@ assets = ($log, $q, gameSettings) ->
 			@totalAssests = parseInt(@totalSounds, 10)
 
 		# @checkAudioState: Check if an audio asset has been downloaded
-		#-------------------------------------------------------------------
+		#-----------------------------------------------------------------------
 		checkAudioState: ( sound ) =>
 			thisSound = @sounds[sound]
 			return if !thisSound?
@@ -44,13 +47,13 @@ assets = ($log, $q, gameSettings) ->
 			return thisSound
 
 		# @downloadAll: Download the sound assets (only if we haven't already)
-		#-------------------------------------------------------------------
+		#-----------------------------------------------------------------------
 		downloadAll: ->
 			return @downloadSounds()
 
 		# @downlonadSounds: For each of the sound files convert to an
 		# Audio element and donwload
-		#-------------------------------------------------------------------
+		#-----------------------------------------------------------------------
 		downloadSounds: =>
 			deferred = $q.defer()
 
@@ -78,6 +81,8 @@ assets = ($log, $q, gameSettings) ->
 
 			return deferred.promise
 
+		# @playSound: Start playing the sound (if allowed)
+		#-----------------------------------------------------------------------
 		playSound: ( name ) =>
 			sound = @sounds[name]
 			return if !sound?
@@ -101,6 +106,8 @@ assets = ($log, $q, gameSettings) ->
 				sound.play?()
 			return
 
+		# @pauseSound: Pause the sound
+		#-----------------------------------------------------------------------
 		pauseSound: ( name ) =>
 			sound = @sounds[name]
 			return if !sound?

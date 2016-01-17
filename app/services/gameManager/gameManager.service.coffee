@@ -128,7 +128,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 
 			return this
 
-		#	@watch: Assign watchers to various aspects of the ggame
+		#	@watch: Assign watchers to various aspects of the game
 		#-------------------------------------------------------------------
 		watch: () ->
 			@watcher = new Watcher( @scope )
@@ -141,10 +141,14 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			@watcher.start(@namespace + '.removedNodes', @onRemovedNodesChange)
 			@watcher.start(@namespace + '.endGameAnimation', @onEndGameAnimationChange)
 
+		#	@pauseGame
+		#-------------------------------------------------------------------
 		pauseGame: () ->
 			@timer?.pause()
 			return
 
+		#	@resumeGame
+		#-------------------------------------------------------------------
 		resumeGame: () ->
 			@timer?.start() if not @gameOver
 			return
@@ -340,15 +344,6 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			if numMoves < 0 and not @won and not @lost
 				@disableNewConnections = true
 				@render.movesLeft(@won, 'red')
-
-			# if @mode is 'tutorial'
-			# 	if numMoves < 0 and not @won and not @lost
-			# 		@disableNewConnections = true
-			# 		@render.movesLeft(@won, 'red')
-			# else
-			# 	if numMoves <= 0 and not @won and not @lost
-			# 		@disableNewConnections = true
-			# 		@render.movesLeft(@won, 'red')
 
 		#	@endGameAnimation
 		#		Wait for the end game animations to finish
