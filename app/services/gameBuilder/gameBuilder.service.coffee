@@ -124,6 +124,9 @@ gameBuilderService = ( $log, LEVELS, SHAPE, BOARD, utils) ->
 
 			return @board
 
+		#	@generatePredefinedPath
+		# 		Create a path when given a set of shapes
+		#-------------------------------------------------------------------
 		generatePredefinedPath: ->
 			totalShapes = @opts.step.shapes.length
 			i = 0
@@ -144,8 +147,8 @@ gameBuilderService = ( $log, LEVELS, SHAPE, BOARD, utils) ->
 
 		#	@generatePath
 		# 		Figure out the path for the nodes in the game board
-		# 		We need to generate this path to guarantee that a player
-		# 		has a way to solve the game
+		# 		We need to generate this path to guarantee that a player has a
+		# 		way to solve the game
 		#-------------------------------------------------------------------
 		generatePath: ( parentNode ) ->
 			# Return if the path is the correct size
@@ -296,15 +299,24 @@ gameBuilderService = ( $log, LEVELS, SHAPE, BOARD, utils) ->
 
 			return isVisited
 
+		#	@updateChainTally
+		# 		Check how big of a color/shape chain we have
+		#-------------------------------------------------------------------
 		updateChainTally: ( isKeepColor ) ->
 			if isKeepColor
 				@totalColorChain += 1
 			else
 				@totalShapeChain += 1
 
+		#	@checkHasColorChain
+		# 		Check if we have more than two of the same colors in a row
+		#-------------------------------------------------------------------
 		checkHasColorChain: ->
 			return @totalColorChain > 2
 
+		#	@checkHasShapeChain
+		# 		Check if we have more than two shape types in the a row
+		#-------------------------------------------------------------------
 		checkHasShapeChain: ->
 			return @totalShapeChain > 2
 
@@ -328,7 +340,7 @@ gameBuilderService = ( $log, LEVELS, SHAPE, BOARD, utils) ->
 
 			return @board
 
-		#	@makeUnique
+		#	@fillGridAsUnique
 		# 		Loop over the gameboard and make all the nodes unique
 		#-----------------------------------------------------------------------
 		fillGridAsUnique: () ->
