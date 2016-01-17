@@ -1,5 +1,6 @@
 'use strict'
 
+manifestJSON = require('./manifest.json')
 require('offline-plugin/runtime').install( null )
 
 # Vendors

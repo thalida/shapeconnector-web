@@ -52,8 +52,8 @@ var common = {
 				loader: 'file-loader?name=[path][name].[hash].[ext]'
 			},
 			{
-				test: /\.json/,
-				loader: 'json'
+				test: /\.(json)(\?]?.*)?$/,
+				loader: 'file-loader?name=[path][name].[ext]'
 			}
 		]
 	},
@@ -87,7 +87,11 @@ var common = {
 };
 
 var productionConfig = {};
-var devConfig = {};
+var devConfig = {
+	plugins: [
+		new webpack.HotModuleReplacementPlugin()
+ 	]
+};
 
 var config = ( isProduction ) ? productionConfig : devConfig;
 module.exports = merge(common, config);
