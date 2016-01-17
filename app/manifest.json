@@ -1,0 +1,24 @@
+{
+  "short_name": "ShapeConnector",
+  "name": "ShapeConnector",
+  "description": "A simple open source puzzle game.",
+  "display": "standalone",
+  "theme_color": "#252658",
+  "background_color": "#366D8B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "launcher-icon-1x.png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "launcher-icon-2x.png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "launcher-icon-4x.png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "index.html?launcher=true"
+}

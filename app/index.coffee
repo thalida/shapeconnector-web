@@ -1,6 +1,9 @@
 'use strict'
 
-require('offline-plugin/runtime').install( null )
+manifestJSON = require('./manifest.json')
+
+if MODE.production is true
+	require('offline-plugin/runtime').install( null )
 
 # Vendors
 require 'jquery'

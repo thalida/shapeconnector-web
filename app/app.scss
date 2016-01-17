@@ -5,7 +5,10 @@
 @import "./assets/styles/colors";
 @import "./assets/styles/animations";
 
-html { box-sizing: border-box; }
+html {
+	box-sizing: border-box;
+	-webkit-text-size-adjust: 100%;
+}
 *, *:before, *:after { box-sizing: inherit; }
 
 body {
