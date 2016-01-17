@@ -1,5 +1,7 @@
 'use strict'
 
+require('./favicon.ico')
+
 # Import manifest.json for use in index.html file
 manifestJSON = require('./manifest.json')
 

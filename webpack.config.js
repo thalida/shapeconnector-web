@@ -52,7 +52,7 @@ var common = {
 				loader: 'file-loader?name=[path][name].[hash].[ext]'
 			},
 			{
-				test: /\.(json)(\?]?.*)?$/,
+				test: /\.(json|ico)(\?]?.*)?$/,
 				loader: 'file-loader?name=[path][name].[ext]'
 			}
 		]
@@ -79,7 +79,8 @@ var common = {
 			scope: '/',
 			updateStrategy: 'hash',
 			ServiceWorker: {
-				output: 'sw.js'
+				output: 'sw.js',
+				entry: APP + '/serviceWorker.coffee'
 			},
 			AppCache: null
 		})
