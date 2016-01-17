@@ -20,11 +20,48 @@ Checkout the [open issues](https://github.com/thalida/ShapeConnector/issues) for
 
 
 ## Contributing
+### Clone ShapeConnector
 
+Clone the ShapeConnector repository using [git][git]:
+
+```
+git clone git@github.com:thalida/ShapeConnector.git
+cd ShapeConnector
+```
+
+### Install Dependencies
+
+We depend on `npm`, the [node package manager](https://www.npmjs.org/) for *all* of the tools and libraries we need to develop the app.
+
+```
+npm install
+```
+### Running the game
+
+#### In Development
+This repo comes with the webpack build server already configured, start the server with:
+
+```
+npm run dev
+```
+
+Browse to the app at `http://localhost:8080`.
+
+#### In Production
+When running in the production, your website needs to have `https://` suppport, as ServiceWorks **require** and SSL cert.
+```
+npm run build
+```
 
 
 ## License
-
+GNU General Public License v3.0
 
 
 ## Resources
+**Music:**
+"Carefree" by Kevin MacLeod [incompetech.com](http://incompetech.com)
+Licensed under Creative Commons: By Attribution 3.0
+
+**Sounds:** 
+Generated using [as3sfxr](http://www.superflashbros.net/as3sfxr/)
