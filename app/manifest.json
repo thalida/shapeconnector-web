@@ -8,16 +8,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "launcher-icon-1x.png",
-      "sizes": "48x48"
-    },
-    {
-      "src": "launcher-icon-2x.png",
-      "sizes": "96x96"
-    },
-    {
-      "src": "launcher-icon-4x.png",
-      "sizes": "192x192"
+      "src": "/assets/images/android-192-xxxhpdi.png"
     }
   ],
   "start_url": "index.html?launcher=true"
