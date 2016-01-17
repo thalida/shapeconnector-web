@@ -86,26 +86,7 @@ var common = {
 	]
 };
 
-var productionConfig = {
-	entry: {
-		vendors: [
-			'jquery',
-			'angular',
-			'angular-animate',
-			'angular-cookies',
-			'angular-resource',
-			'angular-sanitize',
-			'angular-touch',
-			'angular-ui-router',
-			'ngstorage'
-		]
-	},
-	plugins: [
-		new webpack.optimize.DedupePlugin(),
-		new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.[hash].js')
-	]
-};
-
+var productionConfig = {};
 var devConfig = {};
 
 var config = ( isProduction ) ? productionConfig : devConfig;
