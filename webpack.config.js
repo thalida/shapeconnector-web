@@ -84,8 +84,7 @@ var productionConfig = {
 			scope: '/',
 			updateStrategy: 'hash',
 			ServiceWorker: {
-				output: 'sw.js',
-				entry: APP + '/serviceWorker.coffee'
+				output: 'sw.js'
 			},
 			AppCache: null
 		})

@@ -1,9 +1,10 @@
 'use strict'
 
-require('./favicon.ico')
+require './favicon.ico'
+require './assets/images/android-192-xxxhpdi.png'
 
 # Import manifest.json for use in index.html file
-manifestJSON = require('./manifest.json')
+# manifestJSON = require('./manifest.json')
 
 # ServiceWorker for Offline Support
 if MODE.production is true
