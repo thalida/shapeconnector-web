@@ -34,7 +34,7 @@
 	</div>
 </div>
 
-<sc:modal name="pauseModal" show="showPauseModal" style="blue">
+<sc:modal name="pauseModal" show="showPauseModal" style="blue" position="center">
 	<div class="game-pause_modal game-modal">
 		<div class="game-pause_modal-controls">
 			<div sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn small-circle restart-icon"></div>
@@ -50,7 +50,7 @@
 	</div>
 </sc:modal>
 
-<sc:modal name="winModal" show="showWinModal" style="teal">
+<sc:modal name="winModal" show="showWinModal" style="teal" position="center">
 	<div class="game-win_modal game-modal">
 		<span class="modal-content-header">Awesome!</span>
 		<span class="modal-content-subtext">
@@ -72,7 +72,7 @@
 	</div>
 </sc:modal>
 
-<sc:modal name="loseModal" show="showLoseModal" style="red">
+<sc:modal name="loseModal" show="showLoseModal" style="red" position="center">
 	<div class="game-lose_modal game-modal">
 		<span class="modal-content-header">Time&rsquo;s up!</span>
 		<div class="game-modal-main_btns">

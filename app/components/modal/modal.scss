@@ -118,13 +118,17 @@
 
 		.btn {
 			height: 40px;
-			width: 120px;
+			width: 150px;
 			font-size: 14px;
 			padding-top: 12px;
 			padding-bottom: 12px;
 
 			&.addon-arrow:after {
 				margin-top: 3px;
+			}
+
+			&.type-text {
+				width: 100px;
 			}
 		}
 	}
