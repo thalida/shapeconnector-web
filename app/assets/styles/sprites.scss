@@ -2,7 +2,7 @@ $icon-spritePath: 'assets/images/icon-sprite';
 $icon-spriteURL: $icon-spritePath + '.png';
 $icon-spritex2URL: $icon-spritePath + '@2x.png';
 $bgiSizeW: 287px;
-$bgiSizeH: 153px;
+$bgiSizeH: 192px;
 $logo-large: 137px 68px $icon-spriteURL -22px -21px $icon-spritex2URL;
 $logo-small: 46px 24px $icon-spriteURL -22px -107px $icon-spritex2URL;
 $arrow-right-black: 8px 11.993000000000002px $icon-spriteURL -249.50448549730794px -112.19922859705821px $icon-spritex2URL;
@@ -13,6 +13,8 @@ $restart-black: 18px 18px $icon-spriteURL -151px -110px $icon-spritex2URL;
 $skip-black: 18.010000228881836px 16.62168683318977px $icon-spriteURL -183px -110px $icon-spritex2URL;
 $restart-white: 18px 18px $icon-spriteURL -81px -110px $icon-spritex2URL;
 $skip-white: 18.010000228881836px 16.62168683318977px $icon-spriteURL -113px -110px $icon-spritex2URL;
+$link-black: 16.000978760496714px 16.001104038009142px $icon-spriteURL -50.99924999999985px -150.99802100879566px $icon-spritex2URL;
+$link-white: 16.000978760496714px 16.001104038009142px $icon-spriteURL -23.999249999999847px -150.99802100879566px $icon-spritex2URL;
 
 @mixin cssSprite( $spriteVals ) {
 	$spriteUrl1x: nth( $spriteVals, 3 );
