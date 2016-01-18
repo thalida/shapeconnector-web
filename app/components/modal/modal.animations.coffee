@@ -2,7 +2,8 @@
 
 angular.module('app').animation '.modal', [
 	'$log'
-	($log) ->
+	'$rootScope'
+	($log, $rootScope) ->
 		visiblityClass = 'js-modal-animate-visibility'
 		minimizeClass = 'js-modal-animate-minimize'
 
@@ -36,6 +37,7 @@ angular.module('app').animation '.modal', [
 						$content.css(marginTop: marginTop, width: '100%')
 						$el.addClass('minimized')
 						setOverflow('auto')
+						$rootScope.$broadcast('modal-animations-done', 'modal-minimized')
 						done()
 				}
 			)
@@ -72,6 +74,7 @@ angular.module('app').animation '.modal', [
 						$el.show()
 						$content.css(top: '0%')
 						window.scrollTo(0, 0)
+						$rootScope.$broadcast('modal-animations-done', 'modal-shown')
 						done()
 				}
 			)
@@ -101,6 +104,7 @@ angular.module('app').animation '.modal', [
 						$el.hide()
 						$content.css(top: '100%')
 						setOverflow('auto')
+						$rootScope.$broadcast('modal-animations-done', 'modal-hidden')
 						done()
 
 				}

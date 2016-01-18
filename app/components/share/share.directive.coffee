@@ -7,7 +7,7 @@
 #-------------------------------------------------------------------------------
 
 angular.module('app').directive 'share', [
-	'$log',
+	'$log'
 	require '../../services/gameManager'
 	require '../../services/gameSettings'
 	require '../../services/gameUtils'
@@ -57,6 +57,11 @@ angular.module('app').directive 'share', [
 
 			return
 		]
-		link: ($scope, el, attrs) -> return;
+		link: ($scope, el, attrs) ->
+			$scope.$on('modal-animations-done', ( e, animationType ) ->
+				if animationType is 'modal-shown'
+					$scope.share.selectAll()
+			)
 
+			return
 ]
