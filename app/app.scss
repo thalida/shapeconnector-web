@@ -69,6 +69,9 @@ body {
 	text-transform: uppercase;
 	.light {
 		font-weight: 300;
+		&.faded {
+			opacity: 0.8;
+		}
 	}
 	&.small {
 		font-size: 14px;
