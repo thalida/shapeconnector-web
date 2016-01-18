@@ -51,7 +51,6 @@ angular.module('app').directive 'share', [
 
 			this.selectAll = () =>
 				$input = $el.find('.share-modal-input')
-				$input.focus()
 				$input[0].setSelectionRange(0, @gameLink.length)
 				return
 
