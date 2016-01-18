@@ -57,7 +57,7 @@ assets = ($log, $q, gameSettings) ->
 		downloadSounds: =>
 			deferred = $q.defer()
 
-			if @assetsLoaded == @totalAssests
+			if @assetsLoaded >= @totalAssests
 				deferred.resolve()
 			else
 				angular.forEach(@sounds, (src, sound) =>
@@ -71,7 +71,7 @@ assets = ($log, $q, gameSettings) ->
 							if sound?.status is 'loaded'
 								@assetsLoaded += 1
 
-							if @assetsLoaded == @totalAssests
+							if @assetsLoaded >= @totalAssests
 								deferred.resolve()
 						)
 
@@ -80,7 +80,7 @@ assets = ($log, $q, gameSettings) ->
 						@sounds[sound].load()
 					else
 						@assetsLoaded += 1
-						if @assetsLoaded == @totalAssests
+						if @assetsLoaded >= @totalAssests
 							deferred.resolve()
 				)
 
