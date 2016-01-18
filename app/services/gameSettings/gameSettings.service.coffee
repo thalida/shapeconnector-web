@@ -41,7 +41,7 @@ gameSettingsService = ( $log, $localStorage, GAME_TYPES, LEVELS ) ->
 		#-------------------------------------------------------------------
 		setDifficulty: ( level ) ->
 			# Make sure that it's a valid difficulty
-			if LEVELS[ level.toUpperCase() ]?
+			if LEVELS[ level?.toUpperCase() ]?
 				@difficulty = level.toLowerCase()
 
 			$localStorage.difficulty = @difficulty

@@ -2,10 +2,7 @@
 
 route = ($stateProvider) ->
 	$stateProvider.state('play',
-		url: '/play'
-		params: {
-			mode: {}
-		}
+		url: '/play/:game?mode&difficulty'
 		templateUrl: 'views/play/play.html'
 		controller: 'PlayController'
 		controllerAs: 'play'
