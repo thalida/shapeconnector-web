@@ -12,7 +12,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	z-index: 2;
+	z-index: 3;
 	overflow: auto;
 
 	&.minimized {
@@ -33,6 +33,10 @@
 
 		&.blue {
 			background-image: $gradient-blue-4-blue-5;
+		}
+
+		&.white {
+			background-color: white;
 		}
 	}
 
@@ -74,6 +78,11 @@
 			background-image: $gradient-blue-4-blue-5;
 		}
 
+		.modal.white & {
+			background-color: white;
+			color: black;
+		}
+
 		.modal.minimized & {
 			display: none;
 		}
@@ -86,6 +95,10 @@
 			text-transform: uppercase;
 			margin-bottom: 5px;
 			color: white;
+
+			.modal.white & {
+				color: black;
+			}
 		}
 
 		&-text {
@@ -93,6 +106,10 @@
 			font-size: 18px;
 			line-height: 1.3;
 			color: white;
+
+			.modal.white & {
+				color: black;
+			}
 		}
 
 		&-subtext {
@@ -101,6 +118,10 @@
 			font-weight: 300;
 			line-height: 1.3;
 			color: white;
+
+			.modal.white & {
+				color: black;
+			}
 		}
 	}
 
