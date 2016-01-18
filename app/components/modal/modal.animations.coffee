@@ -102,6 +102,7 @@ angular.module('app').animation '.modal', [
 						$content.css(top: '100%')
 						setOverflow('auto')
 						done()
+
 				}
 			)
 
