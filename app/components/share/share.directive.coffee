@@ -58,8 +58,8 @@ angular.module('app').directive 'share', [
 			return
 		]
 		link: ($scope, el, attrs) ->
-			$scope.$on('modal-animations-done', ( e, animationType ) ->
-				if animationType is 'modal-shown'
+			$scope.$on('modal-animations-done', ( e, args ) ->
+				if args.type is 'modal-shown' and args.$el.data('name') is 'shareModal'
 					$scope.share.selectAll()
 			)
 

@@ -37,7 +37,7 @@ angular.module('app').animation '.modal', [
 						$content.css(marginTop: marginTop, width: '100%')
 						$el.addClass('minimized')
 						setOverflow('auto')
-						$rootScope.$broadcast('modal-animations-done', 'modal-minimized')
+						$rootScope.$broadcast('modal-animations-done', {type: 'modal-minimized', $el: $el})
 						done()
 				}
 			)
@@ -74,7 +74,7 @@ angular.module('app').animation '.modal', [
 						$el.show()
 						$content.css(top: '0%')
 						window.scrollTo(0, 0)
-						$rootScope.$broadcast('modal-animations-done', 'modal-shown')
+						$rootScope.$broadcast('modal-animations-done', {type: 'modal-shown', $el: $el})
 						done()
 				}
 			)
@@ -104,7 +104,7 @@ angular.module('app').animation '.modal', [
 						$el.hide()
 						$content.css(top: '100%')
 						setOverflow('auto')
-						$rootScope.$broadcast('modal-animations-done', 'modal-hidden')
+						$rootScope.$broadcast('modal-animations-done', {type: 'modal-hidden', $el: $el})
 						done()
 
 				}
