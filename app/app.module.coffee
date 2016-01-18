@@ -20,6 +20,7 @@ window.app = angular.module('app', [
 	'app.tutorial'
 
 ])
+.constant( 'ALPHABET', config.ALPHABET )
 .constant( 'LEVELS', config.LEVELS )
 .constant( 'TUTORIAL_STEPS', config.TUTORIAL_STEPS )
 .constant( 'GAME_TYPES', config.GAME_TYPES )

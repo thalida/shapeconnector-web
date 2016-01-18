@@ -11,10 +11,112 @@ $requires = [
 	'$log'
 	'BOARD'
 	'SHAPE'
+	'ALPHABET'
 ]
 
-gameUtils = ( $log, BOARD, SHAPE ) ->
+gameUtils = ( $log, BOARD, SHAPE, ALPHABET ) ->
 	utils =
+		#	@convertGameToStr
+		# 		Convert the game data to a string
+		#-------------------------------------------------------------------
+		convertGameToStr: ( gameboard ) ->
+			goalStr = gameboard.endNodes.reduce((prev, curr, idx, array) ->
+  				prevNodeStr = utils.convertNodeToStr( prev, true )
+  				currNodeStr = utils.convertNodeToStr( curr, true )
+
+  				return prevNodeStr + ':' + currNodeStr
+			)
+
+			boardArr = []
+			gameboard.board.forEach(( row, index ) ->
+				row.forEach(( node ) ->
+					boardArr.push( utils.convertNodeToStr(node) )
+				)
+			)
+
+			gameStr = goalStr + ':' + gameboard.maxMoves + ':' + boardArr.join('')
+
+			console.log( gameStr, gameboard )
+
+			return window.btoa( gameStr );
+
+		#	@convertStrToGame
+		# 		Convert string to game data
+		#-------------------------------------------------------------------
+		convertStrToGame: ( encodedStr ) ->
+			gameStr = window.atob( encodedStr )
+
+			game =
+				maxMoves: 0,
+				endNodes: [],
+				board: []
+
+			[startNodeStr, endNodeStr, movesStr, boardStr] = gameStr.split(':')
+
+			game.maxMoves = parseInt( movesStr, 10 )
+
+			game.endNodes.push( utils.convertStrToNode( startNodeStr ) )
+			game.endNodes.push( utils.convertStrToNode( endNodeStr ) )
+
+			flatBoardArr = boardStr.split('')
+			gridSize = Math.sqrt( flatBoardArr.length )
+
+			flatBoardArr.forEach(( nodeStr, i ) ->
+				x =  Math.floor(i / gridSize)
+				y = (i % gridSize)
+
+				if !game.board[x]?
+					game.board[x] = []
+
+				game.board[x][y] = utils.convertStrToNode( nodeStr )
+				game.board[x][y].coords = {x, y}
+			)
+
+			# console.log( gameStr, game )
+
+			return game
+
+		#	@convertNodeToStr
+		#-------------------------------------------------------------------
+		convertNodeToStr: ( node, includeCoords = false ) ->
+			colorIdx = SHAPE.COLORS.indexOf(node.color)
+			typeIdx = SHAPE.TYPES.indexOf(node.type)
+
+			alphaIdx = (colorIdx * SHAPE.COLORS.length) + typeIdx
+			nodeStr = ALPHABET[alphaIdx]
+
+			if includeCoords
+				coords = node.coords.x + '' + node.coords.y
+				nodeStr += coords
+
+			return nodeStr
+
+		#	@convertStrToNode
+		#-------------------------------------------------------------------
+		convertStrToNode: ( nodeStr ) ->
+			node =
+				color: ''
+				type: ''
+				coords: {}
+
+			[nodeAlpha, nodeX, nodeY] = nodeStr.split('')
+
+			alphaIdx = ALPHABET.indexOf(nodeAlpha)
+			totalColors = SHAPE.COLORS.length
+
+			nodeColorIdx = Math.floor(alphaIdx / totalColors)
+			nodeTypeIdx = (alphaIdx % totalColors)
+
+			node.color = SHAPE.COLORS[nodeColorIdx]
+			node.type = SHAPE.TYPES[nodeTypeIdx]
+
+			if nodeX? and nodeY?
+				node.coords =
+					x: parseInt(nodeX, 10)
+					y: parseInt(nodeY, 10)
+
+			return node
+
 		#	@calcBoardX
 		# 		With a given canvas X coord get the X column of the board
 		#-------------------------------------------------------------------

@@ -6,6 +6,7 @@
 #
 #-------------------------------------------------------------------------------
 
+alphabet = 'abcdefghijklmnopqrstuvwxyz'
 
 shapeConsts = {
 	COLORS: [
@@ -44,6 +45,7 @@ boardConsts.DIMENSIONS = {
 
 
 module.exports = {
+	ALPHABET: alphabet,
 	BOARD: boardConsts,
 	SHAPE: shapeConsts,
 	LEVELS: {
