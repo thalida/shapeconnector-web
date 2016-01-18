@@ -13,11 +13,19 @@
 		&:hover {
 			opacity: 0.8;
 		}
+
+		@media (max-height: 510px) {
+			margin-top: 0px;
+		}
 	}
 
 	&-modal {
 		text-align: center;
-		padding: 30px;
+		padding: 15px 30px;
+
+		.modal-content.size-large & {
+			padding: 30px;
+		}
 
 		&-input {
 		    height: 40px;
@@ -32,7 +40,11 @@
 		&-actions {
 			border-top: 1px solid rgba(black, 0.1);
 			text-align: center;
-			padding: 30px 0;
+			padding: 15px 0;
+
+			.modal-content.size-large & {
+				padding: 30px;
+			}
 
 			.btn {
 				margin: 0 auto;

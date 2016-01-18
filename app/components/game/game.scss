@@ -14,6 +14,8 @@
 
 	margin: 0 auto;
 	position: relative;
+   	-webkit-transition: all 400ms;
+	transition: all 400ms;
 
 	// Make all canvas elements seem interactable
 	canvas {

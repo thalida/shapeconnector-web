@@ -66,6 +66,9 @@
 		color: black;
 		background-color: #ccc;
 
+   		-webkit-transition: all 400ms;
+		transition: all 400ms;
+
 		.modal.teal & {
 			background-image: $gradient-blue-6-blue-7;
 		}

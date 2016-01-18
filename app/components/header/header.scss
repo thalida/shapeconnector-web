@@ -19,4 +19,11 @@
 	.logomark {
 		margin-top: 5px;
 	}
+
+
+	@media (max-height: 510px) {
+		.logomark {
+			display: none;
+		}
+	}
 }
