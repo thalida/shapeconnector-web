@@ -36,7 +36,7 @@ gameUtils = ( $log, BOARD, SHAPE, ALPHABET ) ->
 
 			gameStr = goalStr + ':' + gameboard.maxMoves + ':' + boardArr.join('')
 
-			console.log( gameStr, gameboard )
+			# console.log( gameStr, gameboard )
 
 			return window.btoa( gameStr );
 
