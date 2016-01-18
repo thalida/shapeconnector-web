@@ -8,11 +8,19 @@ angular.module('app').directive 'appHeader', [
 		restrict: 'E'
 		scope:
 			onClick: '&?'
+			onShareEvent: '&?'
+			shareOpts: '=?'
+			showShare: '@?'
 		link: ($scope, el, attrs) ->
+			$scope.showShareLink = $scope.showShare == 'true'
+
 			$scope.onLogoClick = ( e ) ->
 				if $scope.onClick?
 					$scope.onClick({params: e})
 				else
 					$state.go('home')
 				return
+
+			$scope.shareEvent = ( params ) ->
+				$scope.onShareEvent({ params })
 ]
