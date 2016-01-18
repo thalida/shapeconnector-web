@@ -23,6 +23,7 @@ angular.module('app').directive 'scGame', [
 			gameType: '@?type'
 			difficulty: '@?'
 			attempts: '=?'
+			modalShown: '=?'
 			triggerGamePause: '=?pauseGame'
 			onNewGame: '&?'
 			onResetGame: '&?'
@@ -168,15 +169,19 @@ angular.module('app').directive 'scGame', [
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: game.cacheGameBoard)
 				quitGame: -> $scope.onQuitGame?(params: true)
-				pauseGame: ->
+				pauseGame: () ->
 					if game.gameOver is false
 						game.pauseGame()
-						$scope.showPauseModal = true
-				resumeGame: ->
-					$scope.$apply( =>
-						game.resumeGame()
-						$scope.showPauseModal = false
-					)
+						if $scope.modalShown isnt 'share'
+							$scope.showPauseModal = true
+							$scope.modalShown = 'pause'
+				resumeGame: (useApply = true) ->
+					game.resumeGame()
+					$scope.triggerGamePause = false
+					$scope.showPauseModal = false
+					$scope.modalShown = ''
+
+					$scope.$apply() if useApply
 
 
 
@@ -197,21 +202,26 @@ angular.module('app').directive 'scGame', [
 						() -> return game.won
 						( hasWon ) ->
 							$scope.showWinModal = (hasWon is true)
+							$scope.modalShown = 'win'
 					)
 
 					watcher.start(
 						() -> return game.lost
 						( hasLost ) ->
 							$scope.showLoseModal = (hasLost is true)
+							$scope.modalShown = 'lose'
 					)
 
-			stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame ) ->
+			stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame, lastState ) ->
 				if $scope.triggerGamePause is true
-					$scope.triggerGamePause = false
 					if game?.gameOver is true
 						$scope.actions.quitGame()
 					else
 						$scope.actions.pauseGame()
+
+				if lastState is true and pauseGame is false and $scope.modalShown is 'share'
+					$scope.modalShown = ''
+					$scope.actions.resumeGame( false )
 
 			)
 
