@@ -91,6 +91,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		setBoard: ( game ) ->
 			# Generate the game board arrays
 			gameBuilder = new GameBuilderService(mode: @mode, step: @step, difficulty: @difficulty)
+
 			if game?
 				gameBoard = angular.copy( game )
 			else
@@ -102,6 +103,8 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			@endNodes = gameBoard.endNodes
 			@maxMoves = gameBoard.maxMoves
 			@movesLeft = @maxMoves - 1
+
+			return
 
 		#	@start: Namespaced quick actions for selectedNodes
 		#-------------------------------------------------------------------

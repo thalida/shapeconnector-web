@@ -1,7 +1,5 @@
 'use strict'
 
-require './'
-
 #===============================================================================
 #
 #	ShapeConnector (SC) Canvas Directive
@@ -30,7 +28,6 @@ angular.module('app').directive 'scCanvas', [
 			canvasEl = $canvas[0]
 			ctx = null
 			canvas = null
-
 
 			# render: Sets the canvans dimenions, sets up the events, and creates
 			# the new Draw classes

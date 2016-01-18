@@ -61,22 +61,27 @@ assets = ($log, $q, gameSettings) ->
 				deferred.resolve()
 			else
 				angular.forEach(@sounds, (src, sound) =>
-					@sounds[sound] = new Audio()
-					@sounds[sound].status = 'loading'
-					@sounds[sound].name = sound
+					if typeof src is 'string'
+						@sounds[sound] = new Audio()
+						@sounds[sound].status = 'loading'
+						@sounds[sound].name = sound
 
-					@sounds[sound].addEventListener('canplay', =>
-						sound = @checkAudioState( sound )
-						if sound?.status is 'loaded'
-							@assetsLoaded += 1
+						@sounds[sound].addEventListener('canplay', =>
+							sound = @checkAudioState( sound )
+							if sound?.status is 'loaded'
+								@assetsLoaded += 1
 
+							if @assetsLoaded == @totalAssests
+								deferred.resolve()
+						)
+
+						@sounds[sound].src = src
+						@sounds[sound].preload = 'auto'
+						@sounds[sound].load()
+					else
+						@assetsLoaded += 1
 						if @assetsLoaded == @totalAssests
 							deferred.resolve()
-					)
-
-					@sounds[sound].src = src
-					@sounds[sound].preload = 'auto'
-					@sounds[sound].load()
 				)
 
 			return deferred.promise

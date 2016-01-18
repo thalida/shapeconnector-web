@@ -36,7 +36,12 @@ run = ($rootScope, $location, $timeout, $state, WindowEvents, assets) ->
 									clearTimeout
 
 	$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
-		if (toState.name is 'play' || toState.name is 'tutorial') and fromState.name.length is 0
+		blacklist = [
+			# 'play'
+			'tutorial'
+		]
+
+		if blacklist.indexOf(toState.name) >= 0 and fromState.name.length is 0
 			e.preventDefault()
 			$state.go('home')
 	)
