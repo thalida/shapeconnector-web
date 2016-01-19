@@ -1,9 +1,14 @@
+$share-img-url: 'assets/images/share.png';
+$win-img-url: 'assets/images/win.png';
+$gameplay-gif-url: 'assets/images/gameplay-mini.gif';
+
 $icon-spritePath: 'assets/images/icon-sprite';
 $icon-spriteURL: $icon-spritePath + '.png';
 $icon-spritex2URL: $icon-spritePath + '@2x.png';
 $bgiSizeW: 287px;
 $bgiSizeH: 192px;
 $logo-large: 137px 68px $icon-spriteURL -22px -21px $icon-spritex2URL;
+$logo-medium: 91px 45px $icon-spriteURL -80px -141px $icon-spritex2URL;
 $logo-small: 46px 24px $icon-spriteURL -22px -107px $icon-spritex2URL;
 $arrow-right-black: 8px 11.993000000000002px $icon-spriteURL -249.50448549730794px -112.19922859705821px $icon-spritex2URL;
 $arrow-right-white: 8px 11.993000000000002px $icon-spriteURL -219.50448549730794px -112.19922859705821px $icon-spritex2URL;

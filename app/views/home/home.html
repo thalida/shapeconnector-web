@@ -1,4 +1,6 @@
-<div class="home-view">
+<div class="home-view" ng-class="[
+	{'is-onboarding': home.showTutorial === true}
+]">
 	<div class="home-view-content">
 		<div class="logo-container">
 			<span class="logo medium" ng-if="home.showTutorial === true"></span>
@@ -6,37 +8,41 @@
 			<span class="logomark"><span class="light">Shape</span>Connector</span>
 		</div>
 
-		<slideshow ng-if="home.showTutorial === true">
-			<slide>
-				<!-- <div class="slide-header">Connect Shapes</div> -->
-				<div class="image gameplay" title="ShapeConnector game play demo"></div>
-				<div class="slide-subheader">Connect similar shapes to solve the puzzle&hellip;</div>
-			</slide>
-			<slide>
-				<!-- <div class="slide-header">Never Give Up</div> -->
-				<div class="image win" title="Game won popup"></div>
-				<div class="slide-subheader">Keep trying until you win!</div>
-			</slide>
-			<slide>
-				<!-- <div class="slide-header">Share Gameboards</div> -->
-				<div class="image share" title="Share ShapeConnector game boards!"></div>
-				<div class="slide-subheader">Share & save the board you&rsquo;re playing</div>
-			</slide>
-		</slideshow>
+		<div ng-if="::home.showTutorial === true">
+			<slideshow>
+				<slide>
+					<!-- <div class="slide-header">Connect Shapes</div> -->
+					<div class="image gameplay" title="ShapeConnector game play demo"></div>
+					<div class="slide-subheader">Connect similar shapes to solve the puzzle&hellip;</div>
+				</slide>
+				<slide>
+					<!-- <div class="slide-header">Never Give Up</div> -->
+					<div class="image win" title="Game won popup"></div>
+					<div class="slide-subheader">Keep trying until you win!</div>
+				</slide>
+				<slide>
+					<!-- <div class="slide-header">Share Gameboards</div> -->
+					<div class="image share" title="Share ShapeConnector game boards!"></div>
+					<div class="slide-subheader">Share the board you&rsquo;re playing</div>
+				</slide>
+			</slideshow>
 
-		<div class="btn-container" ng-if="home.showTutorial === true">
-			<a ng-click="home.onSelectGame()" class="btn type-primary">Play</a>
+			<div class="btn-container">
+				<a ng-click="home.onSelectGame()" class="btn type-primary">Play</a>
+			</div>
 		</div>
 
-		<div class="btn-container" ng-if="home.showTutorial === false">
-			<a ng-click="home.onSelectGame('timed')" class="btn type-primary">Timed</a>
-			<a ng-click="home.onSelectGame('freeplay')" class="btn type-secondary">Freeplay</a>
-		</div>
+		<div ng-if="::home.showTutorial === false">
+			<div class="btn-container" >
+				<a ng-click="home.onSelectGame('timed')" class="btn type-primary">Timed</a>
+				<a ng-click="home.onSelectGame('freeplay')" class="btn type-secondary">Freeplay</a>
+			</div>
 
-		<div class="secondary-actions" ng-if="home.showTutorial === false">
-			<a class="action btn type-text" ui-sref="settings">Settings</a>
-			<a class="action btn type-text" ui-sref="tutorial({step: 1})">Tutorial</a>
-			<a class="action btn type-text" ui-sref="about">About</a>
+			<div class="secondary-actions">
+				<a class="action btn type-text" ui-sref="settings">Settings</a>
+				<a class="action btn type-text" ui-sref="tutorial({step: 1})">Tutorial</a>
+				<a class="action btn type-text" ui-sref="about">About</a>
+			</div>
 		</div>
 	</div>
 </div>

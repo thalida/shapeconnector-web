@@ -54,6 +54,16 @@
 			}
 		}
 
+		&.step3,
+		&.step4 {
+			.game {
+				left: 0 !important;
+				top: 30px !important;
+				position: relative !important;
+				margin: 0 auto;
+			}
+		}
+
 		&.step3 {
 			.game-header {
 				padding-bottom: 10px;
@@ -62,12 +72,6 @@
 		}
 
 		&.step4 {
-			.game {
-				left: 0 !important;
-				top: 30px !important;
-				position: relative !important;
-				margin: 0 auto;
-			}
 			.game-header {
 				margin-left: -50px;
 			}

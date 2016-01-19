@@ -35,23 +35,11 @@
 	}
 
 	.btn-container {
-		position: fixed;
-		bottom: 0;
-		left: 0;
-		text-align: center;
-		margin: 0 auto;
-		width: 100%;
+		position: relative;
+		margin: 60px 0;
 
 		.btn {
 			margin: 0 auto 20px;
-		}
-
-		@media (min-height: 600px) {
-			position: relative;
-			margin: 60px 0;
-			.btn {
-				margin: 0 auto 20px;
-			}
 		}
 	}
 
@@ -107,6 +95,38 @@
 			&.win {
 				background-image: url($win-img-url);
 				background-position: top center;
+			}
+		}
+	}
+
+	&.is-onboarding {
+		.btn-container {
+			.btn {
+				background-color: rgba($color-blue-4, 1);
+			}
+		}
+
+		@media (max-height: 599px) {
+			.slideshow {
+				margin-top: 30px;
+				margin-bottom: 70px;
+			}
+
+			.btn-container {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				text-align: center;
+				margin: 0 auto;
+				width: 100%;
+
+				.btn {
+					margin-bottom: 0;
+					width: 50%;
+					box-shadow: 0px -1px 4px 0px rgba(black, 0.2);
+					border-bottom-left-radius: 0;
+					border-bottom-right-radius: 0;
+				}
 			}
 		}
 	}
