@@ -9,13 +9,14 @@
 
 $requires = [
 	'$log'
+	'$interval'
 	'SHAPE'
 	'HEXCOLORS'
 
 	require '../../services/utils'
 ]
 
-canvasDrawService = ( $log, SHAPE, HEXCOLORS, utils ) ->
+canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 	class CanvasDrawService
 		#	@constructor
 		#-------------------------------------------------------------------
@@ -464,6 +465,106 @@ canvasDrawService = ( $log, SHAPE, HEXCOLORS, utils ) ->
 				width: params.size.w,
 				height: params.size.h
 			}
+
+		#	@confettiAnimation
+		# 		Creates a confetti animation
+		# 		http://jsfiddle.net/mj3SM/6/
+		#-------------------------------------------------------------------
+		confettiAnimation: ( params ) ->
+			_defaults =
+				canvas: null
+				totalParticles: 100
+				radius: 6
+				tilt: 3
+
+			_config = angular.extend({}, _defaults, params)
+
+			return if !_config.canvas?
+
+			W = _config.canvas.width()
+			H = _config.canvas.height()
+
+			# angle will be an ongoing incremental flag. Sin and Cos functions will be applied to it to create vertical and horizontal movements of the flakes
+			angle = 0;
+
+			particles = while _config.totalParticles -= 1
+				{
+					x: Math.random() * W
+					y: Math.random() * H
+					r: Math.random() * _config.radius + 1
+					d: Math.random() * _config.totalParticles
+					color: "rgba(" + Math.floor((Math.random() * 255)) + ", " + Math.floor((Math.random() * 25)) + ", " + Math.floor((Math.random() * 255)) + ", 1)"
+					tilt: Math.floor(Math.random() * _config.tilt) - _config.tilt
+				}
+
+			# console.log( particles, _config.totalParticles )
+			_config.totalParticles = particles.length
+
+			draw = =>
+				@ctx.clearRect(0, 0, W, H)
+
+				particles.forEach(( p ) =>
+					@ctx.beginPath()
+					@ctx.lineWidth = p.r
+					@ctx.strokeStyle = p.color
+					@ctx.moveTo(p.x, p.y)
+					@ctx.lineTo(p.x + p.tilt, p.y + p.tilt)
+					@ctx.stroke()
+				)
+
+				updateParticles()
+
+				return
+
+
+			updateParticles = =>
+				angle += 0.01;
+
+				particles.forEach(( p, i ) =>
+					# Updating X and Y coordinates
+					# We will add 1 to the cos function to prevent negative values which will lead flakes to move upwards
+					# Every particle has its own density which can be used to make the downward movement different for each flake
+					# Lets make it more random by adding in the radius
+					p.y += Math.cos(angle + p.d) + 1 + p.r / 2;
+					p.x += Math.sin(angle) * 2;
+
+					# Sending flakes back from the top when it exits
+					# Lets make it a bit more organic and let flakes enter from the left and right also.
+					if p.x > W + 5 || p.x < -5 || p.y > H
+						if i % 3 > 0 # 66.67% of the flakes
+							particles[i] =
+								x: Math.random() * W
+								y: -10
+								r: p.r
+								d: p.d
+								color: p.color
+								tilt: p.tilt
+						else
+							# If the flake is exitting from the right
+							if Math.sin(angle) > 0
+								# Enter from the left
+								particles[i] =
+									x: -5
+									y: Math.random() * H
+									r: p.r
+									d: p.d
+									color: p.color
+									tilt: p.tilt
+							else
+								# Enter from the right
+								particles[i] =
+									x: W + 5
+									y: Math.random() * H
+									r: p.r
+									d: p.d
+									color: p.color
+									tilt: p.tilt
+				)
+
+			# animation loop
+			stop = $interval(draw, 20)
+
+			return stop
 
 
 		#	@genericCircle

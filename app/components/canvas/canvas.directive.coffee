@@ -28,12 +28,14 @@ angular.module('app').directive 'scCanvas', [
 			canvasEl = $canvas[0]
 			ctx = null
 			canvas = null
+			isFirstRender = true
 
 			# render: Sets the canvans dimenions, sets up the events, and creates
 			# the new Draw classes
 			#-------------------------------------------------------------------
-			render = ->
-				$scope.size = JSON.parse( $scope.size )
+			render = () ->
+				if typeof $scope.size != 'object'
+					$scope.size = JSON.parse( $scope.size )
 
 				setDimension('width')
 				setDimension('height')
@@ -41,8 +43,10 @@ angular.module('app').directive 'scCanvas', [
 				ctx = canvasEl.getContext('2d')
 				ctx.scale(2, 2)
 
-				save()
-				events.bind()
+				if isFirstRender
+					isFirstRender = false
+					save()
+					events.bind()
 
 
 			# setDimensions: Set the width/height of the canvas
@@ -113,7 +117,6 @@ angular.module('app').directive 'scCanvas', [
 			#-------------------------------------------------------------------
 			stopSizeWatch = $scope.$watch('size', (size) ->
 				return if !size?
-				stopSizeWatch()
 
 				# Kick things off!
 				render()
