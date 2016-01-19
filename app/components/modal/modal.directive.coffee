@@ -30,6 +30,8 @@ angular.module('app').directive 'scModal', [
 			# Trigger the modal hide action
 			@show = -> $scope.showModal = false
 
+			@getIsAnimating = -> return $scope.isAnimating
+
 			$transclude((clone) ->
 				mainContent = $el.find('.modal-content')
 				minimizeSection = $el.find('.modal-minimized')
@@ -180,6 +182,8 @@ app.directive 'scModalAction', [
 
 			# wait the duration of the modal animation before calling the eventCallback
 			callbackDelay = if attrs.noDelay? then 0 else 400
+			triggeredAction = false
+			triggeredEvt = null
 
 			runAction = ( e ) ->
 				# Check if a valid action was assigned
@@ -187,16 +191,22 @@ app.directive 'scModalAction', [
 
 				$scope.$apply(() ->
 					action()
-
-					# If a callback has been passed, wait the duration of the
-					# modal animation before calling the eventCallback
-					if hasCallback
-						$timeout(() ->
-							eventCallback($scope, { e })
-						, callbackDelay)
+					triggeredAction = true
+					triggeredEvt = e
 				)
 
 			$(el).on('click', runAction)
+
+			$scope.$watch(
+				() -> modalCtrl.getIsAnimating()
+				( isAnimating ) ->
+					if triggeredAction and !isAnimating and hasCallback
+						triggeredAction = false
+						triggeredEvt = null
+						eventCallback($scope, { e: triggeredEvt })
+
+					return
+			)
 
 			return
 ]

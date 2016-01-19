@@ -116,7 +116,6 @@ angular.module('app').directive 'scGame', [
 				# Position the board correctly on the window
 				positionBoard()
 
-				# Create a scoped copy of the Game class
 				game.start()
 				$scope.attempts += 1
 
@@ -175,13 +174,15 @@ angular.module('app').directive 'scGame', [
 						if $scope.modalShown isnt 'share'
 							$scope.showPauseModal = true
 							$scope.modalShown = 'pause'
-				resumeGame: (useApply = true) ->
+				resumeGame: (useApply = false) ->
 					game.resumeGame()
 					$scope.triggerGamePause = false
 					$scope.showPauseModal = false
 					$scope.modalShown = ''
 
 					$scope.$apply() if useApply
+
+					return
 
 
 
@@ -198,32 +199,32 @@ angular.module('app').directive 'scGame', [
 			)
 
 			startWatching = ->
-					watcher.start(
-						() -> return game.won
-						( hasWon ) ->
-							$scope.showWinModal = (hasWon is true)
-							$scope.modalShown = 'win'
-					)
+				watcher.start(
+					() -> return game.won
+					( hasWon ) ->
+						$scope.showWinModal = (hasWon is true)
+						$scope.modalShown = 'win'
+				)
 
-					watcher.start(
-						() -> return game.lost
-						( hasLost ) ->
-							$scope.showLoseModal = (hasLost is true)
-							$scope.modalShown = 'lose'
-					)
+				watcher.start(
+					() -> return game.lost
+					( hasLost ) ->
+						$scope.showLoseModal = (hasLost is true)
+						$scope.modalShown = 'lose'
+				)
 
-			stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame, lastState ) ->
-				if $scope.triggerGamePause is true
-					if game?.gameOver is true
-						$scope.actions.quitGame()
-					else
-						$scope.actions.pauseGame()
+				stopPauseWatcher = watcher.start('triggerGamePause', ( pauseGame, lastState ) ->
+					if $scope.triggerGamePause is true
+						if game?.gameOver is true
+							$scope.actions.quitGame()
+						else
+							$scope.actions.pauseGame()
 
-				if lastState is true and pauseGame is false and $scope.modalShown is 'share'
-					$scope.modalShown = ''
-					$scope.actions.resumeGame( false )
+					if lastState is true and pauseGame is false and $scope.modalShown is 'share'
+						$scope.modalShown = ''
+						$scope.actions.resumeGame( false )
 
-			)
+				)
 
 			# Destroy the Game class on directive $destroy
 			$scope.$on('$destroy', () ->

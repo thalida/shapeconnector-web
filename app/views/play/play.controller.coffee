@@ -38,10 +38,12 @@ class PlayController
 			@attempts = 0
 			@gameCopy = null
 			@rebuildGame = true
+			@pauseGame = false
 			return
 
 		@resetGame = =>
 			@rebuildGame = true
+			@pauseGame = false
 			return
 
 		@onHeaderClick = =>
