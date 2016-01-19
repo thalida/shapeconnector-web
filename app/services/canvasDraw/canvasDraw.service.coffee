@@ -473,8 +473,8 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 		confettiAnimation: ( params ) ->
 			_defaults =
 				canvas: null
-				totalParticles: 100
-				radius: 6
+				totalParticles: 150
+				radius: 10
 				tilt: 3
 
 			_config = angular.extend({}, _defaults, params)
@@ -493,7 +493,7 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 					y: Math.random() * H
 					r: Math.random() * _config.radius + 1
 					d: Math.random() * _config.totalParticles
-					color: "rgba(" + Math.floor((Math.random() * 255)) + ", " + Math.floor((Math.random() * 25)) + ", " + Math.floor((Math.random() * 255)) + ", 1)"
+					color: "rgba(" + Math.floor((Math.random() * 80)) + ", " + Math.floor((Math.random() * 220)) + ", " + Math.floor((Math.random() * 200)) + ", 1)"
 					tilt: Math.floor(Math.random() * _config.tilt) - _config.tilt
 				}
 
@@ -501,7 +501,7 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 			_config.totalParticles = particles.length
 
 			draw = =>
-				@ctx.clearRect(0, 0, W, H)
+				@ctx.clearRect(0, 0, W + 50, H + 50)
 
 				particles.forEach(( p ) =>
 					@ctx.beginPath()
