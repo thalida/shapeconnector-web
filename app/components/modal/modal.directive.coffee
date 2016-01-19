@@ -54,6 +54,8 @@ angular.module('app').directive 'scModal', [
 			modal = new class Modal
 				constructor: ->
 					$scope.minimizeModal = false
+					$scope.isAnimating = false
+					return
 
 				#	@show
 				# 		Positions the modal correclty then inits the show animation
@@ -63,6 +65,7 @@ angular.module('app').directive 'scModal', [
 
 					# animateVisibility is set as a class ng animate watches
 					$scope.animateVisibility = 'js-modal-animate-visibility'
+					$scope.isAnimating = true
 					return
 
 				#	@hide
@@ -71,6 +74,7 @@ angular.module('app').directive 'scModal', [
 				hide: ->
 					# Remove the visiblity class - triggers animate on classRemove
 					$scope.animateVisibility = ''
+					$scope.isAnimating = true
 					return
 
 				#	@hide
@@ -78,6 +82,7 @@ angular.module('app').directive 'scModal', [
 				#---------------------------------------------------------------
 				minimize: ->
 					$scope.animateMinimize = 'js-modal-animate-minimize'
+					$scope.isAnimating = true
 					return
 
 				#	@positionModal
@@ -130,12 +135,21 @@ angular.module('app').directive 'scModal', [
 					modal.minimize() if minimized is true
 					return
 
+				onAnimationDone: ( e, args ) ->
+					return if $scope.name isnt args.$el.data('name')
+					$scope.$apply(() ->
+						$scope.isAnimating = false
+					)
+					return
+
+
 			# Keep the contents covering the game board as the window changes
 			$window.on('resize', modal.positionModal)
 
 			# Setup watches on the show + minimize variables
 			$scope.$watch('showModal', modal.showModalWatch)
 			$scope.$watch('minimizeModal', modal.minimizeModalWatch)
+			$scope.$on('modal-animations-done', modal.onAnimationDone)
 			return
 ]
 

@@ -18,6 +18,7 @@ angular.module('app').animation '.modal', [
 			$('body').css({'overflow': state})
 			$('.app-container').css({'overflow': state})
 			$('.modal').css({'overflow': state})
+			return
 
 		minimizeModal = ( element, done ) ->
 			[$el, $content, $overlay] = getSelectors( element )
@@ -29,6 +30,15 @@ angular.module('app').animation '.modal', [
 
 			marginTop = $(window).height() - 70
 
+			$overlay.animate({opacity: '0'},
+				{
+					duration: 350
+					queue: false
+					complete: ->
+						$overlay.css(opacity: '0')
+				}
+			)
+
 			$content.animate({marginTop: marginTop, width: '100%'},
 				{
 					duration: 500
@@ -39,15 +49,6 @@ angular.module('app').animation '.modal', [
 						setOverflow('auto')
 						$rootScope.$broadcast('modal-animations-done', {type: 'modal-minimized', $el: $el})
 						done()
-				}
-			)
-
-			$overlay.animate({opacity: '0'},
-				{
-					duration: 350
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '0')
 				}
 			)
 
@@ -66,6 +67,15 @@ angular.module('app').animation '.modal', [
 
 			$el.show()
 
+			$overlay.animate({opacity: '1'},
+				{
+					duration: 400
+					queue: false
+					complete: ->
+						$overlay.css(opacity: '1')
+				}
+			)
+
 			$content.animate({top: '0%'},
 				{
 					duration: 500
@@ -78,15 +88,7 @@ angular.module('app').animation '.modal', [
 						done()
 				}
 			)
-
-			$overlay.animate({opacity: '1'},
-				{
-					duration: 400
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '1')
-				}
-			)
+			return
 
 		hideModal = ( element, done ) ->
 			[$el, $content, $overlay] = getSelectors( element )
@@ -95,6 +97,15 @@ angular.module('app').animation '.modal', [
 
 			$overlay.css(opacity: '1')
 			$content.css(top: '0%')
+
+			$overlay.animate({opacity: '0'},
+				{
+					duration: 350
+					queue: false
+					complete: ->
+						$overlay.css(opacity: '0')
+				}
+			)
 
 			$content.animate({top: '100%'},
 				{
@@ -109,15 +120,7 @@ angular.module('app').animation '.modal', [
 
 				}
 			)
-
-			$overlay.animate({opacity: '0'},
-				{
-					duration: 350
-					queue: false
-					complete: ->
-						$overlay.css(opacity: '0')
-				}
-			)
+			return
 
 		return {
 			addClass: (element, className, done) ->

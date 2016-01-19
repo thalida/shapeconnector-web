@@ -66,8 +66,13 @@
 		color: black;
 		background-color: #ccc;
 
-   		-webkit-transition: margin-top 400ms;
+		-webkit-transition: margin-top 400ms;
 		transition: margin-top 400ms;
+
+		.modal.is-animating & {
+			-webkit-transition: none 400ms;
+			transition: none 400ms;
+		}
 
 		.modal.teal & {
 			background-image: $gradient-blue-6-blue-7;
