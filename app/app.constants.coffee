@@ -87,6 +87,7 @@ module.exports = {
 		total: 4
 		success:
 			header1: "Woot! You've successfully completed the tutorial."
+			header2: "FYI: You can play ShapeConnector without an internet connection"
 			playBtnLabel: 'Start Playing'
 			headerPosition: 'top'
 

@@ -1,6 +1,7 @@
 @import "../../assets/styles/mixins";
 @import "../../assets/styles/colors";
 @import "../../assets/styles/generics.scss";
+@import "../../assets/styles/animations";
 
 .about-view {
 	min-height: 100%;
@@ -8,11 +9,17 @@
 	padding: 100px 40px 40px 40px;
 	color: white;
 	text-align: center;
-	background: $gradient-blue-2-blue-3;
+
+	background: linear-gradient(214deg, $color-blue-2, $color-blue-3);
+	background-size: 400% 400%;
+
+	-webkit-animation: blueGradient $animationTiming 25s infinite;
+	animation: blueGradient $animationTiming 25s infinite;
 
 	&-content {
 		display: block;
-		width: 100%;
+		width: 80%;
+		margin: 0 auto;
 	}
 
 	.header {
