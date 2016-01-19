@@ -5,17 +5,22 @@ $requires = [
 	'$location'
 	'$timeout'
 	'$state'
+	'$localStorage'
 
 	require './services/windowEvents'
 	require './services/assets'
 ]
 
-run = ($rootScope, $location, $timeout, $state, WindowEvents, assets) ->
+run = ($rootScope, $location, $timeout, $state, $localStorage, WindowEvents, assets) ->
 	$rootScope.windowEvents = new WindowEvents()
 
 	assets.downloadAll().then(() =>
 		assets.playSound('background')
 	)
+
+	if !$localStorage.firstVisited?
+		$localStorage.firstVisited = new Date()
+		$localStorage.hasCompletedTutorial = false
 
 	$rootScope.windowEvents.onFocus( -> assets.playSound('background') )
 	$rootScope.windowEvents.onBlur( -> assets.pauseSound('background') )
@@ -34,17 +39,6 @@ run = ($rootScope, $location, $timeout, $state, WindowEvents, assets) ->
 									window.oCancelRequestAnimationFrame ||
 									window.msCancelRequestAnimationFrame ||
 									clearTimeout
-
-	$rootScope.$on('$stateChangeStart', (e, toState, toParams, fromState, fromParams) ->
-		blacklist = [
-			# 'play'
-			'tutorial'
-		]
-
-		if blacklist.indexOf(toState.name) >= 0 and fromState.name.length is 0
-			e.preventDefault()
-			$state.go('home')
-	)
 
 	return
 
