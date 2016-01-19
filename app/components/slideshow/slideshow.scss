@@ -4,6 +4,8 @@
 
 .slideshow {
 	.slide {
+		@extend %clickable;
+
 		&-header {
 			display: block;
 			color: white;
