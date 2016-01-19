@@ -24,7 +24,6 @@ angular.module('app').directive 'slideshow', [
 
 			@addSlide = ( slide ) =>
 				@slides.push( slide )
-				console.log( @slides )
 				return @slides
 
 			@showSlide = ( slide ) =>
@@ -69,10 +68,6 @@ angular.module('app').directive 'slideshow', [
 		link: ($scope, el, attrs) ->
 			$scope.slideshow.currSlideIdx = -1
 			$scope.slideshow.goTo('next', 'self')
-
-			# $scope.slideshow.currSlide = $scope.slideshow.slides[$scope.slideshow.currSlideIdx]
-			# $scope.slideshow.showSlide( $scope.slideshow.currSlide )
-			# $scope.slideshow.setTimeout()
 			return
 ]
 
