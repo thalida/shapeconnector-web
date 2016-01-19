@@ -85,15 +85,20 @@ module.exports = {
 	},
 	TUTORIAL_STEPS: {
 		total: 4
+		success:
+			header1: "Woot! You've successfully completed the tutorial."
+			playBtnLabel: 'Start Playing'
+			headerPosition: 'top'
+
 		1: {
-			header1: 'Connect two similar shapes'
-			header2: 'Try it yourself'
+			header1: 'Connect two of the same shapes'
+			header2: 'Try it yourself!'
 			headerPosition: 'top'
 			showGoal: false
 			random: false
 			shapes: [
-				{color: 'yellow', type: 'triangle'}
-				{color: 'green', type: 'triangle'}
+				{color: 'yellow', type: 'diamond'}
+				{color: 'green', type: 'diamond'}
 			]
 		},
 		2: {
@@ -102,12 +107,13 @@ module.exports = {
 			showGoal: false
 			random: false
 			shapes: [
-				{color: 'red', type: 'diamond'}
+				{color: 'red', type: 'triangle'}
 				{color: 'red', type: 'circle'}
 			]
 		},
 		3: {
 			header1: 'Next connect the #{startNode} to a #{endNode}'
+			header2: 'Note: You cannot move at a diagonal'
 			headerPosition: 'top'
 			showGoal: true
 			showMovesLeft: false
@@ -118,6 +124,7 @@ module.exports = {
 		}
 		4: {
 			header1: 'Now connect a #{startNode} to a #{endNode} in exactly 3 moves'
+			header2: 'Made a mistake? Drag backwards to undo a move!'
 			headerPosition: 'bottom'
 			showGoal: true
 			showMovesLeft: true

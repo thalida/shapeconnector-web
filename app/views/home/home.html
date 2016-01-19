@@ -5,12 +5,20 @@
 			<span class="logomark"><span class="light">Shape</span>Connector</span>
 		</div>
 
-		<div class="btn-container">
+		<div ng-if="home.showTutorial === true">
+			Slideshow
+		</div>
+
+		<div class="btn-container" ng-if="home.showTutorial === true">
+			<a ng-click="home.onSelectGame()" class="btn type-primary">Play</a>
+		</div>
+
+		<div class="btn-container" ng-if="home.showTutorial === false">
 			<a ng-click="home.onSelectGame('timed')" class="btn type-primary">Timed</a>
 			<a ng-click="home.onSelectGame('freeplay')" class="btn type-secondary">Freeplay</a>
 		</div>
 
-		<div class="secondary-actions">
+		<div class="secondary-actions" ng-if="home.showTutorial === false">
 			<a class="action btn type-text" ui-sref="settings">Settings</a>
 			<a class="action btn type-text" ui-sref="tutorial({step: 1})">Tutorial</a>
 			<a class="action btn type-text" ui-sref="about">About</a>
