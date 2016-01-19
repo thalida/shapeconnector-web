@@ -1,4 +1,4 @@
-<div class="game" ng-class="{'won': game.won == true, 'lost': game.lost == true}">
+<div class="game" ng-class="{'won': game.won == true, 'lost': game.lost == true, 'not-initload': isFirstInit == false}">
 	<div class="game-header">
 		<sc:canvas
 			classes="game-goal"

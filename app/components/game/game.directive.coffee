@@ -38,6 +38,7 @@ angular.module('app').directive 'scGame', [
 			$scope.showWinModal = false
 			$scope.showLoseModal = false
 			$scope.showPauseModal = false
+			$scope.isFirstInit = true
 
 
 			# utils: simple functions used to render the board
@@ -196,6 +197,7 @@ angular.module('app').directive 'scGame', [
 					stopCanvasWatch()
 					start()
 					startWatching()
+					$scope.isFirstInit = false
 			)
 
 			startWatching = ->
