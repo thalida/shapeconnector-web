@@ -1,13 +1,28 @@
 <div class="home-view">
 	<div class="home-view-content">
 		<div class="logo-container">
-			<span class="logo large"></span>
+			<span class="logo medium" ng-if="home.showTutorial === true"></span>
+			<span class="logo large" ng-if="home.showTutorial === false"></span>
 			<span class="logomark"><span class="light">Shape</span>Connector</span>
 		</div>
 
-		<div ng-if="home.showTutorial === true">
-			Slideshow
-		</div>
+		<slideshow ng-if="home.showTutorial === true">
+			<slide>
+				<!-- <div class="slide-header">Connect Shapes</div> -->
+				<div class="image gameplay" title="ShapeConnector game play demo"></div>
+				<div class="slide-subheader">Connect similar shapes to solve the puzzle&hellip;</div>
+			</slide>
+			<slide>
+				<!-- <div class="slide-header">Never Give Up</div> -->
+				<div class="image win" title="Game won popup"></div>
+				<div class="slide-subheader">Keep trying until you win!</div>
+			</slide>
+			<slide>
+				<!-- <div class="slide-header">Share Gameboards</div> -->
+				<div class="image share" title="Share ShapeConnector game boards!"></div>
+				<div class="slide-subheader">Share & save the board you&rsquo;re playing</div>
+			</slide>
+		</slideshow>
 
 		<div class="btn-container" ng-if="home.showTutorial === true">
 			<a ng-click="home.onSelectGame()" class="btn type-primary">Play</a>
