@@ -1,0 +1,16 @@
+<div class="slideshow" data-name="{{name}}" ng-class="[style]">
+	<div class="slideshow-slides"
+		ng-swipe-right="slideshow.goTo('prev', 'swipe')"
+		ng-swipe-left="slideshow.goTo('next', 'swipe')"
+		ng-click="slideshow.goTo('next', 'click' )"
+		ng-transclude></div>
+	<div class="slideshow-pages">
+		<span
+			ng-repeat="slide in slideshow.slides"
+			class="slideshow-page"
+			ng-class="[
+				{selected: slide.isShown == true}
+			]">
+		</span>
+	</div>
+</div>
