@@ -4,31 +4,36 @@ $requires = [
 	'$scope'
 	'$log'
 	'$state'
+	'$interval'
 	'$localStorage'
 	'TUTORIAL_STEPS'
 ]
 
 class TutorialController
-	constructor: ( $scope, $log, $state, $localStorage, TUTORIAL_STEPS ) ->
+	constructor: ( $scope, $log, $state, $interval, $localStorage, TUTORIAL_STEPS ) ->
 		step = parseInt($state.params.step, 10)
-		@playMode = $state.params.mode
+		totTutorialViews = TUTORIAL_STEPS.total + 1
 
-		if not (1 <= step <= 5)
+		if not (1 <= step <= totTutorialViews)
 			$state.go('tutorial', {step: 1})
 
-		@showSuccess = step == 5
-
-		if @showSuccess
-			$localStorage.hasCompletedTutorial = true
-
+		@showSuccess = step == totTutorialViews
 		@mode = 'tutorial'
 		@stepNum = step
 		@step = angular.copy(TUTORIAL_STEPS[@stepNum])
 		@endNodes = []
 
+		if @showSuccess
+			@canvasSize =
+				width: window.innerWidth
+				height: window.innerHeight
+
+			@success = angular.copy(TUTORIAL_STEPS.success)
+			$localStorage.hasCompletedTutorial = true
+
 		@skip = =>
 			$localStorage.hasCompletedTutorial = true
-			$state.go('play', {mode: @playMode})
+			$state.go('play', {mode: 'timed'})
 			return
 
 		replaceNodeText = ( str, find, node ) ->
@@ -51,6 +56,43 @@ class TutorialController
 				@step.header2 = replaceNodeText(@step.header2, '#{startNode}', startNode)
 				@step.header2 = replaceNodeText(@step.header2, '#{endNode}', endNode)
 		)
+
+		renderConfetti = () =>
+			$interval.cancel(@stopAnimation) if @stopAnimation?
+
+			return if !@canvas?
+
+			@stopAnimation = @canvas.draw.confettiAnimation(
+				canvas: @canvas.$el
+				totalParticles: 100
+				radius: 6
+				tilt: 3
+			)
+
+			return @stopAnimation
+
+
+		if @showSuccess
+			canvasWatch = $scope.$watch('tutorial.canvas', (canvas) ->
+				if canvas?.draw?
+					canvasWatch()
+					@canvas = canvas
+
+					renderConfetti()
+					resizeWatch()
+					return
+			)
+
+
+		resizeWatch = () =>
+			$(window).on('resize', () =>
+				@canvasSize =
+					width: window.innerWidth
+					height: window.innerHeight
+
+				renderConfetti()
+			)
+			return
 
 		return
 

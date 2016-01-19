@@ -10,7 +10,14 @@
 		</a>
 	</div>
 	<div class="success" ng-if="tutorial.showSuccess == true">
-		<span class="step-header">You've successfully completed the tutorial!</span>
-		<span class="success-button btn type-primary" ui-sref="play({mode:tutorial.playMode})">Start Playing</span>
+		<span class="step-header">{{tutorial.success.header1}}</span>
+		<span class="success-button btn type-primary" ui-sref="play({mode:tutorial.playMode})">{{tutorial.success.playBtnLabel}}</span>
 	</div>
+	<sc:canvas
+	 	ng-if="tutorial.showSuccess == true"
+		classes="tutorial-view-confetti_canvas"
+		name="confetti"
+		size="{{tutorial.canvasSize}}"
+		canvas="tutorial.canvas">
+	</sc:canvas>
 </div>

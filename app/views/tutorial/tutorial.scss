@@ -1,8 +1,15 @@
-@import "../../assets/styles/sprites.scss";
+@import "../../assets/styles/sprites";
+@import "../../assets/styles/mixins";
+@import "../../assets/styles/animations";
+@import "../../assets/styles/btn";
+@import "../../assets/styles/colors";
 
 .tutorial-view {
+	position: absolute;
 	width: 100%;
-	color: white;
+	height: 100%;
+
+	background-color: $color-background;
 
 	.step {
 		width: 80%;
@@ -55,8 +62,12 @@
 		}
 
 		&.step4 {
-			margin: 80px auto;
-
+			.game {
+				left: 0 !important;
+				top: 30px !important;
+				position: relative !important;
+				margin: 0 auto;
+			}
 			.game-header {
 				margin-left: -50px;
 			}
@@ -64,9 +75,18 @@
 	}
 
 	.success {
-		width: 300px;
+		position: relative;
+		width: 80%;
+		z-index: 1;
+
 		margin: 200px auto;
 		text-align: center;
+
+		@media (min-height: 350px) {
+			margin-top: 0;
+			margin-bottom: 0;
+			@include vertical-align;
+		}
 
 		&-button {
 			padding: 15px 10px;
@@ -80,5 +100,11 @@
 				background-color: rgba(white, 0.9);
 			}
 		}
+	}
+
+	&-confetti_canvas {
+		position: absolute;
+		top: 0;
+		left: 0;
 	}
 }
