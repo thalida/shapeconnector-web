@@ -52,18 +52,21 @@
 	}
 
 	.slideshow {
-		width: 230px;
+		width: 300px;
 
 		.slideshow-slides {
-			height: 280px;
+			height: 260px;
 		}
 
 		.slideshow-slide {
-			width: 230px;
+			width: 100%;
 
 			.slideshow-slide-subheader {
+				display: block;
+				color: white;
+				font-size: 18px;
+				line-height: 1em;
 				padding-top: 10px;
-				font-style: italic;
 			}
 
 			.image {
