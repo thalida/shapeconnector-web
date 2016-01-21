@@ -16,10 +16,12 @@
 		margin: 10% auto;
 		text-align: center;
 
-		@media (min-height: 600px) {
-			margin-top: 0;
-			margin-bottom: 0;
-			@include vertical-align;
+		@media (min-height: 475px) {
+			.home-view:not(.is-onboarding) & {
+				margin-top: 0;
+				margin-bottom: 0;
+				@include vertical-align;
+			}
 		}
 	}
 
@@ -97,7 +99,6 @@
 		}
 	}
 
-
 	&.is-onboarding {
 		.btn-container {
 			.btn {
@@ -108,9 +109,17 @@
 			}
 		}
 
+		.home-view-content {
+			@media (min-height: 600px) {
+				margin-top: 0;
+				margin-bottom: 0;
+				@include vertical-align;
+			}
+		}
+	}
 
-
-		@media (max-height: 599px) {
+	@media (max-height: 599px) {
+		&.is-onboarding {
 			.slideshow {
 				margin-top: 30px;
 				margin-bottom: 70px;
