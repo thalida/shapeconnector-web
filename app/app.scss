@@ -22,10 +22,10 @@ body {
 [ui-view].ng-enter,
 [ui-view].ng-leave {
 	position: absolute;
-	-webkit-transition: all .5s $animationTiming;
-	-moz-transition: all .5s $animationTiming;
-	-o-transition: all .5s $animationTiming;
-	transition: all .5s $animationTiming;
+	-webkit-transition: all 500ms $animationTiming;
+	-moz-transition: all 500ms $animationTiming;
+	-o-transition: all 500ms $animationTiming;
+	transition: all 500ms $animationTiming;
 }
 
 [ui-view].ng-enter {
@@ -49,6 +49,13 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+}
+
+.app-view {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
 }
 
 .logo {

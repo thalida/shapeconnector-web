@@ -1,19 +1,23 @@
+
 <app:header
 	on-click="play.onHeaderClick()"
 	on-share-event="play.onShareEvent( params )"
 	show-share="true"
 	share-opts="play.shareOpts">
 </app:header>
-<div recompiler="play.rebuildGame" animate="fadeIn">
-	<sc:game
-		type="{{play.gameType}}"
-		difficulty="{{play.difficulty}}"
-		attempts="play.attempts"
-		source-game="play.gameCopy"
-		pause-game="play.pauseGame"
-		modal-shown="play.modal"
-		on-new-game="play.createNewGame(params)"
-		on-reset-game="play.resetGame(params)"
-		on-quit-game="play.goHome(params)">
-	</sc:game>
+
+<div class="app-view">
+	<div recompiler="play.rebuildGame" animate="fadeIn">
+		<sc:game
+			type="{{play.gameType}}"
+			difficulty="{{play.difficulty}}"
+			attempts="play.attempts"
+			source-game="play.gameCopy"
+			pause-game="play.pauseGame"
+			modal-shown="play.modal"
+			on-new-game="play.createNewGame(params)"
+			on-reset-game="play.resetGame(params)"
+			on-quit-game="play.goHome(params)">
+		</sc:game>
+	</div>
 </div>
