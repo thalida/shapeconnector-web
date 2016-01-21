@@ -3,9 +3,16 @@
   "version": "1.2.0",
   "main": "app/app.module.coffee",
   "scripts": {
-    "dev": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base dist --host 0.0.0.0 --port 8080",
-    "staging": "NODE_ENV=production webpack -p --progress --colors --watch",
-    "build": "NODE_ENV=production webpack -p --progress --colors"
+    "clean": "rm -r dist/*",
+
+    "prebuild:prod": "npm run clean",
+    "prebuild:staging": "npm run clean",
+    "build:prod": "NODE_ENV=production webpack -p --progress --colors",
+    "build:staging": "NODE_ENV=production webpack -p --progress --colors --watch",
+
+    "start:staging": "npm run build:staging && cd dist && python -m SimpleHTTPServer",
+    "start:dev": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base dist --host 0.0.0.0 --port 8080",
+    "start": "npm run run:dev"
   },
   "devDependencies": {
     "coffee-loader": "^0.7.2",
