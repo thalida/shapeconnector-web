@@ -1,10 +1,25 @@
 @import "../../assets/styles/mixins";
 @import "../../assets/styles/colors";
+@import "../../assets/styles/sprites";
+@import "../../assets/styles/animations";
 @import "../../assets/styles/generics.scss";
 
 .slideshow {
-	.slide {
+	margin: 50px auto 0;
+	width: 500px;
+	cursor: pointer;
+
+	&-slides {
+		position: relative;
+		overflow: hidden;
+		height: 500px;
+	}
+
+	&-slide {
 		@extend %clickable;
+
+		display: block;
+		position: absolute;
 
 		&-header {
 			display: block;
@@ -20,6 +35,24 @@
 			font-size: 16px;
 			line-height: 20px;
 		}
+
+		&.ng-hide-add,
+		&.ng-hide-remove
+		{
+			-webkit-transition: 500ms $animationTiming all;
+			transition: 500ms $animationTiming all;
+		}
+
+		&.ng-hide-remove,
+		&.ng-hide-add.ng-hide-add-active {
+			opacity: 0;
+		}
+
+		&.ng-hide-remove.ng-hide-remove-active,
+		&.ng-hide-add {
+			opacity: 1;
+		}
+
 	}
 
 	&-pages {

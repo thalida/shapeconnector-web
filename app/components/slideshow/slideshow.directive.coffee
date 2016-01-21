@@ -26,12 +26,12 @@ angular.module('app').directive 'slideshow', [
 				@slides.push( slide )
 				return @slides
 
-			@showSlide = ( slide ) =>
-				slide.show()
+			@showSlide = ( slide, direction ) =>
+				slide.show( direction )
 				return
 
-			@hideSlide = ( slide ) =>
-				slide.hide()
+			@hideSlide = ( slide, direction ) =>
+				slide.hide( direction )
 				return
 
 			@goTo = ( directionName, trigger ) ->
@@ -40,6 +40,7 @@ angular.module('app').directive 'slideshow', [
 
 				direction = if directionName is 'next' then 1 else -1
 
+				@directionClass = if directionName is 'next' then 'left' else 'right'
 				@priorSlide = @currSlide
 				@currSlideIdx += direction
 
@@ -51,9 +52,9 @@ angular.module('app').directive 'slideshow', [
 				@currSlide = @slides[@currSlideIdx]
 
 				if @priorSlide?
-					@hideSlide( @priorSlide )
+					@hideSlide( @priorSlide, @directionClass )
 
-				@showSlide( @currSlide )
+				@showSlide( @currSlide, @directionClass )
 
 				# @setTimeout()
 
@@ -93,10 +94,12 @@ angular.module('app').directive 'slide', [
 		controller: ['$scope', '$element', '$transclude', ($scope, $el, $transclude) ->
 			@isShown = false
 
-			@show = () ->
+			@show = ( direction ) ->
+				@direction = direction
 				@isShown = true
 
-			@hide = () ->
+			@hide = ( direction ) ->
+				@direction = direction
 				@isShown = false
 
 			return this

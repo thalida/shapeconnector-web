@@ -13,8 +13,8 @@
 	background: linear-gradient(214deg, $color-blue-2, $color-blue-3);
 	background-size: 400% 400%;
 
-	-webkit-animation: blueGradient $animationTiming 25s infinite;
-	animation: blueGradient $animationTiming 25s infinite;
+	-webkit-animation: blueGradient $animationTiming 30s infinite;
+	animation: blueGradient $animationTiming 30s infinite;
 
 	&-content {
 		display: block;
@@ -55,54 +55,61 @@
 	}
 
 	.slideshow {
-		margin: 50px auto 0;
-	}
+		width: 230px;
 
-	.slide {
-		display: block;
-		position: relative;
-
-		.slide-subheader {
-			padding-top: 10px;
-			font-style: italic;
+		.slideshow-slides {
+			height: 280px;
 		}
 
-		.image {
-			display: block;
-			margin: 0px auto 0;
+		.slideshow-slide {
 			width: 230px;
-			height: 230px;
 
-			background-repeat: no-repeat;
-			background-position: center center;
-			-webkit-background-size: cover;
-			-moz-background-size: cover;
-			-o-background-size: cover;
-			background-size: cover;
-
-			box-shadow: 0px 4px 4px 0px rgba(black, 0.20);
-			border-radius: 4px;
-
-			&.gameplay {
-				background-image: url($gameplay-gif-url);
+			.slideshow-slide-subheader {
+				padding-top: 10px;
+				font-style: italic;
 			}
 
-			&.share {
-				background-image: url($share-img-url);
-				background-position: top center;
-			}
+			.image {
+				display: block;
+				margin: 0px auto 0;
+				width: 230px;
+				height: 230px;
 
-			&.win {
-				background-image: url($win-img-url);
-				background-position: top center;
+				background-repeat: no-repeat;
+				background-position: center center;
+				-webkit-background-size: cover;
+				-moz-background-size: cover;
+				-o-background-size: cover;
+				background-size: cover;
+
+				box-shadow: 0px 4px 4px 0px rgba(black, 0.20);
+				border-radius: 4px;
+
+				&.gameplay {
+					background-image: url($gameplay-gif-url);
+				}
+
+				&.share {
+					background-image: url($share-img-url);
+					background-position: top center;
+				}
+
+				&.win {
+					background-image: url($win-img-url);
+					background-position: top center;
+				}
 			}
 		}
 	}
+
 
 	&.is-onboarding {
 		.btn-container {
 			.btn {
 				background-color: rgba($color-blue-4, 1);
+				&:hover {
+					background-color: rgba($color-blue-4, 0.6)
+				}
 			}
 		}
 
