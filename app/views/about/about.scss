@@ -7,7 +7,7 @@
 	min-height: 100%;
 	width: 100%;
 	color: white;
-	text-align: center;
+	text-align: left;
 
 	background: linear-gradient(214deg, $color-blue-2, $color-blue-3);
 	background-size: 400% 400%;
@@ -15,18 +15,21 @@
 	-webkit-animation: blueGradient $animationTiming 25s infinite;
 	animation: blueGradient $animationTiming 25s infinite;
 
+	.app-header {
+		position: relative;
+	}
+
 	&-content {
 		display: block;
-		width: 90%;
+		width: 100%;
 		max-width: 500px;
-		margin: 0 auto;
-		padding: 100px 40px 40px 40px;
+		padding: 100px 5% 40px;
 	}
 
 	.header {
 		color: white;
 		font-size: 22px;
-		text-align: center;
+		text-align: left;
 		margin-bottom: 10px;
 	}
 
