@@ -6,8 +6,8 @@ require('./favicon.ico')
 manifestJSON = require('./manifest.json')
 
 # ServiceWorker for Offline Support
-if MODE.production is true
-	require('offline-plugin/runtime').install( null )
+# if MODE.production is true
+# 	require('offline-plugin/runtime').install( null )
 
 # Vendors
 require 'jquery'

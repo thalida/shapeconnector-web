@@ -66,6 +66,16 @@ var common = {
 			template: APP + '/index.html',
 			inject: true
 		}),
+		// new OfflinePlugin({
+		// 	caches: 'all',
+		// 	scope: '/',
+		// 	updateStrategy: 'hash',
+		// 	ServiceWorker: {
+		// 		output: 'sw.js',
+		// 		entry: APP + '/serviceWorker.coffee'
+		// 	},
+		// 	AppCache: null
+		// }),
 		new ExtractTextPlugin("[name].[hash].css", {
             allChunks: true
         }),
@@ -73,16 +83,6 @@ var common = {
 			MODE: {
 				production: isProduction
 			}
-		}),
-		new OfflinePlugin({
-			caches: 'all',
-			scope: '/',
-			updateStrategy: 'hash',
-			ServiceWorker: {
-				output: 'sw.js',
-				entry: APP + '/serviceWorker.coffee'
-			},
-			AppCache: null
 		})
 	]
 };

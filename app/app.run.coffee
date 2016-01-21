@@ -12,8 +12,6 @@ $requires = [
 ]
 
 run = ($rootScope, $location, $timeout, $state, $localStorage, WindowEvents, assets) ->
-	console.log( new Date() )
-
 	$rootScope.windowEvents = new WindowEvents()
 
 	assets.downloadAll().then(() =>
