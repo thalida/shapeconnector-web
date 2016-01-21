@@ -34,20 +34,27 @@ angular.module('app').directive 'slideshow', [
 				slide.hide( direction )
 				return
 
-			@goTo = ( directionName, trigger ) ->
+			@goTo = ( directionKey, trigger ) ->
 				if @autoSlideTimeout?
 					$timeout.cancel( @autoSlideTimeout )
 
-				direction = if directionName is 'next' then 1 else -1
-
-				@directionClass = if directionName is 'next' then 'left' else 'right'
 				@priorSlide = @currSlide
-				@currSlideIdx += direction
+				@priorSlideIdx = @currSlideIdx
 
-				if directionName is 'next' and @currSlideIdx > @slides.length - 1
-					@currSlideIdx = 0
-				else if directionName is 'prev' and @currSlideIdx < 0
-					@currSlideIdx = @slides.length - 1
+				if typeof directionKey is 'number'
+					@currSlideIdx = directionKey
+					@directionClass = if @currSlideIdx > @priorSlideIdx then 'left' else 'right'
+				else if typeof directionKey is 'string'
+					direction = if directionKey is 'next' then 1 else -1
+
+					@directionClass = if directionKey is 'next' then 'left' else 'right'
+					@currSlideIdx += direction
+
+					if directionKey is 'next' and @currSlideIdx > @slides.length - 1
+						@currSlideIdx = 0
+					else if directionKey is 'prev' and @currSlideIdx < 0
+						@currSlideIdx = @slides.length - 1
+
 
 				@currSlide = @slides[@currSlideIdx]
 

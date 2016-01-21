@@ -7,9 +7,9 @@
 .slideshow {
 	margin: 50px auto 0;
 	width: 500px;
-	cursor: pointer;
 
 	&-slides {
+		@extend %clickable;
 		position: relative;
 		overflow: hidden;
 		height: 500px;
@@ -64,6 +64,8 @@
 	}
 
 	&-page {
+		@extend %clickable;
+
 		display: inline-block;
 		position: relative;
 		width: 8px;

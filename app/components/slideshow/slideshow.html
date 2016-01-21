@@ -1,14 +1,18 @@
 <div class="slideshow"
 	data-name="{{name}}"
-	ng-class="[slideshow.style, slideshow.directionClass]"
-	ng-swipe-right="slideshow.goTo('prev', 'swipe')"
-	ng-swipe-left="slideshow.goTo('next', 'swipe')"
-	ng-click="slideshow.goTo('next', 'click' )">
+	ng-class="[slideshow.style, slideshow.directionClass]">
 
-	<div class="slideshow-slides" ng-transclude></div>
+	<div ng-transclude
+		class="slideshow-slides"
+		ng-swipe-right="slideshow.goTo('prev', 'swipe')"
+		ng-swipe-left="slideshow.goTo('next', 'swipe')"
+		ng-click="slideshow.goTo('next', 'click' )">
+	</div>
+
 	<div class="slideshow-pages">
 		<span
 			ng-repeat="slide in slideshow.slides"
+			ng-click="slideshow.goTo( $index, 'click' )"
 			class="slideshow-page"
 			ng-class="[
 				{selected: slide.isShown == true}
