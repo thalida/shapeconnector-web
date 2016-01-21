@@ -8,7 +8,7 @@ $requires = [
 
 route = ($stateProvider, $urlRouterProvider, $locationProvider) ->
 	$urlRouterProvider.otherwise('/')
-	$locationProvider.html5Mode( false )
+	$locationProvider.html5Mode( MODE.production == true )
 
 	$urlRouterProvider.rule(($injector, $location) ->
 		path = $location.path()
