@@ -7,6 +7,10 @@
 .tutorial-view {
 	background-color: $color-background;
 
+	&.success {
+		overflow: hidden;
+	}
+
 	.step {
 		width: 80%;
 		margin: 120px auto;

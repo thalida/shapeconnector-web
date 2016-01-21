@@ -64,7 +64,7 @@ class TutorialController
 
 			@stopAnimation = @canvas.draw.confettiAnimation(
 				canvas: @canvas.$el
-				totalParticles: 100
+				totalParticles: 'auto'
 				radius: 6
 				tilt: 3
 			)
@@ -85,14 +85,19 @@ class TutorialController
 
 
 		resizeWatch = () =>
-			$(window).on('resize', () =>
-				@canvasSize =
-					width: window.innerWidth
-					height: window.innerHeight
+			stopResizeWatch = $scope.$watchCollection(
+				() ->
+					return [window.innerWidth, window.innerHeight]
+				( dimension ) =>
+					@canvasSize =
+						width: dimension[0]
+						height: dimension[1]
 
-				renderConfetti()
+					renderConfetti()
+
+					return
+				true
 			)
-			return
 
 		return
 

@@ -484,21 +484,21 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 			W = _config.canvas.width()
 			H = _config.canvas.height()
 
+			if params.totalParticles is 'auto'
+				_config.totalParticles = Math.ceil(W/H * 150);
+
 			# angle will be an ongoing incremental flag. Sin and Cos functions will be applied to it to create vertical and horizontal movements of the flakes
 			angle = 0;
-
-			particles = while _config.totalParticles -= 1
+			i = _config.totalParticles
+			particles = while i -= 1
 				{
 					x: Math.random() * W
 					y: Math.random() * H
 					r: Math.random() * _config.radius + 1
-					d: Math.random() * _config.totalParticles
+					d: Math.random() * i
 					color: "rgba(" + Math.floor((Math.random() * 80)) + ", " + Math.floor((Math.random() * 220)) + ", " + Math.floor((Math.random() * 200)) + ", 1)"
 					tilt: Math.floor(Math.random() * _config.tilt) - _config.tilt
 				}
-
-			# console.log( particles, _config.totalParticles )
-			_config.totalParticles = particles.length
 
 			draw = =>
 				@ctx.clearRect(0, 0, W + 50, H + 50)
