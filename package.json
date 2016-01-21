@@ -3,15 +3,15 @@
   "version": "1.2.0",
   "main": "app/app.module.coffee",
   "scripts": {
-    "clean": "rm -r dist/*",
+    "clean": "rm -rf dist",
 
-    "prebuild:prod": "npm run clean",
     "prebuild:staging": "npm run clean",
+    "prebuild:prod": "npm run clean",
+    "build:staging": "NODE_ENV=production webpack -p --progress --colors",
     "build:prod": "NODE_ENV=production webpack -p --progress --colors",
-    "build:staging": "NODE_ENV=production webpack -p --progress --colors --watch",
 
-    "start:staging": "npm run build:staging && cd dist && python -m SimpleHTTPServer",
     "start:dev": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base dist --host 0.0.0.0 --port 8080",
+    "start:staging": "npm run build:staging && cd dist && python -m SimpleHTTPServer",
     "start": "npm run run:dev"
   },
   "devDependencies": {
