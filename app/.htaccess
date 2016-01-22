@@ -6,4 +6,4 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-RewriteRule ^([a-zA-Z0-9\/]+)\/?$ #/$1 [NC,L]
+RewriteRule ^(.+)\/?$ #/$1 [NC,L]
