@@ -46,7 +46,10 @@
 			<sc:noise-toggles></sc:noise-toggles>
 		</div>
 
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Go Home</a>
+		<div class="game-pause_modal-links">
+			<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Home</a>
+			<a sc:modal:action="close" on-complete="actions.quitGame('settings')" class="btn type-text">Settings</a>
+		</div>
 	</div>
 </sc:modal>
 

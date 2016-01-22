@@ -31,8 +31,10 @@ class PlayController
 		@pauseGame = false
 		@attempts = 0
 
-		@goHome = ->
-			$state.go('home')
+		@leaveGame = ( params ) ->
+			params.route ?= 'home'
+			$state.go( params.route )
+			return
 
 		@createNewGame = =>
 			@attempts = 0

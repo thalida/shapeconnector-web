@@ -168,7 +168,7 @@ angular.module('app').directive 'scGame', [
 			$scope.actions =
 				newGame: -> $scope.onNewGame?(params: true)
 				resetGame: -> $scope.onResetGame?(params: game.cacheGameBoard)
-				quitGame: -> $scope.onQuitGame?(params: true)
+				quitGame: ( route ) -> $scope.onQuitGame?(params: {route})
 				pauseGame: () ->
 					if game.gameOver is false
 						game.pauseGame()

@@ -164,8 +164,18 @@
 			}
 		}
 
-		.btn.type-text {
+		&-links {
+			@include clearfix;
 			margin: 0 auto;
+			text-align: center;
+
+			.btn.type-text {
+				display: inline-block;
+				width: 100px;
+				padding: 0;
+				text-align: center;
+			}
 		}
+
 	}
 }
