@@ -42,15 +42,24 @@ npm install
 This repo comes with the webpack build server already configured, start the server with:
 
 ```
-npm run dev
+npm run start:dev
 ```
 
 Browse to the app at `http://localhost:8080`.
 
-#### In Production
-When running in the production, your website needs to have `https://` suppport, as ServiceWorks **require** and SSL cert.
+#### In Staging
+To replicate what the production environment would be like locally, run:
+
 ```
-npm run build
+npm run start:staging
+```
+
+The above cmd runs `npm run clean` and `npm run build:staging`, then starts a 
+python web server using: `python -m SimpleHTTPServer`.
+
+#### In Production
+```
+npm run build:prod
 ```
 
 

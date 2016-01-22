@@ -12,7 +12,7 @@
 
     "start:dev": "webpack-dev-server --devtool eval --progress --colors --hot --inline --content-base dist --host 0.0.0.0 --port 8080",
     "start:staging": "npm run build:staging && cd dist && python -m SimpleHTTPServer",
-    "start": "npm run run:dev"
+    "start": "npm run start:dev"
   },
   "devDependencies": {
     "coffee-loader": "^0.7.2",
