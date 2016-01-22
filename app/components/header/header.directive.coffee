@@ -11,8 +11,10 @@ angular.module('app').directive 'appHeader', [
 			onShareEvent: '&?'
 			shareOpts: '=?'
 			showShare: '@?'
+			showMenu: '@?'
 		link: ($scope, el, attrs) ->
 			$scope.showShareLink = $scope.showShare == 'true'
+			$scope.showMenuIcon = $scope.showMenu == 'true'
 
 			$scope.onLogoClick = ( e ) ->
 				if $scope.onClick?

@@ -1,4 +1,9 @@
 <div class="app-header">
+	<div class="menu"
+		ng-show="showMenuIcon === true"
+		ng-click="onLogoClick( e )">
+		<div class="menu-middle"></div>
+	</div>
 	<div class="logo-container" ng-click="onLogoClick( e )">
 		<div class="logo small"></div>
 		<div class="logomark small"><span class="light faded">Shape</span>Connector</div>
