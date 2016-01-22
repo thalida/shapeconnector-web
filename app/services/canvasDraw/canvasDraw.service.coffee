@@ -485,7 +485,8 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 			H = _config.canvas.height()
 
 			if params.totalParticles is 'auto'
-				_config.totalParticles = Math.ceil(H/W * 200);
+				largestNum = if H > W then H else W
+				_config.totalParticles = Math.ceil( (H * W) / (largestNum * 3) );
 
 			# angle will be an ongoing incremental flag. Sin and Cos functions will be applied to it to create vertical and horizontal movements of the flakes
 			angle = 0;
