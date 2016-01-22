@@ -1,13 +1,7 @@
 'use strict'
 
-require('./favicon.ico')
-
 # Import manifest.json for use in index.html file
 manifestJSON = require('./manifest.json')
-
-# ServiceWorker for Offline Support
-# if MODE.production is true
-# 	require('offline-plugin/runtime').install( null )
 
 # Vendors
 require 'jquery'

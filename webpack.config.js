@@ -17,11 +17,21 @@ var DIST = __dirname + '/dist';
 var common = {
 	context: APP,
 	entry: {
-		app: './'
+		app: './',
+		vendors: [
+			'jquery',
+			'angular',
+			'angular-animate',
+			'angular-cookies',
+			'angular-resource',
+			'angular-sanitize',
+			'angular-touch',
+			'angular-ui-router'
+		]
 	},
 	output: {
 		path: DIST,
-        filename: "[name].[hash].js",
+        filename: "[name].[chunkhash].js",
         chunkFilename: "[id].js",
 		publicPath: ''
 	},
@@ -52,7 +62,7 @@ var common = {
 				loader: 'file-loader?name=[path][name].[hash].[ext]'
 			},
 			{
-				test: /\.(json|ico)(\?]?.*)?$/,
+				test: /\.(json)(\?]?.*)?$/,
 				loader: 'file-loader?name=[path][name].[ext]'
 			}
 		]
@@ -62,28 +72,23 @@ var common = {
 		extensions: ["", ".webpack.js", ".web.js", ".js", ".coffee"]
 	},
 	plugins: [
-		new HtmlWebpackPlugin({
-			template: APP + '/index.html',
-			inject: true
-		}),
-		// new OfflinePlugin({
-		// 	caches: 'all',
-		// 	scope: '/',
-		// 	updateStrategy: 'hash',
-		// 	ServiceWorker: {
-		// 		output: 'sw.js',
-		// 		entry: APP + '/serviceWorker.coffee'
-		// 	},
-		// 	AppCache: null
-		// }),
-		new ExtractTextPlugin("[name].[hash].css", {
-            allChunks: true
-        }),
 		new webpack.DefinePlugin({
 			MODE: {
 				production: isProduction
 			}
-		})
+		}),
+		new HtmlWebpackPlugin({
+			template: APP + '/index.html',
+			inject: true,
+			favicon: APP + '/favicon.ico',
+			options: {
+				isProduction: isProduction
+			}
+		}),
+		new ExtractTextPlugin("[name].[chunkhash].css", {
+            allChunks: true
+        }),
+		new webpack.optimize.CommonsChunkPlugin("vendors", "vendors.[chunkhash].js")
 	]
 };
 
