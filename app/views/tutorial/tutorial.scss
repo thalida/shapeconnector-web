@@ -12,7 +12,13 @@
 	}
 
 	&.success {
-		overflow: hidden;
+		overflow-y: auto;
+		overflow-x: hidden;
+		z-index: 1;
+
+		@media (min-height: 350px) {
+			overflow: hidden;
+		}
 	}
 
 	.step {
@@ -87,11 +93,11 @@
 		width: 80%;
 		z-index: 1;
 
-		margin: 200px auto;
+		margin: 50px auto;
 		text-align: center;
 
 		@media (min-height: 350px) {
-			margin-top: 0;
+			margin-top: -50px;
 			margin-bottom: 0;
 			@include vertical-align;
 		}
@@ -111,7 +117,7 @@
 	}
 
 	&-confetti_canvas {
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
 	}

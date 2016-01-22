@@ -1,6 +1,7 @@
 @import "../../assets/styles/mixins";
 
 .app-header {
+	@include clearfix;
 	padding: 5% 5% 0% 5%;
 	position: absolute;
 	z-index: 1;
