@@ -384,6 +384,14 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				else
 					@disableNewConnections = false
 
+			@getAllNeighborNodes()
+
+			# Update the cache of the last selection state
+			@lastSelectedState = angular.copy( @selectedNodes )
+
+			return
+
+		getAllNeighborNodes: () ->
 			touchedNodes = []
 			priorLastNode = @lastSelectedState[@lastSelectedState.length - 1]
 			parentNode = @getSelectedNodes.last()
@@ -398,9 +406,6 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				touchedNodes = touchedNodes.concat( parentNode )
 
 			@addTouchedNodes( touchedNodes )
-
-			# Update the cache of the last selection state
-			@lastSelectedState = angular.copy( @selectedNodes )
 
 			return
 

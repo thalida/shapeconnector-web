@@ -55,7 +55,7 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 					nodeStyle = 'touched'
 			else
 				isValidNextMove = gameUtils.isValidNextMove( lastNode, node )
-				if isValidNextMove is true
+				if isValidNextMove is true and @game.movesLeft > 0
 					nodeStyle = 'glow'
 				else
 					nodeStyle = 'untouched'
