@@ -73,13 +73,15 @@ class TutorialController
 
 
 		if @showSuccess
+			isFirstRender = true
 			canvasWatch = $scope.$watch('tutorial.canvas', (canvas) ->
 				if canvas?.draw?
-					canvasWatch()
 					@canvas = canvas
-
 					renderConfetti()
-					resizeWatch()
+
+					if isFirstRender
+						isFirstRender = false
+						resizeWatch()
 					return
 			)
 
@@ -92,8 +94,6 @@ class TutorialController
 					@canvasSize =
 						width: dimension[0]
 						height: dimension[1]
-
-					renderConfetti()
 
 					return
 				true

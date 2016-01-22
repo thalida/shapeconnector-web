@@ -42,10 +42,10 @@ angular.module('app').directive 'scCanvas', [
 
 				ctx = canvasEl.getContext('2d')
 				ctx.scale(2, 2)
+				save()
 
 				if isFirstRender
 					isFirstRender = false
-					save()
 					events.bind()
 
 
