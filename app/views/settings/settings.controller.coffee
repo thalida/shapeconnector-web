@@ -5,12 +5,13 @@ $requires = [
 	'$rootScope'
 	'$scope'
 	'$state'
+	'$localStorage'
 	'LEVELS'
 	require '../../services/gameSettings'
 ]
 
 class SettingsController
-	constructor: ($log, $rootScope, $scope, $state, LEVELS, gameSettings) ->
+	constructor: ($log, $rootScope, $scope, $state, $localStorage, LEVELS, gameSettings) ->
 		@isProd = MODE.production is true
 		@levels = angular.copy( LEVELS )
 		@levels.DEFAULT = null
@@ -24,6 +25,11 @@ class SettingsController
 			if @levels[ level ]?
 				gameSettings.setDifficulty( level )
 				@selectedLevel = level
+
+		@clearLocalStorage = ->
+			$localStorage.$reset()
+			$state.go('home')
+			return
 
 
 SettingsController.$inject = $requires

@@ -12,5 +12,10 @@
 			</a>
 		</div>
 		<sc:noise-toggles></sc:noise-toggles>
+		<div class="btn-container" ng-if="settings.isProd === false">
+			<a ng-click="settings.clearLocalStorage( key )" class="btn">
+			   Clear LocalStorage
+			</a>
+		</div>
 	</div>
 </div>
