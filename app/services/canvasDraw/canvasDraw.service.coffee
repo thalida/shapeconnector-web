@@ -257,6 +257,14 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 				@ctx.shadowOffsetX = 0
 				@ctx.shadowOffsetY = 0
 
+			else if params.style is 'glow'
+				@ctx.fillStyle = "rgba(0,0,0,0.2)"
+				@ctx.strokeStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 1.0)"
+				@ctx.shadowColor = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.9)"
+				@ctx.shadowBlur = 4
+				@ctx.shadowOffsetX = 0
+				@ctx.shadowOffsetY = 0
+
 			@ctx.fill()
 			@ctx.stroke()
 			@ctx.restore()

@@ -20,7 +20,7 @@ watcherService = ( $log ) ->
 		#	@start: Start watcing a collection of items and trigger the cb
 		#-------------------------------------------------------------------
 		start: ( items, callback ) ->
-			watch = @scope.$watchCollection(items, callback)
+			watch = @scope.$watchCollection(items, callback, true)
 			@watching.push( watch )
 
 			return watch

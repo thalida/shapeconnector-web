@@ -156,7 +156,11 @@ angular.module('app').directive 'scGame', [
 			#	Note: Keep $scope.$apply since events are bound outåside of angular
 			#-------------------------------------------------------------------
 			events =
-				onMove: ( e, params ) -> $scope.$apply( => game.onMoveEvent(e, params) )
+				onMove: ( e, params ) ->
+					$scope.$apply( =>
+						game.onMoveEvent(e, params)
+						return
+					)
 				onEnd: -> $scope.$apply( => game.onEndEvent() )
 				onCancel: -> $scope.$apply( => game.onCancelEvent() )
 				onResize: -> positionBoard()

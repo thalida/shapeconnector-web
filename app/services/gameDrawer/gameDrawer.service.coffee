@@ -44,9 +44,9 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 		getNodeStyle: ( node, lastNode ) ->
 			return if !node?
 
-			if node.selected is true
-				lastNode = @game.getSelectedNodes.last()
+			lastNode = @game.getSelectedNodes.last()
 
+			if node.selected is true
 				if gameUtils.isSameNode(node, @game.startNode)
 					nodeStyle = 'start'
 				else if @game.won and gameUtils.isSameNode(node, lastNode)
@@ -54,7 +54,11 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 				else
 					nodeStyle = 'touched'
 			else
-				nodeStyle = 'untouched'
+				isValidNextMove = gameUtils.isValidNextMove( lastNode, node )
+				if isValidNextMove is true
+					nodeStyle = 'glow'
+				else
+					nodeStyle = 'untouched'
 
 			return nodeStyle
 
@@ -536,7 +540,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 		# 		Create a "fill" deselected animation on the node
 		#---------------------------------------------------------------
 		fillAnimation: ( node ) ->
-			drawNode = @canvas.game.draw.createDrawParams(node, 'untouched')
+			nodeStyle = @getNodeStyle( node )
+			drawNode = @canvas.game.draw.createDrawParams(node, nodeStyle)
 			drawNode.animation = {type: 'fill'}
 
 			@canvas.game.draw.runAnimation(
@@ -549,6 +554,8 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 							clear: shape
 
 					done: ( shape ) =>
+						nodeStyle = @getNodeStyle( node )
+						drawNode = @canvas.game.draw.createDrawParams(node, nodeStyle)
 						node.animation = null
 						# Clear any leftover states from animation
 						@canvas.game.draw.clear( shape )

@@ -46,6 +46,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			@addedNodes = []
 			@removedNodes = []
 			@touchedNodes = []
+			@lastSelectedState = []
 			@startNode = null
 
 			@gameOver = false
@@ -210,19 +211,8 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			isValidCanvasY = @validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
 			return false if not isValidCanvasX or not isValidCanvasY
 
-			# Check that the node this move is closest to is one that we're
-			# allowed to move to (up, down, left, or right only)
 			parentNode = @getSelectedNodes.last()
-			dx = Math.abs(parentNode.coords.x - node.coords.x)
-			dy = Math.abs(parentNode.coords.y - node.coords.y)
-			isValidDirection = (dx + dy) is 1
-			return false if not isValidDirection
-
-			# Check that the node we're closest to is either the same color
-			# or the same type as the parent node
-			sameColor = parentNode.color == node.color
-			sameType = parentNode.type == node.type
-			isValidMove = isValidDirection and (sameColor or sameType)
+			isValidMove = gameUtils.isValidNextMove( parentNode, node )
 			return false if not isValidMove
 
 			# Woot! We've made a valid move
@@ -393,6 +383,26 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 					@disableNewConnections = true
 				else
 					@disableNewConnections = false
+
+			touchedNodes = []
+			priorLastNode = @lastSelectedState[@lastSelectedState.length - 1]
+			parentNode = @getSelectedNodes.last()
+
+			if priorLastNode?
+				lastTouchedNodes = gameUtils.getNeighborNodes( @board, priorLastNode )
+				touchedNodes = touchedNodes.concat( lastTouchedNodes )
+				touchedNodes = touchedNodes.concat( priorLastNode )
+
+			if parentNode?
+				touchedNodes = touchedNodes.concat(gameUtils.getNeighborNodes( @board, parentNode ))
+				touchedNodes = touchedNodes.concat( parentNode )
+
+			@addTouchedNodes( touchedNodes )
+
+			# Update the cache of the last selection state
+			@lastSelectedState = angular.copy( @selectedNodes )
+
+			return
 
 		#	@touchedNodes
 		# 		If a node has been "touched" by an animation re-render it

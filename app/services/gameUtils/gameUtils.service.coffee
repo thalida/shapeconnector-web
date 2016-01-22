@@ -243,6 +243,26 @@ gameUtils = ( $log, BOARD, SHAPE, ALPHABET ) ->
 
 			return neighbors
 
+		isValidNextMove: ( parentNode, node ) ->
+			return false if !parentNode? or parentNode.selected is false
+
+			# Check that the node this move is closest to is one that we're
+			# allowed to move to (up, down, left, or right only)
+			dx = Math.abs(parentNode.coords.x - node.coords.x)
+			dy = Math.abs(parentNode.coords.y - node.coords.y)
+			isValidDirection = (dx + dy) is 1
+			return false if not isValidDirection
+
+			# Check that the node we're closest to is either the same color
+			# or the same type as the parent node
+			sameColor = parentNode.color == node.color
+			sameType = parentNode.type == node.type
+			isValidMove = isValidDirection and (sameColor or sameType)
+
+			return isValidMove
+
+
+
 	return utils
 
 
