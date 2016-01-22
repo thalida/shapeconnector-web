@@ -24,12 +24,18 @@ class PlayController
 		@gameType = gameSettings.setGameType( mode )
 		@difficulty = gameSettings.setDifficulty( difficulty )
 
+
 		if $localStorage.hasCompletedTutorial != true
 			$state.go('tutorial', {step: 1, mode: @gameType})
+
 
 		@rebuildGame = true
 		@pauseGame = false
 		@attempts = 0
+
+		@updateUrlParams = =>
+			$state.transitionTo('play', {game: gameStr, mode: @gameType, difficulty: @difficulty}, { notify: false })
+			return
 
 		@leaveGame = ( params ) ->
 			params.route ?= 'home'
@@ -37,6 +43,7 @@ class PlayController
 			return
 
 		@createNewGame = =>
+			@updateUrlParams()
 			@attempts = 0
 			@gameCopy = null
 			@rebuildGame = true

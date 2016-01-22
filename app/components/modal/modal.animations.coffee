@@ -3,7 +3,8 @@
 angular.module('app').animation '.modal', [
 	'$log'
 	'$rootScope'
-	($log, $rootScope) ->
+	'$timeout'
+	($log, $rootScope, $timeout) ->
 		visiblityClass = 'js-modal-animate-visibility'
 		minimizeClass = 'js-modal-animate-minimize'
 

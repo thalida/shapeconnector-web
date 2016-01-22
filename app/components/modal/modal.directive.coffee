@@ -139,8 +139,10 @@ angular.module('app').directive 'scModal', [
 
 				onAnimationDone: ( e, args ) ->
 					return if $scope.name isnt args.$el.data('name')
+
 					$scope.$apply(() ->
 						$scope.isAnimating = false
+
 					)
 					return
 
@@ -201,10 +203,11 @@ app.directive 'scModalAction', [
 				() -> modalCtrl.getIsAnimating()
 				( isAnimating ) ->
 					if triggeredAction and !isAnimating and hasCallback
-						triggeredAction = false
-						triggeredEvt = null
-						eventCallback($scope, { e: triggeredEvt })
-
+						$timeout(() ->
+							triggeredAction = false
+							triggeredEvt = null
+							eventCallback($scope, { e: triggeredEvt })
+						)
 					return
 			)
 
