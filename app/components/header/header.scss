@@ -11,7 +11,7 @@
 		@extend %clickable;
 		float: left;
 		position: absolute;
-		width: 13px;
+		width: 12px;
 		margin-top: 4px;
 		left: 0;
 
@@ -45,7 +45,7 @@
 	}
 
 
-	@media (max-height: 510px) {
+	@media (max-height: 600px) {
 		.logomark {
 			display: none;
 		}
@@ -58,7 +58,7 @@
 		}
 
 		.menu {
-			width: 18px;
+			width: 15px;
 		}
 	}
 }
