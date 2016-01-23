@@ -68,6 +68,10 @@ var common = {
 			{
 				test: require.resolve(APP + '/assets/images/logo-gradient-512.png'),
 				loader: 'file-loader?name=[path][name].[ext]'
+			},
+			{
+				test: require.resolve(APP + '/assets/images/gameplay-mini.glow.copy.gif'),
+				loader: 'file-loader?name=[path][name].[ext]'
 			}
 		]
 	},
