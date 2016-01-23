@@ -7,9 +7,15 @@
 		share-opts="play.shareOpts"
 	>
 		<div class="play-view_header-controls">
-			<span class="control pause-icon" ng-click="play.triggerGamePause()" title="Pause Game"></span>
-			<span class="control restart-icon" ng-click="play.resetGame()" title="Reset Game"></span>
-			<span class="control skip-icon"  ng-click="play.createNewGame()" title="Create New Game"></span>
+			<span class="control pause" ng-click="play.triggerGamePause()">
+				<span class="icon" title="Pause Game"></span>
+			</span>
+			<span class="control restart" ng-click="play.resetGame()">
+				<span class="icon" title="Restart Game"></span>
+			</span>
+			<span class="control skip" ng-click="play.createNewGame()">
+				<span class="icon" title="Create Game"></span>
+			</span>
 		</div>
 	</app:header>
 
