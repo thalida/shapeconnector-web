@@ -93,7 +93,7 @@ module.exports = {
 
 		1: {
 			header1: 'Connect two of the same shapes'
-			header2: 'Try it yourself!'
+			header2: 'Try it yourself by dragging or clicking!'
 			headerPosition: 'top'
 			showGoal: false
 			random: false
@@ -125,7 +125,7 @@ module.exports = {
 		}
 		4: {
 			header1: 'Now connect a #{startNode} to a #{endNode} in exactly 3 moves'
-			header2: 'Made a mistake? Drag backwards to undo a move!'
+			header2: 'Made a mistake? Drag or click backwards to undo a move!'
 			headerPosition: 'bottom'
 			showGoal: true
 			showMovesLeft: true
