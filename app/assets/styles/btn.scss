@@ -1,6 +1,7 @@
 @import "./mixins.scss";
 @import "./colors.scss";
 @import "./generics.scss";
+@import "./sprites.scss";
 
 .btn {
 	@extend %clickable;

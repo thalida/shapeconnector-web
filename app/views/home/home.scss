@@ -1,4 +1,4 @@
-@import "../../assets/styles/sprites";
+
 @import "../../assets/styles/mixins";
 @import "../../assets/styles/animations";
 @import "../../assets/styles/btn";
@@ -31,9 +31,13 @@
 		}
 	}
 
+	.selectbox {
+		position: relative;
+		margin: 50px auto;
+	}
+
 	.btn-container {
 		position: relative;
-		margin: 60px 0;
 
 		.btn {
 			margin: 0 auto 20px;
