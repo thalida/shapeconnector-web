@@ -40,6 +40,30 @@ run = ($rootScope, $location, $timeout, $state, $localStorage, WindowEvents, ass
 									window.msCancelRequestAnimationFrame ||
 									clearTimeout
 
+	# https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex
+	if !Array::findIndex
+		Array::findIndex = (predicate) ->
+			if this == null
+				throw new TypeError('Array.prototype.findIndex called on null or undefined')
+
+			if typeof predicate != 'function'
+				throw new TypeError('predicate must be a function')
+
+			list = Object(this)
+			length = list.length >>> 0
+			thisArg = arguments[1]
+			value = undefined
+			i = 0
+
+			while i < length
+				value = list[i]
+				if predicate.call(thisArg, value, i, list)
+					return i
+				i++
+
+			return -1
+
+
 	return
 
 run.$inject = $requires
