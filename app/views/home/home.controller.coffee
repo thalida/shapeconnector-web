@@ -37,7 +37,7 @@ class HomeController
 			if @showTutorial
 				$state.go('tutorial', {step: 1})
 			else
-				$state.go('play', {mode: type})
+				$state.go('play', {mode: type, difficulty: @selectedLevel.toLowerCase()})
 
 		return
 
