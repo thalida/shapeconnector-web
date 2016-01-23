@@ -16,6 +16,7 @@ angular.module('app').directive 'appHeader', [
 			showShare: '@?'
 			showMenu: '@?'
 			showSounds: '@?'
+		transclude: true
 		link: ($scope, el, attrs) ->
 			$scope.showLogo ?= 'true'
 

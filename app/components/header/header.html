@@ -9,6 +9,7 @@
 	<div ng-if="showSoundsIcon" class="music-link" ng-class="[{'on': isMusicOn, 'off': !isMusicOn }]" ng-click="openSoundsModal()">
 		<div class="icon"></div>
 	</div>
+	<div ng-transclude></div>
 	<share ng-if="showShareLink" event-handler="shareEvent( params )" opts="shareOpts"></share>
 	<sc:modal name="soundsModal" show="showSoundsModal" style="blue" position="center" height="170">
 		<div class="sounds-modal">
