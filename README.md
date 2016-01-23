@@ -22,7 +22,7 @@ Checkout the [open issues](https://github.com/thalida/ShapeConnector/issues) for
 ## Contributing
 ### Clone ShapeConnector
 
-Clone the ShapeConnector repository using [git][git]:
+Clone the ShapeConnector repository using [git](https://git-scm.com/):
 
 ```
 git clone git@github.com:thalida/ShapeConnector.git
