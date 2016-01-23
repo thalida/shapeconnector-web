@@ -9,6 +9,7 @@
 
 $requires = [
 	'$log'
+	'$timeout'
 	'LEVELS'
 	'BOARD'
 	'SHAPE'
@@ -22,7 +23,7 @@ $requires = [
 	'assets'
 ]
 
-gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderService, GameDrawer, Watcher, gameUtils, assetsService ) ->
+gameManagerService = ( $log, $timeout, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderService, GameDrawer, Watcher, gameUtils, assetsService ) ->
 	new class GameManager
 		constructor: () ->
 
@@ -195,8 +196,12 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		# 		Validate that node moved to via touch/mouse is a valid one
 		#-------------------------------------------------------------------
 		checkMove: ( node, pos, opts = {save: true} ) ->
+			result =
+				ok: false
+
 			# Return if no node has been found
-			return false if !node? || node is false
+			result.reason = 'no-node'
+			return result if !node? || node is false
 
 			# If we have NO other selected nodes this move is automatically valid
 			if @getSelectedNodes.total() == 0
@@ -207,26 +212,36 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 					return isValidStart = true if sameColor and sameType
 				)
 				@saveNode( node ) if opts.save and isValidStart
-				return isValidStart
+				result.ok = isValidStart
+				result.reason = 'invalid-start'
+				return result
 
 			# Return true if this node is selected
 			if node.selected == true
 				@saveNode( node ) if opts.save is true
-				return true
+				result.ok = true
+				result.reason = 'selected-node'
+				return result
 
 			# Validate that move is in the accepted distance to trigger the closest node
 			isValidCanvasX = @validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
 			isValidCanvasY = @validateTouchAxis({type: 'y', nodeCoord: node.coords.y, touchPos: pos.y})
-			return false if not isValidCanvasX or not isValidCanvasY
+			result.ok = false
+			result.reason = 'invalid-distance'
+			return result if not isValidCanvasX or not isValidCanvasY
 
 			parentNode = @getSelectedNodes.last()
 			isValidMove = gameUtils.isValidNextMove( parentNode, node )
-			return false if not isValidMove
+			result.ok = false
+			result.reason = 'invalid-move'
+			return result if not isValidMove
 
 			# Woot! We've made a valid move
 			@saveNode( node ) if opts.save is true
 
-			return isValidMove
+			result.ok = true
+			result.reason = null
+			return result
 
 		#	@isGameOver
 		# 		Check if the game is completed
@@ -253,7 +268,9 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		# 		Pop the past node if the user is trying to undo a move
 		#-------------------------------------------------------------------
 		saveNode: ( node ) ->
-			return if not node?
+			return false if not node?
+
+			return false if @disableNewConnections and node.selected isnt true
 
 			if node.selected is true
 				if @selectedNodes.length is 1
@@ -266,9 +283,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 						return gameUtils.isSameNode( node, n )
 					)
 
-					# Don't remove the current node (only the ones after)
 					nodeIdx += 1
-
 
 					selectedCopy = angular.copy( @selectedNodes )
 					removedNodes = selectedCopy.splice(nodeIdx, @selectedNodes.length)
@@ -281,15 +296,13 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 
 					@removedNodes = @removedNodes.concat( removedNodes )
 					@selectedNodes.splice(nodeIdx, @selectedNodes.length)
-					return
-
-			return if @disableNewConnections
+					return true
 
 			nodeCoords = node.coords
 			@board[nodeCoords.x][nodeCoords.y].selected = true
 			@selectedNodes.push( node )
 			@addedNodes.push( node )
-			return
+			return true
 
 		#	addTouchedNodes
 		#-------------------------------------------------------------------
@@ -507,15 +520,36 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			# Get the node at this position
 			currNode = gameUtils.findNode( @board, nodePosition )
 
-			if currNode
-				isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
-				if isValidNextNode
-					@saveNode(currNode)
+			return if !currNode?
+			badMove = true
+
+			isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
+			if isValidNextNode.ok
+
+				if @selectedNodes.length is 1
+					badMove = false
+					@isWaitingForMovement = true
+					@isValidStart = true
+
+					$timeout(() =>
+						@isWaitingForMovement = false
+						if !@isDragging
+							@saveNode(currNode)
+							@justSavedNode = currNode
+					,300)
+				else
+					wasSaveSuccessful = @saveNode(currNode)
+					badMove = false if wasSaveSuccessful is true
+
 					@justSavedNode = currNode
 					@isValidStart = true
+
 					@onMoveEvent(e, {start: true, alreadyTouched: true})
-				else
-					assetsService.playSound('badMove')
+
+			if badMove is true and isValidNextNode.reason isnt 'invalid-distance'
+				assetsService.playSound('badMove')
+				@render.shakeAnimation( currNode )
+				return
 
 
 		#	onMoveEvent
@@ -564,6 +598,9 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				else
 					lastTouchedNode = @getSelectedNodes.last()
 					@isValidStart = gameUtils.isSameNode( currNode, lastTouchedNode )
+			else if @isWaitingForMovement is true
+				@isDragging = true
+
 
 			isValidMouse = params.type is 'mouse' and @isDragging
 			isValidTouch = params.type is 'touch'
@@ -574,23 +611,32 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				isNewNode = true
 
 			# Check if we should process the mouse/touch event
-			if (isValidTouch or isValidMouse)
-				if @isValidStart
-					@dragStart = currNode if params.start
-					isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
-					if isValidNextNode and isNewNode
-						@justSavedNode = currNode
-						@saveNode(currNode)
-					@render.trackingLine(@dragStart, nodePosition)
-				else
-					assetsService.playSound('badMove')
+			return if !isValidTouch and !isValidMouse
+
+			badMove = true
+
+			if @isValidStart
+				isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
+				@dragStart = currNode if params.start
+				@render.trackingLine(@dragStart, nodePosition)
+
+				badMove = !isValidNextNode.ok
+
+				if isValidNextNode.ok and isNewNode
+					wasSaveSuccessful = @saveNode(currNode)
+					@justSavedNode = currNode
+					badMove = !wasSaveSuccessful
+
+			if badMove is true and isValidNextNode?.reason isnt 'invalid-distance'
+				assetsService.playSound('badMove')
+				@render.shakeAnimation( currNode )
+				return
 
 
 		#	onEndEvent
 		# 		Callback if the user has triggered a mouse/touch end events
 		#-------------------------------------------------------------------
 		onEndEvent: =>
-			@dragStart = null
 			@isDragging = false
 			return if @gameOver
 
@@ -601,8 +647,6 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		# 		Callback if the user has triggered a touch cancel event
 		#-------------------------------------------------------------------
 		onCancelEvent: =>
-			@dragStart = null
-
 			return if @gameOver
 
 			@removedNodes = []

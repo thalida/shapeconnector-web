@@ -22,7 +22,7 @@ shapeConsts = {
 		'triangle'
 	]
 	SIZE: 18 # size in px for each node
-	BORDER: 2 # border width around each node
+	BORDER: 3 # border width around each node
 }
 shapeConsts.MARGIN = shapeConsts.SIZE * 2 # padding around each shape
 shapeConsts.OUTERSIZE = shapeConsts.SIZE + shapeConsts.MARGIN
