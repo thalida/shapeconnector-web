@@ -1,21 +1,39 @@
 @import "../../assets/styles/mixins.scss";
 @import "../../assets/styles/colors.scss";
 @import "../../assets/styles/generics.scss";
+@import "../../assets/styles/sprites.scss";
 
 .selectbox {
+	@extend %clickable;
+
+	position: relative;
+	display: block;
 	width: 150px;
 	height: 50px;
 	overflow: hidden;
 	margin: 0 auto;
 
-	background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 96% 0;
-	background-color: rgba(white, 0.5);
+	background-color: rgba(white, 0.3);
 	border: 0;
 	border-radius: $border-radius;
 
 	font: normal normal 14px/1.2 'PT Sans', sans-serif;
 
+	-webkit-transition: all 500ms;
+    transition: all 500ms;
+
+	.icon {
+		@include cssSprite( $arrow-down-white );
+		position: absolute;
+		display: block;
+		top: 0;
+		right: 0;
+		margin: 20px 15px;
+	}
+
 	select {
+		@extend %clickable;
+
 		width: 160px;
 		height: 50px;
 		padding: 5px 10px;
@@ -30,5 +48,9 @@
 		color: white;
 		font: normal normal 14px/1.2 'PT Sans', sans-serif;
 		line-height: 1;
+	}
+
+	&:hover {
+		background-color: rgba(white, 0.5);
 	}
 }
