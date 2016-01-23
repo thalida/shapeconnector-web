@@ -277,13 +277,13 @@ gameManagerService = ( $log, $timeout, LEVELS, BOARD, SHAPE, utils, Timer, GameB
 					@board[node.coords.x][node.coords.y].selected = false
 					@removedNodes.push( node )
 					@selectedNodes.pop()
-					return
+					return true
 				else
 					nodeIdx = @selectedNodes.findIndex(( n, i ) ->
 						return gameUtils.isSameNode( node, n )
 					)
 
-					nodeIdx += 1
+					nodeIdx += if nodeIdx is 0 then 0 else 1
 
 					selectedCopy = angular.copy( @selectedNodes )
 					removedNodes = selectedCopy.splice(nodeIdx, @selectedNodes.length)
@@ -536,6 +536,7 @@ gameManagerService = ( $log, $timeout, LEVELS, BOARD, SHAPE, utils, Timer, GameB
 						if !@isDragging
 							@saveNode(currNode)
 							@justSavedNode = currNode
+							@render.allDashedLines()
 					,300)
 				else
 					wasSaveSuccessful = @saveNode(currNode)
