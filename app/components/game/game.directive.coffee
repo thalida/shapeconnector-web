@@ -57,7 +57,7 @@ angular.module('app').directive 'scGame', [
 					headerHeight = if window.innerHeight > 650 then SHAPE.OUTERSIZE + 10 else 0
 
 					topMargin = windowMidHeight - headerHeight - boardHalfHeight
-					topMargin = 60 if topMargin < 100
+					topMargin = 100 if topMargin < 100
 
 					return topMargin
 

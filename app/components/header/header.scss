@@ -3,10 +3,15 @@
 
 .app-header {
 	@include clearfix;
-	padding: 5% 5% 0% 5%;
+	padding: 8%;
+	padding-bottom: 0;
 	position: absolute;
 	z-index: 1;
 	width: 100%;
+
+	@media( min-width: 550px ){
+		padding-top: 5%;
+	}
 
 	.menu {
 		@extend %clickable;
