@@ -55,7 +55,7 @@ class PlayController
 			@pauseGame = false
 			return
 
-		@onHeaderClick = =>
+		@triggerGamePause = =>
 			@pauseGame = true
 			return
 

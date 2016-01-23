@@ -1,0 +1,28 @@
+@import "../../assets/styles/mixins";
+@import "../../assets/styles/sprites";
+
+.play-view {
+	&_header-controls {
+		float: left;
+
+		.control {
+			@extend %clickable;
+			display: inline-block;
+			margin-right: 20px;
+
+			&:hover {
+				opacity: 0.8;
+			}
+		}
+
+		.pause-icon {
+			@include cssSprite( $pause-medium-white );
+		}
+		.skip-icon {
+			@include cssSprite( $skip-medium-white );
+		}
+		.restart-icon {
+			@include cssSprite( $restart-medium-white );
+		}
+	}
+}

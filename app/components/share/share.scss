@@ -4,11 +4,10 @@
 .share {
 	&-link {
 		@extend %clickable;
-		@include cssSprite( $link-white );
+		@include cssSprite( $link-medium-white );
 		content: '';
 		display: block;
 		float: right;
-		margin-top: 12px;
 
 		&:hover {
 			opacity: 0.8;

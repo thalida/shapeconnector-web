@@ -1,24 +1,31 @@
+<div class="play-view">
+	<app:header
+		on-share-event="play.onShareEvent( params )"
+		show-share="true"
+		show-menu="false"
+		show-logo="false"
+		share-opts="play.shareOpts"
+	>
+		<div class="play-view_header-controls">
+			<span class="control pause-icon" ng-click="play.triggerGamePause()" title="Pause Game"></span>
+			<span class="control restart-icon" ng-click="play.resetGame()" title="Reset Game"></span>
+			<span class="control skip-icon"  ng-click="play.createNewGame()" title="Create New Game"></span>
+		</div>
+	</app:header>
 
-<app:header
-	on-click="play.onHeaderClick()"
-	on-share-event="play.onShareEvent( params )"
-	show-share="true"
-	show-menu="true"
-	share-opts="play.shareOpts">
-</app:header>
-
-<div class="app-view">
-	<div recompiler="play.rebuildGame" animate="fadeIn">
-		<sc:game
-			type="{{play.gameType}}"
-			difficulty="{{play.difficulty}}"
-			attempts="play.attempts"
-			source-game="play.gameCopy"
-			pause-game="play.pauseGame"
-			modal-shown="play.modal"
-			on-new-game="play.createNewGame(params)"
-			on-reset-game="play.resetGame(params)"
-			on-quit-game="play.leaveGame(params)">
-		</sc:game>
+	<div class="app-view">
+		<div recompiler="play.rebuildGame" animate="fadeIn">
+			<sc:game
+				type="{{play.gameType}}"
+				difficulty="{{play.difficulty}}"
+				attempts="play.attempts"
+				source-game="play.gameCopy"
+				pause-game="play.pauseGame"
+				modal-shown="play.modal"
+				on-new-game="play.createNewGame(params)"
+				on-reset-game="play.resetGame(params)"
+				on-quit-game="play.leaveGame(params)">
+			</sc:game>
+		</div>
 	</div>
 </div>
