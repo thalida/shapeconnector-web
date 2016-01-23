@@ -107,7 +107,10 @@ assets = ($log, $q, gameSettings) ->
 				sound.play()
 			else
 				return if gameSettings.getAllowSounds() is off
-				sound.currentTime = 0
+
+				if name isnt 'badMove'
+					sound.currentTime = 0
+
 				sound.play?()
 			return
 
