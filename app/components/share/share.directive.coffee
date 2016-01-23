@@ -26,7 +26,7 @@ angular.module('app').directive 'share', [
 					@gameAsStr = gameUtils.convertGameToStr( GameManager.cacheGameBoard )
 					gameUtils.convertStrToGame( @gameAsStr )
 
-					modifier = if MODE.isProduction then '/' else '/#'
+					modifier = if MODE.production is true then '/' else '/#'
 
 					href = window.location.origin + modifier + 'play/'
 					mode = gameSettings.getGameType()
