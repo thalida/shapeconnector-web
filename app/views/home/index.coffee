@@ -2,6 +2,7 @@
 
 require '../../components/slideshow'
 require '../../components/selectbox'
+require '../../components/header'
 
 require './home.scss'
 require './home.html'
