@@ -31,7 +31,7 @@ var common = {
 	},
 	output: {
 		path: DIST,
-        filename: "[name].[chunkhash].js",
+        filename: "[name].[hash].js",
         chunkFilename: "[id].js",
 		publicPath: ''
 	},
@@ -80,19 +80,19 @@ var common = {
 		new HtmlWebpackPlugin({
 			template: APP + '/index.html',
 			inject: true,
-			favicon: APP + '/favicon.ico',
-			options: {
-				isProduction: isProduction
-			}
+			favicon: APP + '/favicon.ico'
 		}),
-		new ExtractTextPlugin("[name].[chunkhash].css", {
+		new ExtractTextPlugin("[name].[hash].css", {
             allChunks: true
-        }),
-		new webpack.optimize.CommonsChunkPlugin("vendors", "vendors.[chunkhash].js")
+        })
 	]
 };
 
-var productionConfig = {};
+var productionConfig = {
+	plugins: [
+		new webpack.optimize.CommonsChunkPlugin("vendors", "vendors.[hash].js")
+	]
+};
 var devConfig = {
 	plugins: [
 		new webpack.HotModuleReplacementPlugin()
