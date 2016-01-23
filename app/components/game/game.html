@@ -37,18 +37,14 @@
 <sc:modal name="pauseModal" show="showPauseModal" style="blue" position="center">
 	<div class="game-pause_modal game-modal">
 		<div class="game-pause_modal-controls">
-			<div sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn small-circle restart-icon"></div>
-			<div sc:modal:action="close" on-complete="actions.resumeGame( e )" class="btn circle play-icon"></div>
-			<div sc:modal:action="close" on-complete="actions.newGame( e )" class="btn small-circle skip-icon"></div>
+			<a sc:modal:action="close" on-complete="actions.resumeGame( e )" class="btn type-primary play-btn">Resume</a>
+			<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-secondary restart-btn">Restart</a>
+			<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-secondary skip-btn">Skip</a>
+			<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Main Menu</a>
 		</div>
 
 		<div class="game-pause_modal-settings">
 			<sc:noise-toggles></sc:noise-toggles>
-		</div>
-
-		<div class="game-pause_modal-links">
-			<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Home</a>
-			<a sc:modal:action="close" on-complete="actions.quitGame('settings')" class="btn type-text">Settings</a>
 		</div>
 	</div>
 </sc:modal>
@@ -63,11 +59,11 @@
 			<a sc:modal:action="minimize" class="btn type-secondary">See gameboard</a>
 			<a sc:modal:action="close" on-complete="actions.newGame()" class="btn type-primary addon-arrow">Next Puzzle</a>
 		</div>
-		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Go Home</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame()" class="btn type-text">Main Menu</a>
 	</div>
 	<div class="scmodal-minimized-content">
 		<a sc:modal:action="close" on-complete="actions.quitGame()" no-delay class="btn float-left type-text">
-			Go Home
+			Main Menu
 		</a>
 		<a sc:modal:action="close" on-complete="actions.newGame()" no-delay class="btn float-right type-primary addon-arrow">
 			Next Puzzle
@@ -82,6 +78,6 @@
 			<a sc:modal:action="close" on-complete="actions.resetGame( e )" class="btn type-secondary">Try again?</a>
 			<a sc:modal:action="close" on-complete="actions.newGame( e )" class="btn type-primary addon-arrow">New Puzzle</a>
 		</div>
-		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Go Home</a>
+		<a sc:modal:action="close" on-complete="actions.quitGame( e )" class="btn type-text">Main Menu</a>
 	</div>
 </sc:modal>

@@ -55,6 +55,10 @@ class PlayController
 			@pauseGame = false
 			return
 
+		@triggerGameReset = =>
+			@resetGameWhen = true
+			return
+
 		@triggerGamePause = =>
 			@pauseGame = true
 			return
