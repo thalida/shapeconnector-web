@@ -86,10 +86,13 @@ angular.module('app').directive 'scCanvas', [
 					if $scope.events.end?
 						canvas.el.addEventListener('touchend', @end, false)
 						canvas.el.addEventListener('touchleave', @end, false)
-						canvas.$el.on('mouseup', ( e ) => @end(e, true))
+						document.body.addEventListener('mouseup',
+							( e ) =>
+								return @end(e, true)
+						, false)
 
 					if $scope.events.cancel?
-						canvas.el.addEventListener('touchcancel', @cancel, false)
+						document.body.addEventListener('touchcancel', @cancel, false)
 
 				unbind: () ->
 					canvas.$el
@@ -102,10 +105,20 @@ angular.module('app').directive 'scCanvas', [
 					canvas.el.removeEventListener('touchend', @end, false)
 					canvas.el.removeEventListener('touchleave', @end, false)
 					canvas.el.removeEventListener('touchcancel', @cancel, false)
+					document.body.removeEventListener('touchcancel', @cancel, false)
+					document.body.removeEventListener('mouseup',
+						( e ) =>
+							return @end(e, true)
+					, false)
+
 
 				process: (evtType, e, isMouse) =>
 					trigger = (if isMouse then 'mouse' else 'touch')
-					$scope.events[evtType]?(e, {start: evtType == 'start', type: trigger })
+					$scope.events[evtType]?(e, {
+						start: evtType == 'start'
+						type: trigger
+						eventType: evtType
+					})
 
 				start: ( e, isMouse ) -> events.process('start', e, isMouse)
 				move: ( e, isMouse ) -> events.process('move', e, isMouse)
