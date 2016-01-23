@@ -15,15 +15,23 @@ run = ($rootScope, $location, $timeout, $state, $localStorage, WindowEvents, ass
 	$rootScope.windowEvents = new WindowEvents()
 
 	assets.downloadAll().then(() =>
-		assets.playSound('background')
+		startWindowClickEvt()
 	)
 
 	if !$localStorage.firstVisited?
 		$localStorage.firstVisited = new Date()
 		$localStorage.hasCompletedTutorial = false
 
-	$rootScope.windowEvents.onFocus( -> assets.playSound('background') )
+	startWindowClickEvt = ->
+		$(window).on('click', ( e ) ->
+			foo = e
+			assets.playSound('background')
+			$(window).off('click')
+		)
+
+	$rootScope.windowEvents.onFocus( startWindowClickEvt )
 	$rootScope.windowEvents.onBlur( -> assets.pauseSound('background') )
+
 
 	window.requestAnimationFrame = window.requestAnimationFrame ||
 								   window.webkitRequestAnimationFrame ||
