@@ -26,7 +26,9 @@ angular.module('app').directive 'share', [
 					@gameAsStr = gameUtils.convertGameToStr( GameManager.cacheGameBoard )
 					gameUtils.convertStrToGame( @gameAsStr )
 
-					href = window.location.href.split('?')[0]
+					modifier = if MODE.isProduction then '/' else '/#'
+
+					href = window.location.origin + modifier + 'play/'
 					mode = gameSettings.getGameType()
 					difficulty = gameSettings.getDifficulty()
 					@gameOpts = "?mode=#{mode}&difficulty=#{difficulty}"
