@@ -12,7 +12,6 @@ $requires = [
 	'$interval'
 	'SHAPE'
 	'HEXCOLORS'
-
 	require '../../services/utils'
 ]
 
@@ -165,6 +164,9 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 
 				else if animationType is 'fadeOut'
 					animationFunc = @fadeOutAnimation
+
+				else if animationType is 'shake'
+					animationFunc = @shakeAnimation
 
 				shape = animationFunc?( params, progress, callbacks?.during)
 
@@ -442,11 +444,8 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 				height: params.size.h
 			}
 
-			return
-
 
 		#	@fadeOutAnimation
-		# 		Adds a shadow beneath the shape
 		#-------------------------------------------------------------------
 		fadeOutAnimation: (params, progress) =>
 			@clear( params.clear )
@@ -473,6 +472,43 @@ canvasDrawService = ( $log, $interval, SHAPE, HEXCOLORS, utils ) ->
 				width: params.size.w,
 				height: params.size.h
 			}
+
+		#	@shakeAnimation
+		# 		Creates a shake animation on the shape
+		#-------------------------------------------------------------------
+		shakeAnimation: (params, progress, cb) =>
+			@clear( params.clear )
+
+			makeShape = @[params.type]
+			rgb = utils.hexToRgb(params.color)
+
+			direction = if progress < 0.5 then -1 else 1
+
+			rotate = ((progress * 60) - 160) * (Math.PI / 180)
+
+			halfWidth = params.size.w / 2
+			halfHeight = params.size.h / 2
+
+			shapeCenter =
+				x: params.coords.x + halfWidth
+				y: params.coords.y + halfHeight
+
+			shape =
+				x: -1 * halfWidth + (15 * direction * (progress/2))
+				y: -1 * halfHeight
+				w: params.size.w
+				h: params.size.h
+
+			@ctx.save()
+			@ctx.translate(shapeCenter.x, shapeCenter.y)
+			# @ctx.rotate( rotate )
+			@ctx.fillStyle = "rgba(#{rgb.r}, #{rgb.g}, #{rgb.b}, 0.9)"
+			makeShape(shape.x, shape.y, shape.w, shape.h)
+			@ctx.fill()
+			@ctx.restore()
+
+			return shape
+
 
 		#	@confettiAnimation
 		# 		Creates a confetti animation

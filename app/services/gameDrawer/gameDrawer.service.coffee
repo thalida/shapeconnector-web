@@ -600,7 +600,7 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 			return
 
 		#	@fadeOut
-		# 		Create a "fadeout" end game animation on the node
+		# 		Create a "fadeout" animation on the node
 		#---------------------------------------------------------------
 		fadeOutAnimation: ( node ) ->
 			drawNode = @canvas.game.draw.createDrawParams(node, 'untouched')
@@ -619,7 +619,47 @@ gameDrawerService = ( $rootScope, $log, BOARD, SHAPE, gameUtils ) ->
 						$rootScope.$apply(() =>
 							node.animation = null
 							@clearBoardMargins()
-							@game.endGameAnimation += 1
+							if @game.gameOver
+								@game.endGameAnimation += 1
+							else
+								nodeStyle = @getNodeStyle( node )
+								drawNode = @canvas.game.draw.createDrawParams(node, nodeStyle)
+								# Clear any leftover states from animation
+								@canvas.game.draw.clear( shape )
+								# Draw the node
+								@canvas.game.draw.create( drawNode )
+						)
+				}
+			)
+
+			return
+
+		#	@shakeAnimation
+		#---------------------------------------------------------------
+		shakeAnimation: ( node ) ->
+			return if !node?
+
+			drawNode = @canvas.game.draw.createDrawParams(node, 'untouched')
+			drawNode.animation = {type: 'shake'}
+			drawNode.duration = 300
+
+			@canvas.game.draw.runAnimation(
+				drawNode,
+				{
+					running: ( animation, shape ) =>
+						node.animation =
+							type: 'shake'
+							id: animation
+							clear: shape
+					done: ( shape ) =>
+						$rootScope.$apply(() =>
+							node.animation = null
+							nodeStyle = @getNodeStyle( node )
+							drawNode = @canvas.game.draw.createDrawParams(node, nodeStyle)
+							# Clear any leftover states from animation
+							@canvas.game.draw.clear( shape )
+							# Draw the node
+							@canvas.game.draw.create( drawNode )
 						)
 				}
 			)
