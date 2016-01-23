@@ -194,17 +194,25 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		#	@checkMove
 		# 		Validate that node moved to via touch/mouse is a valid one
 		#-------------------------------------------------------------------
-		checkMove: ( node, pos, opts ) ->
+		checkMove: ( node, pos, opts = {save: true} ) ->
 			# Return if no node has been found
 			return false if !node? || node is false
 
 			# If we have NO other selected nodes this move is automatically valid
 			if @getSelectedNodes.total() == 0
-				@saveNode( node ) if opts?.save
-				return true
+				isValidStart = false
+				$.each(@endNodes, (i, endNode) =>
+					sameColor = node.color is endNode.color
+					sameType = node.type is endNode.type
+					return isValidStart = true if sameColor and sameType
+				)
+				@saveNode( node ) if opts.save and isValidStart
+				return isValidStart
 
-			# Return false if this node is selected and it is not a grandpa node
-			return false if node.selected == true and not @isGrandPaNode( node )
+			# Return true if this node is selected
+			if node.selected == true
+				@saveNode( node ) if opts.save is true
+				return true
 
 			# Validate that move is in the accepted distance to trigger the closest node
 			isValidCanvasX = @validateTouchAxis({type: 'x', nodeCoord: node.coords.x, touchPos: pos.x})
@@ -216,7 +224,7 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			return false if not isValidMove
 
 			# Woot! We've made a valid move
-			@saveNode( node )
+			@saveNode( node ) if opts.save is true
 
 			return isValidMove
 
@@ -247,19 +255,33 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		saveNode: ( node ) ->
 			return if not node?
 
-			# If the current node is the same as the node two moves back
-			# then the player is dragging back to "undo" the connection they
-			# made. We need to pop this node off.
-			if @isGrandPaNode( node )
-				grandparentNode = @selectedNodes[@selectedNodes.length - 2 ]
-				parentNode = @getSelectedNodes.last()
+			if node.selected is true
+				if @selectedNodes.length is 1
+					@board[node.coords.x][node.coords.y].selected = false
+					@removedNodes.push( node )
+					@selectedNodes.pop()
+					return
+				else
+					nodeIdx = @selectedNodes.findIndex(( n, i ) ->
+						return gameUtils.isSameNode( node, n )
+					)
 
-				@board[parentNode.coords.x][parentNode.coords.y].selected = false
+					# Don't remove the current node (only the ones after)
+					nodeIdx += 1
 
-				# parentNode.parent = grandparentNode
-				@removedNodes.push(parentNode)
-				@selectedNodes.pop()
-				return
+
+					selectedCopy = angular.copy( @selectedNodes )
+					removedNodes = selectedCopy.splice(nodeIdx, @selectedNodes.length)
+
+					$.each(removedNodes, (i, n) =>
+						n.selected = false
+						@board[n.coords.x][n.coords.y].selected = false
+						return
+					)
+
+					@removedNodes = @removedNodes.concat( removedNodes )
+					@selectedNodes.splice(nodeIdx, @selectedNodes.length)
+					return
 
 			return if @disableNewConnections
 
@@ -457,12 +479,12 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 
 			@removedNodes = []
 
-		#	onMoveEvent
-		# 		Callback if the user has triggered a mouse/touch move events
+
+		#	onStartEvent
+		# 		Callback if the user has triggered a mouse/touch start events
 		#-------------------------------------------------------------------
-		onMoveEvent: ( e, params ) =>
+		onStartEvent: (e, params) =>
 			_defaults =
-				start: false
 				type: 'touch'
 
 			params = angular.extend({}, _defaults, params)
@@ -477,6 +499,47 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				touch = e
 
 			# Calculate the position of the touch on the canvas
+			canvasOffset = @canvas.game.$el.offset()
+			nodePosition =
+				x: touch.pageX - canvasOffset.left
+				y: touch.pageY - canvasOffset.top
+
+			# Get the node at this position
+			currNode = gameUtils.findNode( @board, nodePosition )
+
+			if currNode
+				isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
+				if isValidNextNode
+					@saveNode(currNode)
+					@justSavedNode = currNode
+					@isValidStart = true
+					@onMoveEvent(e, {start: true, alreadyTouched: true})
+				else
+					assetsService.playSound('badMove')
+
+
+		#	onMoveEvent
+		# 		Callback if the user has triggered a mouse/touch move events
+		#-------------------------------------------------------------------
+		onMoveEvent: (e, params) =>
+			_defaults =
+				start: false
+				type: 'touch'
+				alreadyTouched: false
+				justSavedNode: @justSavedNode
+
+			params = angular.extend({}, _defaults, params)
+
+			return if @gameOver is true
+
+			# Get the touch coords object
+			touch = e
+			if params.type is 'touch'
+				e.preventDefault()
+				if not params.alreadyTouched
+					touch = e.changedTouches[0]
+
+			# Calculate the position of the touch on the canvas
 			canvasOffset = @canvas.game.$el.offset( )
 			nodePosition =
 				x: touch.pageX - canvasOffset.left
@@ -488,7 +551,6 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 			# If a START event was triggered
 			if currNode and params.start
 				@isDragging = true
-
 				# Make sure the player starts dragging from a valid endNode
 				if @getSelectedNodes.total() is 0
 					@isValidStart = false
@@ -502,35 +564,35 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 				else
 					lastTouchedNode = @getSelectedNodes.last()
 					@isValidStart = gameUtils.isSameNode( currNode, lastTouchedNode )
-					# @addedNodes.push( lastTouchedNode ) if @isValidStart
-
 
 			isValidMouse = params.type is 'mouse' and @isDragging
 			isValidTouch = params.type is 'touch'
+
+			if params.justSavedNode?
+				isNewNode = not (gameUtils.isSameNode(currNode, params.justSavedNode))
+			else
+				isNewNode = true
 
 			# Check if we should process the mouse/touch event
 			if (isValidTouch or isValidMouse)
 				if @isValidStart
 					@dragStart = currNode if params.start
-					@checkMove(currNode, nodePosition, {save: true})
+					isValidNextNode = @checkMove(currNode, nodePosition, {save: false})
+					if isValidNextNode and isNewNode
+						@justSavedNode = currNode
+						@saveNode(currNode)
 					@render.trackingLine(@dragStart, nodePosition)
 				else
 					assetsService.playSound('badMove')
+
 
 		#	onEndEvent
 		# 		Callback if the user has triggered a mouse/touch end events
 		#-------------------------------------------------------------------
 		onEndEvent: =>
+			@dragStart = null
 			@isDragging = false
 			return if @gameOver
-
-			# If the user has tried to leave only one node selected
-			# REMOVE it! A node only "counts" when it has a pair
-			if @getSelectedNodes.total() is 1
-				node = @selectedNodes[0]
-				@board[node.coords.x][node.coords.y].selected = false
-				@removedNodes.push( node )
-				@selectedNodes = []
 
 			@render.clearLinesBoard()
 			@render.allDashedLines()
@@ -539,7 +601,10 @@ gameManagerService = ( $log, LEVELS, BOARD, SHAPE, utils, Timer, GameBuilderServ
 		# 		Callback if the user has triggered a touch cancel event
 		#-------------------------------------------------------------------
 		onCancelEvent: =>
+			@dragStart = null
+
 			return if @gameOver
+
 			@removedNodes = []
 			@removedNodes = [].concat( @selectedNodes )
 			@selectedNodes = []

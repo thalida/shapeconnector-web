@@ -88,7 +88,7 @@ angular.module('app').directive 'scGame', [
 
 				# Callback events for the game canvas
 				$scope.gameCanvasEvents =
-					start: events.onMove
+					start: events.onStart
 					move: events.onMove
 					end: events.onEnd
 					cancel: events.onCancel
@@ -156,11 +156,8 @@ angular.module('app').directive 'scGame', [
 			#	Note: Keep $scope.$apply since events are bound outåside of angular
 			#-------------------------------------------------------------------
 			events =
-				onMove: ( e, params ) ->
-					$scope.$apply( =>
-						game.onMoveEvent(e, params)
-						return
-					)
+				onStart: ( e, params ) -> $scope.$apply( => game.onStartEvent(e, params) )
+				onMove: ( e, params ) -> $scope.$apply( => game.onMoveEvent(e, params) )
 				onEnd: -> $scope.$apply( => game.onEndEvent() )
 				onCancel: -> $scope.$apply( => game.onCancelEvent() )
 				onResize: -> positionBoard()
