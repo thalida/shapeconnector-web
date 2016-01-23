@@ -1,0 +1,34 @@
+@import "../../assets/styles/mixins.scss";
+@import "../../assets/styles/colors.scss";
+@import "../../assets/styles/generics.scss";
+
+.selectbox {
+	width: 150px;
+	height: 50px;
+	overflow: hidden;
+	margin: 0 auto;
+
+	background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 96% 0;
+	background-color: rgba(white, 0.5);
+	border: 0;
+	border-radius: $border-radius;
+
+	font: normal normal 14px/1.2 'PT Sans', sans-serif;
+
+	select {
+		width: 160px;
+		height: 50px;
+		padding: 5px 10px;
+		font-size: 16px;
+
+		border: 0;
+		border-radius: 0;
+		text-transform: uppercase;
+		-webkit-appearance: none;
+
+		background: transparent;
+		color: white;
+		font: normal normal 14px/1.2 'PT Sans', sans-serif;
+		line-height: 1;
+	}
+}

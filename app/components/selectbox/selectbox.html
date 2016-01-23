@@ -1,0 +1,7 @@
+<div class="selectbox">
+   <select
+   		ng-model="selectbox.model"
+   		ng-options="key as option.label for (key, option) in selectbox.options"
+   		ng-change="selectbox.onChange( $event, key )">
+   	</select>
+</div>
