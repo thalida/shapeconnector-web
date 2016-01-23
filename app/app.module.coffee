@@ -16,7 +16,6 @@ window.app = angular.module('app', [
 	'app.about'
 	'app.home'
 	'app.play'
-	'app.settings'
 	'app.tutorial'
 
 ])
@@ -36,5 +35,4 @@ require './app.filters.coffee'
 require './views/about'
 require './views/home'
 require './views/play'
-require './views/settings'
 require './views/tutorial'

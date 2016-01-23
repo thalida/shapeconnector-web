@@ -33,13 +33,17 @@
 		</div>
 
 		<div ng-if="::home.showTutorial === false">
+			<selectbox
+				options="home.levels"
+				model="home.selectedLevel"
+				on-change="home.setDifficulity( params )">
+			</selectbox>
 			<div class="btn-container" >
 				<a ng-click="home.onSelectGame('timed')" class="btn type-primary">Timed</a>
 				<a ng-click="home.onSelectGame('freeplay')" class="btn type-secondary">Freeplay</a>
 			</div>
 
 			<div class="secondary-actions">
-				<a class="action btn type-text" ui-sref="settings">Settings</a>
 				<a class="action btn type-text" ui-sref="tutorial({step: 1})">Tutorial</a>
 				<a class="action btn type-text" ui-sref="about">About</a>
 			</div>

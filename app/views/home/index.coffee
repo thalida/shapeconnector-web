@@ -1,6 +1,7 @@
 'use strict'
 
 require '../../components/slideshow'
+require '../../components/selectbox'
 
 require './home.scss'
 require './home.html'
