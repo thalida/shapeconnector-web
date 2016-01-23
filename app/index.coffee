@@ -1,5 +1,7 @@
 'use strict'
 
+require './assets/images/logo-gradient-512.png'
+
 # Import manifest.json for use in index.html file
 manifestJSON = require('./manifest.json')
 

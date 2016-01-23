@@ -64,6 +64,10 @@ var common = {
 			{
 				test: /\.(json)(\?]?.*)?$/,
 				loader: 'file-loader?name=[path][name].[ext]'
+			},
+			{
+				test: require.resolve(APP + '/assets/images/logo-gradient-512.png'),
+				loader: 'file-loader?name=[path][name].[ext]'
 			}
 		]
 	},
