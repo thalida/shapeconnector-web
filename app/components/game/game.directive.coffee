@@ -25,7 +25,6 @@ angular.module('app').directive 'scGame', [
 			attempts: '=?'
 			modalShown: '=?'
 			triggerGamePause: '=?pauseGame'
-			tiggerGameReset: '=?resetGame'
 			onNewGame: '&?'
 			onResetGame: '&?'
 			onQuitGame: '&?'
@@ -230,17 +229,9 @@ angular.module('app').directive 'scGame', [
 
 				)
 
-				stopResetWatcher = watcher.start('tiggerGameReset', ( resetGame, lastState ) ->
-					if $scope.tiggerGameReset is true
-							game.destroy()
-							$scope.actions.resetGame()
-							$scope.tiggerGameReset = false
-
-				)
-
 			# Destroy the Game class on directive $destroy
 			$scope.$on('$destroy', () ->
-				game.destroy()
+				game?.destroy()
 			)
 			return
 ]

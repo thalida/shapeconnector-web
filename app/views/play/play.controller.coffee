@@ -29,13 +29,9 @@ class PlayController
 			$state.go('tutorial', {step: 1, mode: @gameType})
 
 
-		@rebuildGame = true
+		# @rebuildGame = true
 		@pauseGame = false
 		@attempts = 0
-
-		@updateUrlParams = =>
-			$state.transitionTo('play', {game: gameStr, mode: @gameType, difficulty: @difficulty}, { notify: false })
-			return
 
 		@leaveGame = ( params ) ->
 			params.route ?= 'home'
@@ -43,20 +39,12 @@ class PlayController
 			return
 
 		@createNewGame = =>
-			@updateUrlParams()
-			@attempts = 0
-			@gameCopy = null
-			@rebuildGame = true
-			@pauseGame = false
+			$state.transitionTo($state.current, {mode: @gameType, difficulty: @difficulty}, { reload: true, inherit: false, notify: true });
 			return
 
 		@resetGame = =>
-			@rebuildGame = true
-			@pauseGame = false
-			return
-
-		@triggerGameReset = =>
-			@resetGameWhen = true
+			gameStr = gameUtils.convertGameToStr( @gameCopy )
+			$state.transitionTo($state.current, {game: gameStr, mode: @gameType, difficulty: @difficulty}, { reload: true, inherit: true, notify: true });
 			return
 
 		@triggerGamePause = =>
@@ -70,6 +58,22 @@ class PlayController
 			else if params.type == 'close'
 				@modal = 'share'
 				@pauseGame = false
+
+		$scope.$watch(
+			() =>
+				return @gameCopy
+			( newGameCopy ) =>
+				return if !newGameCopy?
+
+				newGameStr = gameUtils.convertGameToStr( newGameCopy )
+
+				return if newGameStr == gameStr
+
+				if !gameStr? || gameStr?.length == 0
+					gameStr = newGameStr
+					$state.transitionTo($state.current, {game: gameStr, mode: @gameType, difficulty: @difficulty}, { location: 'replace', notify: false })
+				return
+		)
 
 		return
 
