@@ -38,7 +38,6 @@
 
 	.btn-container {
 		position: relative;
-
 		.btn {
 			margin: 0 auto 20px;
 		}
@@ -108,6 +107,7 @@
 
 	&.is-onboarding {
 		.btn-container {
+			margin-top: 60px;
 			.btn {
 				background-color: rgba($color-blue-4, 1);
 				&:hover {

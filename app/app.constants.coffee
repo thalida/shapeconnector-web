@@ -125,7 +125,7 @@ module.exports = {
 		}
 		4: {
 			header1: 'Now connect a #{startNode} to a #{endNode} in exactly 3 moves'
-			header2: 'Made a mistake? Drag or click backwards to undo a move!'
+			header2: 'Made a mistake? Drag or click backwards to undo moves!'
 			headerPosition: 'bottom'
 			showGoal: true
 			showMovesLeft: true
