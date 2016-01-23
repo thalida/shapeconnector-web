@@ -1,4 +1,6 @@
 @import "../../assets/styles/mixins";
+@import "../../assets/styles/sprites";
+
 
 .app-header {
 	@include clearfix;
@@ -44,6 +46,21 @@
 		margin-top: 5px;
 	}
 
+	.music-link {
+		@extend %clickable;
+		float: right;
+		&.on .icon {
+			@include cssSprite( $sound-on-white );
+		}
+		&.off .icon {
+			@include cssSprite( $sound-off-white );
+		}
+
+		&:hover {
+			opacity: 0.8;
+		}
+	}
+
 
 	@media (max-height: 600px) {
 		.logomark {
@@ -59,6 +76,25 @@
 
 		.menu {
 			width: 15px;
+		}
+	}
+}
+
+.sounds-modal {
+	text-align: center;
+	padding: 25px 0;
+
+	.noise-toggles {
+		padding-bottom: 20px;
+	}
+
+	&-actions {
+		border-top: 1px solid rgba(black, 0.1);
+		text-align: center;
+		padding: 15px 0;
+
+		.btn {
+			margin: 0 auto;
 		}
 	}
 }

@@ -19,6 +19,8 @@ angular.module('app').directive 'scModal', [
 			name: '@?'
 			showModal: '=?show'
 			style: '@?'
+			forceHeight: '@?height'
+			forceWidth: '@?width'
 			position: '@?' # over-game | center | top
 		controller: ['$scope', '$element', '$transclude', ($scope, $el, $transclude) ->
 			# Trigger the modal minimize action
@@ -102,6 +104,16 @@ angular.module('app').directive 'scModal', [
 						$content.removeClass('size-normal')
 						$content.addClass('size-large')
 
+					if $scope.forceHeight?
+						modalHeight = $scope.forceHeight
+						$content.removeClass('size-large')
+						$content.removeClass('size-normal')
+
+					if $scope.forceWidth?
+						modalWidth = $scope.forceWidth
+					else
+						modalWidth = (BOARD.DIMENSIONS.w - BOARD.MARGIN.left)
+
 					marginTop = switch
 						when $scope.position is 'over-game' then $gameBoard.offset().top
 						when $scope.position is 'top' then 0
@@ -109,7 +121,7 @@ angular.module('app').directive 'scModal', [
 						else $gameBoard.offset().top
 
 					$content.css(
-						width: BOARD.DIMENSIONS.w - BOARD.MARGIN.left
+						width: modalWidth
 						height: modalHeight
 						marginTop: marginTop
 					)
