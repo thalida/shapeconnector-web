@@ -12,7 +12,7 @@ The caveat: you are only allowed to move up, down, left, or right, and to a shap
 
 The game is developed using Angular, and is built by Webpack. All game elements are rendered on HTML5 canvases. In addition, it is written in CoffeeScript and use SCSS for styles. You can play the game offline through ServiceWorkers.
 
-ShapeConnector was designed using Sketch, and if you would like to view the components, they are available here: [ShapeConnector sketch file](https://github.com/thalida/ShapeConnector/blob/master/shapeconnector.sketch).
+ShapeConnector was designed using Sketch, and if you would like to view the comprehensive layout, they are available here: [ShapeConnector sketch file](https://github.com/thalida/ShapeConnector/blob/master/shapeconnector.sketch).
 
 
 ## Future additions
