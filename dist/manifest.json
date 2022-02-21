@@ -1,0 +1,15 @@
+{
+  "short_name": "ShapeConnector",
+  "name": "ShapeConnector",
+  "description": "A simple open source puzzle game.",
+  "display": "standalone",
+  "theme_color": "#252658",
+  "background_color": "#366D8B",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/images/android-192-xxxhpdi.png"
+    }
+  ],
+  "start_url": "index.html?launcher=true"
+}
