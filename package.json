@@ -36,7 +36,7 @@
     "webpack-merge": "0.7.3"
   },
   "dependencies": {
-    "angular": "1.4.7",
+    "angular": "1.8.3",
     "angular-animate": "1.4.7",
     "angular-cookies": "~1.4.0",
     "angular-resource": "~1.4.0",
